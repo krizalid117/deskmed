@@ -9,5 +9,5 @@ class Usuario extends Model implements Authenticatable
 {
     use \Illuminate\Auth\Authenticatable;
 
-
+    protected $table = "usuarios";
 }

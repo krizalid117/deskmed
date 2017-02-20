@@ -10,12 +10,12 @@ function sendPost(__url, __obj, __func, __loadimg) {
             __func(response);
         }
         else {
-            alert('An error has occured');
+            alerta('An error has occured');
         }
     }, 'json')
         .fail(function (res) {
             if (res.status === 422) {
-                var msg = 'Please, fix the following errors before saving changes: <ul>';
+                var msg = 'Por favor, corrija los siguiente errores antes de continuar: <ul>';
 
                 $.each(res.responseJSON, function (key, value) {
                     for (var i = 0; i < value.length; i++) {
@@ -28,7 +28,7 @@ function sendPost(__url, __obj, __func, __loadimg) {
                 alerta(msg);
             }
             else {
-                alerta('An error has occured');
+                alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde.');
             }
         })
         .always(function () {
