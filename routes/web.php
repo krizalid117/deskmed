@@ -12,5 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('index');
+})->name('home')->middleware('auth');
+
+Route::get('/registro', function () {
+    return view('registro');
+})->name('usuario.registro')->middleware('guest');
+
+Route::get('/login', function () {
+    return view('login');
+})->name('usuario.login')->middleware('guest');
