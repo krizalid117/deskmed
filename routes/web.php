@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('index');
 })->name('home')->middleware('auth');
 
-Route::get('/registro', function () {
+Route::get('/register', function () {
     return view('registro');
 })->name('usuario.registro')->middleware('guest');
 

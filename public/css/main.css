@@ -1,3 +1,10 @@
+:root {
+    --normal-background-color: #333;
+    --normal-text-color: #f1f1f1;
+    --secondary-background-color: #f09006;
+    --secondary-text-color: #ffffff;
+}
+
 *
 , html
 , body
@@ -8,6 +15,42 @@
     box-sizing: border-box;
 }
 
+html, body {
+    /*height: 100%;*/
+    background-color: var(--normal-background-color);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--normal-text-color);
+    font-size: 14px;
+}
+
+.panel-deskmed {
+
+}
+
+.panel-deskmed > .panel-heading {
+    color: var(--secondary-text-color);
+    background-color: var(--secondary-background-color);
+    border-color: #ddd;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.panel-deskmed > .panel-body {
+    color: black;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.bolder {
+    font-weight: bolder;
+}
+
 .ui-dialog-titlebar-close {
     display: none;
+}
+
+input, textarea {
+    outline: none;
 }
