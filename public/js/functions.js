@@ -37,7 +37,7 @@ function sendPost(__url, __obj, __func, __loadimg) {
 }
 
 function alerta(msg, title, func) {
-    title = title || "Alert";
+    title = title || "Alerta";
 
     $('<div class="div-alerta">' + msg + '</div>').dialog({
         title: title,
@@ -50,7 +50,7 @@ function alerta(msg, title, func) {
         },
         buttons: [
             {
-                text: "Close",
+                text: "Cerrar",
                 'class': 'btn',
                 click: function () {
                     if (func) {

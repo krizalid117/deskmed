@@ -13,10 +13,10 @@
     <script src="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.min.js') }}"></script>
     <script>
         // Change JQueryUI plugin names to fix name collision with Bootstrap.
-//        $.widget.bridge('uitooltip', $.ui.tooltip);
-//        $.widget.bridge('uibutton', $.ui.button);
+        $.widget.bridge('uitooltip', $.ui.tooltip);
+        $.widget.bridge('uibutton', $.ui.button);
     </script>
-    {{--<script src="{{ URL::to('js/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>--}}
+    <script src="{{ URL::to('js/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
     @yield('local_css')
 </head>

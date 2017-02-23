@@ -49,6 +49,20 @@
             border: 1px solid #337ab7;
             background-color: #f1f1f1;
         }
+
+        .register-container {
+            display: flex !important;
+            width: auto;
+        }
+
+        .register-content {
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .register-content .form-group > label {
+            margin-top: 10px;
+        }
     </style>
 @endsection
 
@@ -61,48 +75,101 @@
                     <div class="panel-heading text-center">
                         ¿Qué tipo de cuenta deseas crear?
                     </div>
-                    <div class="panel-body clearfix">
-                        <p style="text-align: justify;">
-                            En DeskMed puedes ser paciente y profesional de la salud al mismo tiempo, pero necesitamos saber cuáles serás las actividades principales en tu cuenta.<br><br>Por favor, selecciona el tipo de cuenta principal que piensas utilizar:
-                        </p>
+                    <div class="panel-body">
+                        <div class="register-container clearfix">
+                            <div class="register-content reg-count-1">
+                                <p style="text-align: justify;">
+                                    En DeskMed puedes ser paciente y profesional de la salud al mismo tiempo, pero necesitamos saber cuáles serás las actividades principales en tu cuenta.<br><br>Por favor, selecciona el tipo de cuenta principal que piensas utilizar:
+                                </p>
 
-                        <hr>
+                                <hr>
 
-                        <div class="register-option">
-                            <table>
-                                <tr>
-                                    <td style="width: 25%; text-align: center;">
-                                        <img src="{{ url('img/paciente-icon.png') }}" class="register-option-icon">
-                                    </td>
-                                    <td style="padding: 10px;">
-                                        <div class="register-option-title">Deseo crear una cuenta como Paciente</div>
-                                        <p class="register-option-desc hidden-xs">
-                                            Persona natural que busca consultas en línea con profesionales que puedan ayudarle con sus problemas de salud. Se verifica identificación nacional.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                                <div class="register-option" data-tipo="paciente">
+                                    <table>
+                                        <tr>
+                                            <td style="width: 25%; text-align: center;">
+                                                <img src="{{ url('img/paciente-icon.png') }}" class="register-option-icon">
+                                            </td>
+                                            <td style="padding: 10px;">
+                                                <div class="register-option-title">Deseo crear una cuenta como Paciente</div>
+                                                <p class="register-option-desc hidden-xs">
+                                                    Persona natural que busca consultas en línea con profesionales que puedan ayudarle con sus problemas de salud. Se verifica identificación nacional.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <br>
+                                <div class="register-option" data-tipo="doctor">
+                                    <table>
+                                        <tr>
+                                            <td style="width: 25%; text-align: center;">
+                                                &nbsp;&nbsp;&nbsp;<img src="{{ url('img/doctor-icon.png') }}" class="register-option-icon">
+                                            </td>
+                                            <td style="padding: 10px;">
+                                                <div class="register-option-title">Deseo crear una cuenta como Profesional de la salud</div>
+                                                <p class="register-option-desc hidden-xs">
+                                                    Profesional con estudios afines a la salud. Su formación académica y experiencia serán comprobadas antes de que pueda realizar consultas en línea.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div style="display: none;" class="register-content reg-count-2">
+                                <span class="bold">Registro de Pacientes</span>
+                                <form>
+                                    <div class="form-group">
+                                        <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
+                                        <div class="col-xs-12">
+                                            <input type="email" class="form-control" id="paciente-email" placeholder="correo@ejemplo.com">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-nombres" class="control-label col-xs-12">Nombres</label>
+                                        <div class="col-xs-12">
+                                            <input type="text" class="form-control" id="paciente-nombres" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-apellidos" class="control-label col-xs-12">Apellidos</label>
+                                        <div class="col-xs-12">
+                                            <input type="text" class="form-control" id="paciente-apellidos" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-identificador" class="control-label col-xs-12">Identificador</label>
+                                        <div class="col-xs-12">
+                                            <div class="input-group">
+                                                <div class="input-group-btn">
+                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                        <span class="id-tipo-sel-text">RUT</span> <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="#" class="id-tipo id-tipo-selected">RUT</a></li>
+                                                        <li><a href="#" class="id-tipo">Pasaporte</a></li>
+                                                    </ul>
+                                                </div>
+                                                <input type="text" class="form-control" id="paciente-identificador">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <div style="display: none;" class="register-content reg-count-3">
+                                <form>
+                                    <div class="form-group">
+                                        <div class="col-xs-12">
+                                            <input type="email" class="form-control" id="paciente-email">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <br>
-                        <div class="register-option">
-                            <table>
-                                <tr>
-                                    <td style="width: 25%; text-align: center;">
-                                        <img src="{{ url('img/doctor-icon.png') }}" class="register-option-icon">
-                                    </td>
-                                    <td style="padding: 10px;">
-                                        <div class="register-option-title">Deseo crear una cuenta como Profesional de la salud</div>
-                                        <p class="register-option-desc hidden-xs">
-                                            Profesional con estudios afines a la salud. Su formación académica y experiencia serán comprobadas antes de que pueda realizar consultas en línea.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <hr>
-
-                        <button class="btn btn-primary" style="float: right;">Continuar &rightarrow;</button>
+                    </div>
+                    <div class="panel-footer clearfix">
+                        <button id="btn-register-continue" class="btn btn-primary" style="float: right;" data-step="1" disabled>Continuar &rightarrow;</button>
                     </div>
                 </div>
             </div>
@@ -115,6 +182,38 @@
                 $('.register-option-selected').removeClass('register-option-selected');
 
                 $(this).addClass('register-option-selected');
+
+                $('#btn-register-continue').prop('disabled', false);
+            });
+
+            $('#btn-register-continue').click(function () {
+                var $btn = $(this);
+
+                if ($btn.data('step') === 1) {
+                    var selected = $('.register-option-selected');
+
+                    if (selected.length) {
+                        var nextContainer = (selected.data('tipo') === "paciente") ? $('.reg-count-2') : $('.reg-count-3');
+
+                        $('.reg-count-1').toggle("slide", {direction: "left"}, 500);
+                        nextContainer.toggle("slide", {direction: "right"}, 500, function () {
+                            nextContainer.find('input:eq(0)').focus();
+                        });
+
+                        $btn.text('Finalizar Registro');
+                        $btn.data('step', 2);
+                    }
+                    else {
+                        alerta('Por favor, seleccione un tipo de cuenta a crear.', 'Aviso');
+                    }
+                }
+                else { //Finalización de registro
+
+                }
+            });
+
+            $('.id-tipo').click(function () {
+
             });
         });
     </script>

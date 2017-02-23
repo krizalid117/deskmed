@@ -47,6 +47,14 @@ html, body {
     font-weight: bolder;
 }
 
+.esconder {
+    display: none;
+}
+
+.div-alerta {
+    padding: 15px !important;
+}
+
 .ui-dialog-titlebar-close {
     display: none;
 }
