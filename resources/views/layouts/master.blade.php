@@ -18,7 +18,7 @@
     </script>
     <script src="{{ URL::to('js/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>
     <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
-    @yield('local_css')
+    @yield('local_head')
 </head>
 <body>
 

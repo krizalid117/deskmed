@@ -4,7 +4,7 @@
     Deskmed - Registro de cuenta
 @endsection
 
-@section('local_css')
+@section('local_head')
     <style>
         .register-option > table {
             width: 100%;

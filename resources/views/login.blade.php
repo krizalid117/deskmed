@@ -4,7 +4,7 @@
     Deskmed - Inicio de sesión
 @endsection
 
-@section('local_css')
+@section('local_head')
     <style>
         html, body {
             height: 100%;
