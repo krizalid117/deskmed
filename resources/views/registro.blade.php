@@ -63,6 +63,18 @@
         .register-content .form-group > label {
             margin-top: 10px;
         }
+
+        .id-tipo .ui-icon-check {
+            display: none;
+        }
+
+        .id-tipo-selected {
+            background-color: #f1f1f1;
+        }
+
+        .id-tipo-selected .ui-icon-check {
+            display: inline-block;
+        }
     </style>
 @endsection
 
@@ -73,7 +85,7 @@
             <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
                 <div class="panel panel-deskmed">
                     <div class="panel-heading text-center">
-                        ¿Qué tipo de cuenta deseas crear?
+                        <span class="head-registro-text">¿Qué tipo de cuenta deseas crear?</span>
                     </div>
                     <div class="panel-body">
                         <div class="register-container clearfix">
@@ -146,8 +158,18 @@
                                                         <span class="id-tipo-sel-text">RUT</span> <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li><a href="#" class="id-tipo id-tipo-selected">RUT</a></li>
-                                                        <li><a href="#" class="id-tipo">Pasaporte</a></li>
+                                                        <li>
+                                                            <a href="#" class="id-tipo id-tipo-selected" data-tipo="rut">
+                                                                <span class="id-tipo-text">RUT</span>
+                                                                <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#" class="id-tipo" data-tipo="pasaporte">
+                                                                <span class="id-tipo-text">Pasaporte</span>
+                                                                <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                                 <input type="text" class="form-control" id="paciente-identificador">
@@ -186,6 +208,7 @@
                 $('#btn-register-continue').prop('disabled', false);
             });
 
+            //Se selecciona un tipo de cuenta
             $('#btn-register-continue').click(function () {
                 var $btn = $(this);
 
@@ -202,6 +225,8 @@
 
                         $btn.text('Finalizar Registro');
                         $btn.data('step', 2);
+
+                        $('.head-registro-text').text('Formulario de registro')
                     }
                     else {
                         alerta('Por favor, seleccione un tipo de cuenta a crear.', 'Aviso');
@@ -213,7 +238,15 @@
             });
 
             $('.id-tipo').click(function () {
+                var $this = $(this);
 
+                $('.id-tipo-selected').removeClass('id-tipo-selected');
+
+                $this.addClass('id-tipo-selected');
+
+                $('.id-tipo-sel-text').text($this.find('.id-tipo-text').text());
+
+                $('#paciente-identificador').data('tipo', $this.data('tipo'));
             });
         });
     </script>

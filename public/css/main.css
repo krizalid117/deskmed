@@ -62,3 +62,19 @@ html, body {
 input, textarea {
     outline: none;
 }
+
+.flex-center-all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-center-vert {
+    display: flex;
+    align-items: center;
+}
+
+.flex-center-hor {
+    display: flex;
+    justify-content: center;
+}
