@@ -64,21 +64,36 @@
             margin-top: 10px;
         }
 
-        .id-tipo .ui-icon-check {
+        .id-tipo-paciente .ui-icon-check,
+        .id-tipo-doctor .ui-icon-check,
+        .especialidad .ui-icon-check {
             display: none;
         }
 
-        .id-tipo-selected {
+        .id-tipo-doctor-selected,
+        .id-tipo-paciente-selected,
+        .especialidad-selected {
             background-color: #f1f1f1;
         }
 
-        .id-tipo-selected .ui-icon-check {
+        .id-tipo-doctor-selected .ui-icon-check,
+        .id-tipo-paciente-selected .ui-icon-check,
+        .especialidad-selected .ui-icon-check {
             display: inline-block;
         }
     </style>
 @endsection
 
 @section('content')
+
+    <?php
+            use App\TiposIdentificador;
+            use App\EspecialidadesMedicas;
+
+            $identificadores = TiposIdentificador::pluck('nombre', 'id');
+
+            $especialidades = EspecialidadesMedicas::pluck('nombre', 'id');
+    ?>
 
     <div class="container" style="padding-top: 30px;">
         <div class="row">
@@ -155,21 +170,24 @@
                                             <div class="input-group">
                                                 <div class="input-group-btn">
                                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="id-tipo-sel-text">RUT</span> <span class="caret"></span>
+                                                        <span class="id-tipo-paciente-sel-text">{{ $identificadores[1] }}</span> <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li>
-                                                            <a href="#" class="id-tipo id-tipo-selected" data-tipo="rut">
-                                                                <span class="id-tipo-text">RUT</span>
-                                                                <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#" class="id-tipo" data-tipo="pasaporte">
-                                                                <span class="id-tipo-text">Pasaporte</span>
-                                                                <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
-                                                            </a>
-                                                        </li>
+                                                        <?php
+                                                            $count = 0;
+
+                                                            foreach ($identificadores as $id => $identificador) {
+                                                        ?>
+                                                            <li>
+                                                                <a href="#" class="id-tipo-paciente <?php echo ($count === 0 ? "id-tipo-paciente-selected" : ""); ?>" data-tipo="{{ $id }}">
+                                                                    <span class="id-tipo-text">{{ $identificador }}</span>
+                                                                    <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                                </a>
+                                                            </li>
+                                                        <?php
+                                                                $count++;
+                                                            }
+                                                        ?>
                                                     </ul>
                                                 </div>
                                                 <input type="text" class="form-control" id="paciente-identificador">
@@ -182,8 +200,77 @@
                             <div style="display: none;" class="register-content reg-count-3">
                                 <form>
                                     <div class="form-group">
+                                        <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
                                         <div class="col-xs-12">
-                                            <input type="email" class="form-control" id="paciente-email">
+                                            <input type="email" class="form-control" id="doctor-email" placeholder="correo@ejemplo.com">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-nombres" class="control-label col-xs-12">Nombres</label>
+                                        <div class="col-xs-12">
+                                            <input type="text" class="form-control" id="doctor-nombres" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-apellidos" class="control-label col-xs-12">Apellidos</label>
+                                        <div class="col-xs-12">
+                                            <input type="text" class="form-control" id="doctor-apellidos" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="doctor-identificador" class="control-label col-xs-12">Identificador</label>
+                                        <div class="col-xs-12">
+                                            <div class="input-group">
+                                                <div class="input-group-btn">
+                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                        <span class="id-tipo-doctor-sel-text">{{ $identificadores[1] }}</span> <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <?php
+                                                            $count = 0;
+
+                                                            foreach ($identificadores as $id => $identificador) {
+                                                        ?>
+                                                            <li>
+                                                                <a href="#" class="id-tipo-doctor <?php echo ($count === 0 ? "id-tipo-doctor-selected" : ""); ?>" data-tipo="{{ $id }}">
+                                                                    <span class="id-tipo-text">{{ $identificador }}</span>
+                                                                    <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                                </a>
+                                                            </li>
+                                                        <?php
+                                                                $count++;
+                                                            }
+                                                        ?>
+                                                    </ul>
+                                                </div>
+                                                <input type="text" class="form-control" id="paciente-identificador">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="paciente-nombres" class="control-label col-xs-12">Especialidad</label>
+                                        <div class="dropdown col-xs-12">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dd-esp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width: 100%; text-align: left; position: relative;" data-tipo="1">
+                                                <span id="especialidad-sel-text">{{ $especialidades[1] }}</span>
+                                                <span class="caret" style="position: absolute; right: 8px; top: 15px;"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dd-esp" style="max-height: 200px; overflow-y: auto; top: 94%; left: 14px; width: 94.5%;">
+                                                <?php
+                                                    $count = 0;
+
+                                                    foreach ($especialidades as $id => $especialidad) {
+                                                ?>
+                                                    <li>
+                                                        <a href="#" class="especialidad <?php echo ($count === 0 ? "especialidad-selected" : ""); ?>" data-tipo="{{ $id }}">
+                                                            <span class="especialidad-text">{{ $especialidad }}</span>
+                                                            <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                        </a>
+                                                    </li>
+                                                <?php
+                                                        $count++;
+                                                    }
+                                                ?>
+                                            </ul>
                                         </div>
                                     </div>
                                 </form>
@@ -239,16 +326,40 @@
                 }
             });
 
-            $('.id-tipo').click(function () {
+            $('.id-tipo-paciente').click(function () {
                 var $this = $(this);
 
-                $('.id-tipo-selected').removeClass('id-tipo-selected');
+                $('.id-tipo-paciente-selected').removeClass('id-tipo-paciente-selected');
 
-                $this.addClass('id-tipo-selected');
+                $this.addClass('id-tipo-paciente-selected');
 
-                $('.id-tipo-sel-text').text($this.find('.id-tipo-text').text());
+                $('.id-tipo-paciente-sel-text').text($this.find('.id-tipo-text').text());
 
                 $('#paciente-identificador').data('tipo', $this.data('tipo'));
+            });
+
+            $('.id-tipo-doctor').click(function () {
+                var $this = $(this);
+
+                $('.id-tipo-doctor-selected').removeClass('id-tipo-doctor-selected');
+
+                $this.addClass('id-tipo-doctor-selected');
+
+                $('.id-tipo-doctor-sel-text').text($this.find('.id-tipo-text').text());
+
+                $('#doctor-identificador').data('tipo', $this.data('tipo'));
+            });
+
+            $('.especialidad').click(function () {
+                var $this = $(this);
+
+                $('.especialidad-selected').removeClass('especialidad-selected');
+
+                $this.addClass('especialidad-selected');
+
+                $('#especialidad-sel-text').text($this.find('.especialidad-text').text());
+
+                $('#dd-esp').data('tipo', $this.data('tipo'));
             });
         });
     </script>
