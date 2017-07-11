@@ -11,14 +11,20 @@
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-})->name('home')->middleware('auth');
+//Grupo con middleware "guest", para páginas antes sin sesión iniciada
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/register', function () {
+        return view('registro');
+    })->name('usuario.registro');
 
-Route::get('/register', function () {
-    return view('registro');
-})->name('usuario.registro')->middleware('guest');
+    Route::get('/login', function () {
+        return view('login');
+    })->name('usuario.login');
+});
 
-Route::get('/login', function () {
-    return view('login');
-})->name('usuario.login')->middleware('guest');
+//Grupo con middleware "auth", para páginas que requieran sesión iniciada
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/', function () {
+        return view('index');
+    })->name('home')->middleware('auth');
+});

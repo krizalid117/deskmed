@@ -129,7 +129,7 @@
                                 </div>
                             </div>
                             <div style="display: none;" class="register-content reg-count-2">
-                                <span class="bold">Registro de Pacientes</span>
+                                {{--<span class="bold">Registro de Pacientes</span>--}}
                                 <form>
                                     <div class="form-group">
                                         <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
@@ -216,17 +216,19 @@
                     var selected = $('.register-option-selected');
 
                     if (selected.length) {
-                        var nextContainer = (selected.data('tipo') === "paciente") ? $('.reg-count-2') : $('.reg-count-3');
+                        var esPaciente = (selected.data('tipo') === "paciente"),
+                            nextContainer = esPaciente ? $('.reg-count-2') : $('.reg-count-3');
 
-                        $('.reg-count-1').toggle("slide", {direction: "left"}, 500);
-                        nextContainer.toggle("slide", {direction: "right"}, 500, function () {
+                        $('.reg-count-1').toggle("slide", { direction: "left" }, 500);
+
+                        nextContainer.toggle("slide", { direction: "right" }, 500, function () {
                             nextContainer.find('input:eq(0)').focus();
                         });
 
                         $btn.text('Finalizar Registro');
                         $btn.data('step', 2);
 
-                        $('.head-registro-text').text('Formulario de registro')
+                        $('.head-registro-text').text('Formulario de registro de ' + (esPaciente ? "pacientes" : "doctores"));
                     }
                     else {
                         alerta('Por favor, seleccione un tipo de cuenta a crear.', 'Aviso');
