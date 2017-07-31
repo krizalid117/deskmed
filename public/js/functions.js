@@ -1,65 +1,73 @@
-function sendPost(__url, __obj, __func, __loadimg) {
-    __loadimg = __loadimg || 'img/loading.gif';
+function sendPost(__url, __opt, __func, __loadimg) {
+    mensajes.loading_open(__loadimg);
 
-    $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: black; opacity: .6; z-index: 1000;">' +
-        '<img src="' + __loadimg + '" style="width: 100px; height: 100px; user-select: none; -webkit-user-select: none; -moz-user-select: none;">' +
-    '</div>');
-
-    $.post(__url, __obj, function (response) {
+    $.post(__url, __opt, function (response) {
         if (!response.error) {
             __func(response);
         }
         else {
-            alerta('An error has occured');
+            mensajes.alerta('Hubo un error. Por favor, intente de nuevo más tarde.');
         }
     }, 'json')
         .fail(function (res) {
             if (res.status === 422) {
-                var msg = 'Por favor, corrija los siguiente errores antes de continuar: <ul>';
+                var msg = 'Por favor, corrija los siguiente errores antes de continuar: <ul class="post-error-list">';
 
                 $.each(res.responseJSON, function (key, value) {
                     for (var i = 0; i < value.length; i++) {
-                        msg += '<li>' + value[i] + '</li>';
+                        msg += '<li class="post-error-item">' + value[i] + '</li>';
                     }
                 });
 
                 msg += '</ul>';
 
-                alerta(msg);
+                mensajes.alerta(msg);
             }
             else {
-                alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde.');
+                mensajes.alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde.');
             }
         })
         .always(function () {
-            $('#loading-div').remove();
+            mensajes.loading_close();
         });
 }
 
-function alerta(msg, title, func) {
-    title = title || "Alerta";
+var mensajes = {
+    alerta: function (msg, title, func) {
+        title = title || "Alerta";
 
-    $('<div class="div-alerta">' + msg + '</div>').dialog({
-        title: title,
-        width: 350,
-        resizable: false,
-        modal: true,
-        autoOpen: true,
-        close: function () {
-            $(this).dialog('destroy').remove();
-        },
-        buttons: [
-            {
-                text: "Cerrar",
-                'class': 'btn',
-                click: function () {
-                    if (func) {
-                        func();
+        $('<div class="div-alerta">' + msg + '</div>').dialog({
+            title: title,
+            width: 350,
+            resizable: false,
+            modal: true,
+            autoOpen: true,
+            close: function () {
+                $(this).dialog('destroy').remove();
+            },
+            buttons: [
+                {
+                    text: "Aceptar",
+                    'class': 'btn-aceptar-alerta-default',
+                    click: function () {
+                        if (func) {
+                            func();
+                        }
+
+                        $(this).dialog('close');
                     }
-
-                    $(this).dialog('close');
                 }
-            }
-        ]
-    });
-}
+            ]
+        });
+    },
+    loading_open: function (__loadimg) {
+        __loadimg = __loadimg || 'img/loading.gif';
+
+        $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: black; opacity: .6; z-index: 1000;">' +
+            '<img src="' + __loadimg + '" style="width: 100px; height: 100px; user-select: none; -webkit-user-select: none; -moz-user-select: none;">' +
+            '</div>');
+    },
+    loading_close: function () {
+        $('#loading-div').remove();
+    }
+};

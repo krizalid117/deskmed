@@ -8,9 +8,12 @@
     <link rel="stylesheet" href="{{ URL::to('js/bootstrap-3.3.7/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('css/main.css') }}?_<?php echo time(); ?>">
+    <link rel="stylesheet" href="{{ URL::to('js/select2-4.0.3/dist/css/select2.min.css') }}?_<?php echo time(); ?>">
 
     <script src="{{ URL::to('js/jquery-3.1.1.js') }}"></script>
     <script src="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.min.js') }}"></script>
+    <script src="{{ URL::to('js/select2-4.0.3/dist/js/select2.min.js') }}"></script>
+    <script src="{{ URL::to('js/select2-4.0.3/dist/js/i18n/es.js') }}"></script>
     <script>
         // Change JQueryUI plugin names to fix name collision with Bootstrap.
         $.widget.bridge('uitooltip', $.ui.tooltip);

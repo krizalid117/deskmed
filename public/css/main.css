@@ -23,6 +23,11 @@ html, body {
     font-size: 14px;
 }
 
+.select2-results__option
+, .select2-search__field {
+    color: #000;
+}
+
 .panel-deskmed {
 
 }

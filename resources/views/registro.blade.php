@@ -88,11 +88,14 @@
 
     <?php
             use App\TiposIdentificador;
-            use App\EspecialidadesMedicas;
+            use Illuminate\Support\Facades\DB;
+            use Illuminate\Support\Facades\Session;
 
             $identificadores = TiposIdentificador::pluck('nombre', 'id');
 
-            $especialidades = EspecialidadesMedicas::pluck('nombre', 'id');
+//            $especialidades = EspecialidadesMedicas::all();
+
+            $especialidades = DB::table('especialidades_medicas')->select('id', 'nombre as text')->get();
     ?>
 
     <div class="container" style="padding-top: 30px;">
@@ -243,34 +246,14 @@
                                                         ?>
                                                     </ul>
                                                 </div>
-                                                <input type="text" class="form-control" id="paciente-identificador">
+                                                <input type="text" class="form-control" id="doctor-identificador">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="paciente-nombres" class="control-label col-xs-12">Especialidad</label>
-                                        <div class="dropdown col-xs-12">
-                                            <button class="btn btn-default dropdown-toggle" type="button" id="dd-esp" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width: 100%; text-align: left; position: relative;" data-tipo="1">
-                                                <span id="especialidad-sel-text">{{ $especialidades[1] }}</span>
-                                                <span class="caret" style="position: absolute; right: 8px; top: 15px;"></span>
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dd-esp" style="max-height: 200px; overflow-y: auto; top: 94%; left: 14px; width: 94.5%;">
-                                                <?php
-                                                    $count = 0;
-
-                                                    foreach ($especialidades as $id => $especialidad) {
-                                                ?>
-                                                    <li>
-                                                        <a href="#" class="especialidad <?php echo ($count === 0 ? "especialidad-selected" : ""); ?>" data-tipo="{{ $id }}">
-                                                            <span class="especialidad-text">{{ $especialidad }}</span>
-                                                            <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
-                                                        </a>
-                                                    </li>
-                                                <?php
-                                                        $count++;
-                                                    }
-                                                ?>
-                                            </ul>
+                                        <label for="doctor-esp" class="control-label col-xs-12">Especialidad</label>
+                                        <div class="col-xs-12">
+                                            <select id="doctor-esp" style="width: 100%;"></select>
                                         </div>
                                     </div>
                                 </form>
@@ -287,6 +270,11 @@
 
     <script type="text/javascript">
         $(function () {
+            $('#doctor-esp').select2({
+                data: eval(<?php echo json_encode($especialidades); ?>),
+                language: "es"
+            });
+
             $('.register-option').not('.register-option-selected').click(function () {
                 $('.register-option-selected').removeClass('register-option-selected');
 
@@ -297,14 +285,14 @@
 
             //Se selecciona un tipo de cuenta
             $('#btn-register-continue').click(function () {
-                var $btn = $(this);
+                var $btn = $(this),
+                    selected = $('.register-option-selected'),
+                    esPaciente = (selected.data('tipo') === "paciente");
 
                 if ($btn.data('step') === 1) {
-                    var selected = $('.register-option-selected');
 
                     if (selected.length) {
-                        var esPaciente = (selected.data('tipo') === "paciente"),
-                            nextContainer = esPaciente ? $('.reg-count-2') : $('.reg-count-3');
+                        var nextContainer = esPaciente ? $('.reg-count-2') : $('.reg-count-3');
 
                         $('.reg-count-1').toggle("slide", { direction: "left" }, 500);
 
@@ -318,11 +306,24 @@
                         $('.head-registro-text').text('Formulario de registro de ' + (esPaciente ? "pacientes" : "doctores"));
                     }
                     else {
-                        alerta('Por favor, seleccione un tipo de cuenta a crear.', 'Aviso');
+                        mensajes.alerta('Por favor, seleccione un tipo de cuenta a crear.', 'Aviso');
                     }
                 }
                 else { //Finalización de registro
+                    var datos = {
+                        _token: '{{ csrf_token() }}',
+                        tipo: esPaciente ? 1 : 2,
+                        email: esPaciente ? $('#paciente-email').val() : $('#doctor-email').val(),
+                        nombres: esPaciente ? $('#paciente-nombres').val() : $('#doctor-nombres').val(),
+                        apellidos: esPaciente ? $('#paciente-apellidos').val() : $('#doctor-apellidos').val(),
+                        identificador: esPaciente ? $('#paciente-identificador').val() : $('#doctor-identificador').val(),
+                        tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
+                        especialidad: esPaciente ? null : $('#doctor-esp').val()
+                    };
 
+                    sendPost('{{ route('usuario.create') }}', datos, function () {
+                        alert('registrado!');
+                    });
                 }
             });
 
@@ -348,18 +349,6 @@
                 $('.id-tipo-doctor-sel-text').text($this.find('.id-tipo-text').text());
 
                 $('#doctor-identificador').data('tipo', $this.data('tipo'));
-            });
-
-            $('.especialidad').click(function () {
-                var $this = $(this);
-
-                $('.especialidad-selected').removeClass('especialidad-selected');
-
-                $this.addClass('especialidad-selected');
-
-                $('#especialidad-sel-text').text($this.find('.especialidad-text').text());
-
-                $('#dd-esp').data('tipo', $this.data('tipo'));
             });
         });
     </script>

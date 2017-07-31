@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\CanResetPassword;
 
 class Usuario extends Model implements Authenticatable
 {

@@ -13,13 +13,14 @@
 
 //Grupo con middleware "guest", para páginas antes sin sesión iniciada
 Route::group(['middleware' => 'guest'], function () {
-    Route::get('/register', function () {
-        return view('registro');
-    })->name('usuario.registro');
 
     Route::get('/login', function () {
         return view('login');
     })->name('usuario.login');
+
+    Route::get('/register', 'UsuarioController@register')->name('usuario.registro');
+
+    Route::post('/register', 'UsuarioController@create')->name('usuario.create');
 });
 
 //Grupo con middleware "auth", para páginas que requieran sesión iniciada
