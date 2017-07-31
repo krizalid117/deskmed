@@ -156,6 +156,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label for="paciente-password" class="control-label col-xs-12">Contraseña</label>
+                                        <div class="col-xs-12">
+                                            <input type="password" class="form-control" id="paciente-password" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="paciente-nombres" class="control-label col-xs-12">Nombres</label>
                                         <div class="col-xs-12">
                                             <input type="text" class="form-control" id="paciente-nombres" placeholder="">
@@ -206,6 +212,12 @@
                                         <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
                                         <div class="col-xs-12">
                                             <input type="email" class="form-control" id="doctor-email" placeholder="correo@ejemplo.com">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="doctor-password" class="control-label col-xs-12">Contraseña</label>
+                                        <div class="col-xs-12">
+                                            <input type="password" class="form-control" id="doctor-password" placeholder="">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -318,7 +330,8 @@
                         apellidos: esPaciente ? $('#paciente-apellidos').val() : $('#doctor-apellidos').val(),
                         identificador: esPaciente ? $('#paciente-identificador').val() : $('#doctor-identificador').val(),
                         tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
-                        especialidad: esPaciente ? null : $('#doctor-esp').val()
+                        especialidad: esPaciente ? null : $('#doctor-esp').val(),
+                        password: esPaciente ? $('#paciente-password').val() : $('#doctor-password').val()
                     };
 
                     sendPost('{{ route('usuario.create') }}', datos, function () {

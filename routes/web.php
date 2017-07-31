@@ -11,6 +11,8 @@
 |
 */
 
+Auth::routes();
+
 //Grupo con middleware "guest", para páginas antes sin sesión iniciada
 Route::group(['middleware' => 'guest'], function () {
 
@@ -29,3 +31,5 @@ Route::group(['middleware' => 'auth'], function () {
         return view('index');
     })->name('home')->middleware('auth');
 });
+
+//Route::get('/home', 'HomeController@index');

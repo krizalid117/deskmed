@@ -15,12 +15,19 @@ class CreateUsuariosTable extends Migration
     {
         Schema::create('usuarios', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('identificador', 50);
             $table->string('nombres', 100)->default('');
             $table->string('apellidos', 100)->default('');
             $table->string('email', 100);
             $table->string('password');
-            $table->date('fecha_nacimiento');
+            $table->date('fecha_nacimiento')->nullable();
+            $table->integer('id_tipo_usuario');
+            $table->integer('id_tipo_identificador');
             $table->timestamps();
+
+            $table->foreign('id_tipo_usuario')->references('id')->on('tipos_usuario')->onDelete('set null');
+            $table->foreign('id_tipo_identificador')->references('id')->on('tipos_identificador')->onDelete('restrict');
+            $table->unique(['id_tipo_identificador', 'identificador']);
         });
     }
 
