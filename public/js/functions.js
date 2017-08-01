@@ -6,12 +6,14 @@ function sendPost(__url, __opt, __func, __loadimg) {
             __func(response);
         }
         else {
-            mensajes.alerta('Hubo un error. Por favor, intente de nuevo más tarde.');
+            var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
+
+            mensajes.alerta(errorMsj);
         }
     }, 'json')
         .fail(function (res) {
             if (res.status === 422) {
-                var msg = 'Por favor, corrija los siguiente errores antes de continuar: <ul class="post-error-list">';
+                var msg = 'Por favor, corrija los siguiente errores antes de continuar: <ul class="post-error-list" style="padding-left: 30px;">';
 
                 $.each(res.responseJSON, function (key, value) {
                     for (var i = 0; i < value.length; i++) {
@@ -45,10 +47,11 @@ var mensajes = {
             close: function () {
                 $(this).dialog('destroy').remove();
             },
+            closeOnEscape: false,
             buttons: [
                 {
                     text: "Aceptar",
-                    'class': 'btn-aceptar-alerta-default',
+                    'class': 'btn btn-primary',
                     click: function () {
                         if (func) {
                             func();

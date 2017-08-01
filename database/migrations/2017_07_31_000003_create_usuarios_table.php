@@ -21,8 +21,9 @@ class CreateUsuariosTable extends Migration
             $table->string('email', 100);
             $table->string('password');
             $table->date('fecha_nacimiento')->nullable();
-            $table->integer('id_tipo_usuario');
+            $table->integer('id_tipo_usuario')->nullable();
             $table->integer('id_tipo_identificador');
+            $table->rememberToken();
             $table->timestamps();
 
             $table->foreign('id_tipo_usuario')->references('id')->on('tipos_usuario')->onDelete('set null');
@@ -38,6 +39,7 @@ class CreateUsuariosTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('usuarios_especialidades');
         Schema::dropIfExists('usuarios');
     }
 }

@@ -8,5 +8,7 @@ class TiposIdentificador extends Model
 {
     protected $table = "tipos_identificador";
 
-
+    public function usuarios() {
+        return $this->hasMany('App\Usuario');
+    }
 }

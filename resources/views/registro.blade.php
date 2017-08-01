@@ -329,13 +329,13 @@
                         nombres: esPaciente ? $('#paciente-nombres').val() : $('#doctor-nombres').val(),
                         apellidos: esPaciente ? $('#paciente-apellidos').val() : $('#doctor-apellidos').val(),
                         identificador: esPaciente ? $('#paciente-identificador').val() : $('#doctor-identificador').val(),
-                        tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
+                        id_tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
                         especialidad: esPaciente ? null : $('#doctor-esp').val(),
                         password: esPaciente ? $('#paciente-password').val() : $('#doctor-password').val()
                     };
 
                     sendPost('{{ route('usuario.create') }}', datos, function () {
-                        alert('registrado!');
+                        window.location.href = '{{ route('home') }}';
                     });
                 }
             });

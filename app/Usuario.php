@@ -11,4 +11,20 @@ class Usuario extends Model implements Authenticatable
     use \Illuminate\Auth\Authenticatable;
 
     protected $table = "usuarios";
+
+    public function tipo_usuario() {
+        return $this->belongsTo('App\tiposUsuario', 'id_tipo_usuario');
+    }
+
+    public function tipo_identificador() {
+        return $this->belongsTo('App\TiposIdentificador', 'id_tipo_identificador');
+    }
+
+    public function especialidades() {
+        return $this->belongsToMany('App\EspecialidadesMedicas', 'usuarios_especialidades', 'usuario_id', 'especialidad_id');
+    }
+
+    public static function downRut($rut) {
+        return str_replace(['.', '-'], ['', ''], $rut);
+    }
 }

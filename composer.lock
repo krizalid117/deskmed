@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0f16dd5962473d78e3e9796af8f6abbc",
-    "content-hash": "a3081d7d0e8761880e4c85bfc622e732",
+    "hash": "ca22c1d5c571a9d05e36e90d675ab98a",
+    "content-hash": "c6d05352bfc89623d146564151e7a7a7",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -563,6 +563,52 @@
                 "parser"
             ],
             "time": "2014-09-09 13:34:57"
+        },
+        {
+            "name": "felixkiss/uniquewith-validator",
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/felixkiss/uniquewith-validator.git",
+                "reference": "d899ef30071c8522fdb55b19b8593cf040e53c88"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/felixkiss/uniquewith-validator/zipball/d899ef30071c8522fdb55b19b8593cf040e53c88",
+                "reference": "d899ef30071c8522fdb55b19b8593cf040e53c88",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.*",
+                "illuminate/validation": "5.*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "bossa/phpspec2-expect": "dev-phpspec-3.2",
+                "phpspec/phpspec": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Felixkiss\\UniqueWithValidator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Felix Kiss",
+                    "email": "felix@felixkiss.com"
+                }
+            ],
+            "description": "Custom Laravel Validator for combined unique indexes",
+            "homepage": "https://github.com/felixkiss/uniquewith-validator",
+            "keywords": [
+                "laravel"
+            ],
+            "time": "2017-05-12 15:57:09"
         },
         {
             "name": "jakub-onderka/php-console-color",
