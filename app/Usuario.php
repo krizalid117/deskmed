@@ -23,8 +23,4 @@ class Usuario extends Model implements Authenticatable
     public function especialidades() {
         return $this->belongsToMany('App\EspecialidadesMedicas', 'usuarios_especialidades', 'usuario_id', 'especialidad_id');
     }
-
-    public static function downRut($rut) {
-        return str_replace(['.', '-'], ['', ''], $rut);
-    }
 }

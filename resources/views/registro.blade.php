@@ -199,7 +199,7 @@
                                                         ?>
                                                     </ul>
                                                 </div>
-                                                <input type="text" class="form-control" id="paciente-identificador">
+                                                <input type="text" class="form-control inp-id" id="paciente-identificador" data-tipo="1">
                                             </div>
                                         </div>
                                     </div>
@@ -258,7 +258,7 @@
                                                         ?>
                                                     </ul>
                                                 </div>
-                                                <input type="text" class="form-control" id="doctor-identificador">
+                                                <input type="text" class="form-control inp-id" id="doctor-identificador" data-tipo="1">
                                             </div>
                                         </div>
                                     </div>
@@ -285,6 +285,10 @@
             $('#doctor-esp').select2({
                 data: eval(<?php echo json_encode($especialidades); ?>),
                 language: "es"
+            });
+
+            $('.inp-id').RutValidation(function () {
+                return parseInt($(this).data('tipo')) === 1; //Hará la validación sólo si el data "tipo" es 1 (tipo de identificador rut).
             });
 
             $('.register-option').not('.register-option-selected').click(function () {
@@ -349,7 +353,7 @@
 
                 $('.id-tipo-paciente-sel-text').text($this.find('.id-tipo-text').text());
 
-                $('#paciente-identificador').data('tipo', $this.data('tipo'));
+                $('#paciente-identificador').data('tipo', $this.data('tipo')).blur();
             });
 
             $('.id-tipo-doctor').click(function () {
@@ -361,7 +365,7 @@
 
                 $('.id-tipo-doctor-sel-text').text($this.find('.id-tipo-text').text());
 
-                $('#doctor-identificador').data('tipo', $this.data('tipo'));
+                $('#doctor-identificador').data('tipo', $this.data('tipo')).blur();
             });
         });
     </script>

@@ -42,13 +42,13 @@ class UsuarioController extends Controller
             'password' => 'Contraseña',
         ]);
 
-        $data = [
+        $datos = [
             'error' => false
         ];
 
         $usuario = new Usuario();
 
-        $usuario->identificador = $request['id_tipo_identificador'] === "1" ? Usuario::downRut($request['identificador']) : $request['identificador'];
+        $usuario->identificador = $request['id_tipo_identificador'] === "1" ? UsuarioController::downRut($request['identificador']) : $request['identificador'];
         $usuario->nombres = $request['nombres'];
         $usuario->apellidos = $request['apellidos'];
         $usuario->email = $request['email'];
@@ -58,8 +58,6 @@ class UsuarioController extends Controller
         $usuario->id_tipo_identificador = $request['id_tipo_identificador'];
 
         $nUsuariosMismoIdTipoId = DB::table('usuarios')->where('identificador', '=', $usuario->identificador)->where('id_tipo_identificador', '=', $usuario->id_tipo_identificador)->count();
-
-//        dd($nUsuariosMismoIdTipoId);
 
         //Si no existe otro usuario con el mismo identificador y tipo de identificador...
         if (intval($nUsuariosMismoIdTipoId) === 0) {
@@ -76,16 +74,26 @@ class UsuarioController extends Controller
             }
         }
         else {
+            $ident = $usuario->id_tipo_identificador === "1" ? UsuarioController::upRut($usuario->identificador) : $usuario->identificador;
+
             $datos['error'] = true;
-            $datos['mensaje'] = "Ya existe un usuario con identificador \"$usuario->identificador\" para el tipo de identificación seleccionada.";
+            $datos['mensaje'] = 'Ya existe un usuario con identificador "' . $ident . '" para el tipo de identificación seleccionada.';
         }
 
-        return response()->json($data);
+        return response()->json($datos);
     }
 
     public function logout() {
         Auth::logout();
 
         return redirect()->route('usuario.login');
+    }
+
+    public static function downRut($rut) {
+        return ltrim(str_replace(['.', '-'], ['', ''], $rut), '0');
+    }
+
+    public static function upRut($rut) {
+        return number_format(substr($rut, 0, -1), 0, "", ".") . '-' . substr($rut, strlen($rut) - 1, 1);
     }
 }
