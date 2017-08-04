@@ -83,6 +83,24 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    public function signIn(Request $request) {
+        $this->validate($request, [
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        $datos = [
+            "error" => false,
+            "logged_in" => false,
+        ];
+
+        if (Auth::attempt(['email' => $request['email'], 'password' => bcrypt($request['password'])])) {
+            $datos["logged_in"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
     public function logout() {
         Auth::logout();
 

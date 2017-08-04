@@ -74,6 +74,23 @@
             font-size: 16px;
             padding: 5px 12px;
         }
+
+        .spn-msg {
+            display: none;
+            position: absolute;
+            color: red;
+            left: 0;
+            text-align: left;
+            width: 260px;
+        }
+
+        .login-input {
+            -webkit-transition: border-color 300ms;
+            -moz-transition: border-color 300ms;
+            -ms-transition: border-color 300ms;
+            -o-transition: border-color 300ms;
+            transition: border-color 300ms;
+        }
     </style>
 @endsection
 
@@ -89,16 +106,20 @@
                         <div class="panel-body">
                             <br>
                             <div class="login-input-group">
-                                <input type="text" name="deskmed-username">
-                                <label>Correo electrónico</label>
+                                <input type="text" name="deskmed-username" id="inp-usr" class="login-input">
+                                <label for="inp-usr">Correo electrónico</label>
+                                <span class="spn-msg" id="spn-usr-empty">Por favor, ingrese un correo electrónico</span>
                             </div>
-                            <div class="login-input-group">
-                                <input type="password" name="deskmed-password">
+                            <div class="login-input-group" style="position: relative;">
+                                <input type="password" name="deskmed-password" id="inp-pw" class="login-input">
                                 <label>Contraseña</label>
+                                <span class="spn-msg" id="spn-pw-empty">Por favor, ingrese una contraseña</span>
+                                <span class="spn-msg" id="spn-pwusr-wrong">Usuario y/o contraseña incorrectos</span>
                             </div>
+                            <br>
                             <button class="btn btn-primary login-btn bold" id="login-ok">Iniciar sesión</button>
                             <p></p>
-                            <a href="{{ route('usuario.registro') }}" class="btn btn-success login-btn bold" id="register-ok">¡Quiero registrarme!</a>
+                            <a href="{{ route('usuario.register') }}" class="btn btn-success login-btn bold" id="register-ok">¡Quiero registrarme!</a>
                         </div>
                     </div>
                 </div>
@@ -107,6 +128,9 @@
     </div>
     <script type="text/javascript">
         $(function () {
+            var inpUsername = $('#inp-usr');
+            var inpPassword = $('#inp-pw');
+
             $('.login-input-group').children('input').focusout(function () {
                 var texto = $(this).val();
 
@@ -117,6 +141,64 @@
                     $(this).removeClass('has-value');
                 }
             });
+
+            $('#login-ok').click(function () {
+                attempLogin();
+            });
+
+            inpUsername.add(inpPassword).keypress(function (e) {
+                if (e.which === 13) {
+                    attempLogin();
+                }
+            });
+
+            function attempLogin() {
+                var usernameText = $.trim(inpUsername.val());
+                var passwordTxt = inpPassword.val();
+
+                $('.spn-msg').hide();
+
+                if (usernameText.length > 0) {
+                    if (passwordTxt.length > 0) {
+                        sendPost('{{ route('usuario.signin') }}', { email: usernameText, password: passwordTxt, _token: '{{ csrf_token() }}' }, function (datos) {
+                            if (datos.logged_in) {
+                                window.location.href = '{{ route('home') }}';
+                            }
+                            else {
+                                inpUsername.css('border-color', 'red');
+                                inpPassword.css('border-color', 'red').focus().select();
+
+                                $('#spn-pwusr-wrong').fadeIn(300);
+
+                                setTimeout(function () {
+                                    inpUsername.css('border-color', '#a8a8a8');
+                                    inpPassword.css('border-color', '#a8a8a8');
+
+                                    $('#spn-pwusr-wrong').fadeOut(300);
+                                }, 5000);
+                            }
+                        });
+                    }
+                    else {
+                        inpPassword.css('border-color', 'red');
+                        $('#spn-pw-empty').fadeIn(300);
+
+                        setTimeout(function () {
+                            inpPassword.css('border-color', '#a8a8a8');
+                            $('#spn-pw-empty').fadeOut(300);
+                        }, 5000);
+                    }
+                }
+                else {
+                    inpUsername.css('border-color', 'red');
+                    $('#spn-usr-empty').fadeIn(300);
+
+                    setTimeout(function () {
+                        inpUsername.css('border-color', '#a8a8a8');
+                        $('#spn-usr-empty').fadeOut(300);
+                    }, 5000);
+                }
+            }
         });
     </script>
 @endsection

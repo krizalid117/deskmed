@@ -338,7 +338,7 @@
                         password: esPaciente ? $('#paciente-password').val() : $('#doctor-password').val()
                     };
 
-                    sendPost('{{ route('usuario.create') }}', datos, function () {
+                    sendPost('{{ route('usuario.signup') }}', datos, function () {
                         window.location.href = '{{ route('home') }}';
                     });
                 }

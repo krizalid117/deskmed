@@ -17,9 +17,10 @@ Auth::routes();
 Route::group(['middleware' => 'guest'], function () {
 
     Route::get('/login', 'UsuarioController@login')->name('usuario.login');
+    Route::post('/signin', 'UsuarioController@signIn')->name('usuario.signin');
 
-    Route::get('/register', 'UsuarioController@register')->name('usuario.registro');
-    Route::post('/register', 'UsuarioController@store')->name('usuario.create');
+    Route::get('/register', 'UsuarioController@register')->name('usuario.register');
+    Route::post('/signup', 'UsuarioController@store')->name('usuario.signup');
 });
 
 //Grupo con middleware "auth", para páginas que requieran sesión iniciada

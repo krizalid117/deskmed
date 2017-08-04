@@ -18,7 +18,8 @@ class CreateUsuariosTable extends Migration
             $table->string('identificador', 50);
             $table->string('nombres', 100)->default('');
             $table->string('apellidos', 100)->default('');
-            $table->string('email', 100);
+            $table->string('name', 50)->nullable(); //campo para el Auth
+            $table->string('email', 255);
             $table->string('password');
             $table->date('fecha_nacimiento')->nullable();
             $table->integer('id_tipo_usuario')->nullable();

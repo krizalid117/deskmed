@@ -9,5 +9,11 @@
 @endsection
 
 @section('content')
-    <a href="{{ route('usuario.logout') }}">Salir.</a>
+    <?php
+        use Illuminate\Support\Facades\Auth;
+
+        $usuario = Auth::user()["attributes"];
+    ?>
+
+    Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
 @endsection

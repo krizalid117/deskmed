@@ -1,9 +1,13 @@
+/* VARIABLES */
+
 :root {
     --normal-background-color: #292929;
     --normal-text-color: #f1f1f1;
     --secondary-background-color: #f09006;
     --secondary-text-color: #ffffff;
 }
+
+/* GLOBALS */
 
 *
 , html
@@ -13,6 +17,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    outline: 0 !important;
 }
 
 html, body {
@@ -22,6 +27,8 @@ html, body {
     color: var(--normal-text-color);
     font-size: 14px;
 }
+
+/* FRAMEWORKS AND LIBRARIES FIXES */
 
 .select2-results__option
 , .select2-search__field {
@@ -51,6 +58,21 @@ html, body {
 .panel-deskmed > .panel-body {
     color: black;
 }
+
+.ui-widget-overlay {
+    background: #000;
+    opacity: .3;
+}
+
+.ui-dialog .ui-dialog-buttonpane {
+    border-width: 0;
+}
+
+.select2-dropdown {
+    z-index: 99 !important;
+}
+
+/* OTHER CSS RULES */
 
 .bold {
     font-weight: bold;
