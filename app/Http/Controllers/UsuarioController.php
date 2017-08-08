@@ -30,7 +30,7 @@ class UsuarioController extends Controller
             'password' => 'required|max:50|min:6',
         ], [
             'especialidad.required_if' => 'El campo "Especialidad" es obligatorio.',
-            'identificador.unique_with' => 'El identificador ":value" ya existe para el tipo de identificación seleccionada.',
+            'identificador.unique_with' => 'El identificador "' . $request['identificador'] . '" ya existe para el tipo de identificación seleccionada.',
         ], [
             'tipo' => 'Tipo de usuario',
             'email' => 'Correo electrónico',
@@ -51,7 +51,7 @@ class UsuarioController extends Controller
         $usuario->identificador = $request['id_tipo_identificador'] === "1" ? UsuarioController::downRut($request['identificador']) : $request['identificador'];
         $usuario->nombres = $request['nombres'];
         $usuario->apellidos = $request['apellidos'];
-        $usuario->email = $request['email'];
+        $usuario->email = mb_strtolower($request['email'], 'utf8');
         $usuario->password = bcrypt($request['password']);
         $usuario->fecha_nacimiento = null;
         $usuario->id_tipo_usuario = $request['tipo'];
@@ -63,9 +63,11 @@ class UsuarioController extends Controller
         if (intval($nUsuariosMismoIdTipoId) === 0) {
             if ($usuario->save()) {
 
-                $usuario->especialidades()->sync([
-                    1 => $request['especialidad']
-                ], false);
+                if (intval($usuario->id_tipo_usuario) !== 1) {
+                    $usuario->especialidades()->sync([
+                        1 => $request['especialidad']
+                    ], false);
+                }
 
                 Auth::login($usuario);
             }
@@ -94,7 +96,7 @@ class UsuarioController extends Controller
             "logged_in" => false,
         ];
 
-        if (Auth::attempt(['email' => $request['email'], 'password' => bcrypt($request['password'])])) {
+        if (Auth::attempt(['email' => mb_strtolower($request['email'], 'utf8'), 'password' => $request['password']])) {
             $datos["logged_in"] = true;
         }
 

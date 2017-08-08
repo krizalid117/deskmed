@@ -1,10 +1,12 @@
 @extends('layouts.master')
 
-@section('title')
-    Deskmed - Registro de cuenta
+@section('title', '| Registro de cuenta')
+
+@section('cssvariables')
+    <link rel="stylesheet" href="{{ URL::to('css/variables_logged_out.css') }}">
 @endsection
 
-@section('local_head')
+@section('stylesheets')
     <style>
         .register-option > table {
             width: 100%;
@@ -279,7 +281,9 @@
             </div>
         </div>
     </div>
+@endsection
 
+@section('scripts')
     <script type="text/javascript">
         $(function () {
             $('#doctor-esp').select2({
@@ -302,8 +306,8 @@
             //Se selecciona un tipo de cuenta
             $('#btn-register-continue').click(function () {
                 var $btn = $(this),
-                    selected = $('.register-option-selected'),
-                    esPaciente = (selected.data('tipo') === "paciente");
+                        selected = $('.register-option-selected'),
+                        esPaciente = (selected.data('tipo') === "paciente");
 
                 if ($btn.data('step') === 1) {
 
@@ -369,5 +373,4 @@
             });
         });
     </script>
-
 @endsection

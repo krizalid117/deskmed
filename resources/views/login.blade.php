@@ -1,10 +1,12 @@
 @extends('layouts.master')
 
-@section('title')
-    Deskmed - Inicio de sesión
+@section('title', '| Inicio de sesión')
+
+@section('cssvariables')
+    <link rel="stylesheet" href="{{ URL::to('css/variables_logged_out.css') }}">
 @endsection
 
-@section('local_head')
+@section('stylesheets')
     <style>
         html, body {
             height: 100%;
@@ -126,6 +128,9 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
     <script type="text/javascript">
         $(function () {
             var inpUsername = $('#inp-usr');

@@ -1,11 +1,6 @@
 /* VARIABLES */
 
-:root {
-    --normal-background-color: #292929;
-    --normal-text-color: #f1f1f1;
-    --secondary-background-color: #f09006;
-    --secondary-text-color: #ffffff;
-}
+
 
 /* GLOBALS */
 
@@ -26,6 +21,7 @@ html, body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: var(--normal-text-color);
     font-size: 14px;
+    height: 100%;
 }
 
 /* FRAMEWORKS AND LIBRARIES FIXES */

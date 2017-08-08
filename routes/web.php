@@ -25,7 +25,7 @@ Route::group(['middleware' => 'guest'], function () {
 
 //Grupo con middleware "auth", para páginas que requieran sesión iniciada
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/', 'HomeController@index')->name('home');
 
     Route::get('/logout', 'UsuarioController@logout')->name('usuario.logout');
 });

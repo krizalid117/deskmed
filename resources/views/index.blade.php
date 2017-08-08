@@ -1,10 +1,8 @@
-@extends('layouts.master')
+@extends('layouts.app')
 
-@section('title')
-    Deskmed - Servicio de consultas médicas online
-@endsection
+@section('title', '| Servicio de consultas médicas online')
 
-@section('local_head')
+@section('stylesheets')
 
 @endsection
 
@@ -15,5 +13,11 @@
         $usuario = Auth::user()["attributes"];
     ?>
 
-    Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
+    {{--Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>--}}
+
+    contentttt
+@endsection
+
+@section('scripts')
+
 @endsection
