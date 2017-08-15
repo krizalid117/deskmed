@@ -8,12 +8,12 @@
 
 @section('content')
     <?php
-        use Illuminate\Support\Facades\Auth;
+//        use Illuminate\Support\Facades\Auth;
 
-        $usuario = Auth::user()["attributes"];
+        $usuario = Auth::user();
     ?>
 
-    {{--Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>--}}
+    Hola, {{ $usuario["attributes"]["nombres"] . " " . $usuario["attributes"]["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
 
     contentttt
 @endsection

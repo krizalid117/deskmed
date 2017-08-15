@@ -1,7 +1,6 @@
 /* VARIABLES */
 
 
-
 /* GLOBALS */
 
 *
@@ -68,7 +67,9 @@ html, body {
     z-index: 99 !important;
 }
 
+
 /* OTHER CSS RULES */
+
 
 .bold {
     font-weight: bold;
@@ -116,4 +117,59 @@ input, textarea {
 
 .post-error-list {
     text-align: left;
+}
+
+
+/**** APP ****/
+
+
+.main-container {
+    display: flex;
+    height: 100%;
+}
+
+.side-menu {
+    flex: 0 0 300px; /* do not grow, do not shrink, start at 300px */
+}
+
+.content {
+    flex: 1;
+}
+
+
+/*** MENU ***/
+
+
+.side-menu-container {
+    display: flex;
+    height: 100%;
+}
+
+.side-menu-container > div {
+    background-color: var(--menu-bg-color);
+}
+
+.side-menu-minified {
+    flex: 0 0 60px;
+    /*display: none;*/
+}
+
+.side-menu-expanded {
+    flex: 1;
+    display: none;
+}
+
+.side-menu-expander {
+    flex: 0 0 12px;
+    height: 25px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.side-menu-expander > .ui-icon {
+    position: absolute;
+    right: 0;
+    bottom: 5px;
 }

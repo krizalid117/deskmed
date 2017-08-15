@@ -1,32 +1,25 @@
+<?php
+    use \Illuminate\Support\Facades\Auth;
+
+    $usuario = Auth::user();
+?>
 <!doctype html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    {{--<meta http-equiv="X-UA-Compatible" content="ie=edge">--}}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Deskmed @yield('title')</title>
     <link rel="stylesheet" href="{{ URL::to('js/bootstrap-3.3.7/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.min.css') }}">
 
-    <link rel="stylesheet" href="{{ URL::to('css/variables_app.css') }}">
+    <link rel="stylesheet" href="{{ URL::to('css/variables_app.css') }}?_<?php echo time(); ?>">
     <link rel="stylesheet" href="{{ URL::to('css/main.css') }}?_<?php echo time(); ?>">
     <link rel="stylesheet" href="{{ URL::to('js/select2-4.0.3/dist/css/select2.min.css') }}?_<?php echo time(); ?>">
 
     <style>
         .cont {
-            border: solid 1px black;
-        }
-
-        .main-container {
-            display: flex;
-        }
-
-        .side-menu {
-            flex: 0 0 300px; /* do not grow, do not shrink, start at 300px */
-        }
-
-        .content {
-            flex: 1;
+            /*border: solid 1px black;*/
         }
     </style>
 
@@ -36,7 +29,7 @@
 
 <div class="main-container">
     <div class="cont side-menu">
-        @include('layouts.menu')
+        @include('includes.menu')
     </div>
     <div class="cont content">
         <div class="container-fluid">
