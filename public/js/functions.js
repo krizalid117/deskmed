@@ -68,7 +68,7 @@ var mensajes = {
 
         $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: black; opacity: .6; z-index: 1000;">' +
             '<img src="' + __loadimg + '" style="width: 100px; height: 100px; user-select: none; -webkit-user-select: none; -moz-user-select: none;">' +
-            '</div>');
+        '</div>');
     },
     loading_close: function () {
         $('#loading-div').remove();

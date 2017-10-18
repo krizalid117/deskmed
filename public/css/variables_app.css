@@ -1,7 +1,8 @@
 :root {
     --normal-background-color: rgb(238, 238, 238);
     --normal-text-color: #000000;
-    --secondary-background-color: #f09006;
+    --secondary-background-color: #f09006; /* #F0AA3D  #EDB97C */
     --secondary-text-color: #ffffff;
     --menu-bg-color: #292929;
+    --menu-bg-color-hover: #3b3b3b;
 }
