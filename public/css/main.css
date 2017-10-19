@@ -11,6 +11,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     outline: 0 !important;
 }
 
@@ -119,7 +120,6 @@ input, textarea {
     text-align: left;
 }
 
-
 /**** APP ****/
 
 
@@ -197,6 +197,13 @@ input, textarea {
 
 .side-menu-item-container .side-menu-item {
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 
     -webkit-transition: background-color 200ms;
     -moz-transition: background-color 200ms;
@@ -214,8 +221,10 @@ input, textarea {
 }
 
 .img-menu {
-    width: 32px;
-    height: 32px;
+    width: var(--menu-icon-size);
+    height: var(--menu-icon-size);
+    flex: none;
+    /*background-color: #00b3ee;*/
 }
 
 .content-menu {
@@ -227,7 +236,10 @@ input, textarea {
     white-space: nowrap;
     text-overflow: ellipsis;
     letter-spacing: .08em;
+    flex: 1;
     display: none;
+    line-height: var(--menu-icon-size);
+    position: relative;
 }
 
 .td-content-menu {
@@ -240,6 +252,7 @@ input, textarea {
     color: black;
     font-weight: normal;
     padding: 0 5px;
+    line-height: 20px;
 
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
@@ -248,8 +261,13 @@ input, textarea {
 
 .icon-search-menu {
     position: absolute;
-    left: 20px;
-    top: 50%;
+    left: 18px;
+    top: 45%;
+    cursor: pointer;
+}
+
+.menu-pad-helper {
+    padding-top: 3px;
 }
 
 .txt-search-menu {

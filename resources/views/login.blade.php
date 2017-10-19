@@ -26,7 +26,7 @@
         .login-input-group > input {
             border: none;
             border-bottom: solid 2px #a8a8a8;
-            padding: 10px 5px;
+            padding: 5px 5px;
             color: #333;
             font-size: 18px;
             display: inline-block;
@@ -118,6 +118,10 @@
                                 <span class="spn-msg" id="spn-pw-empty">Por favor, ingrese una contraseña</span>
                                 <span class="spn-msg" id="spn-pwusr-wrong">Usuario y/o contraseña incorrectos</span>
                             </div>
+                            <div class="pretty o-warning curvy hover a-rotate" style="float: left;">
+                                <input type="checkbox" id="chk-remember">
+                                <label for="chk-stay"><i class="glyphicon glyphicon-ok"></i> Recordarme</label>
+                            </div>
                             <br>
                             <button class="btn btn-primary login-btn bold" id="login-ok">Iniciar sesión</button>
                             <p></p>
@@ -165,7 +169,12 @@
 
                 if (usernameText.length > 0) {
                     if (passwordTxt.length > 0) {
-                        sendPost('{{ route('usuario.signin') }}', { email: usernameText, password: passwordTxt, _token: '{{ csrf_token() }}' }, function (datos) {
+                        sendPost('{{ route('usuario.signin') }}', {
+                            email: usernameText,
+                            password: passwordTxt,
+                            remember: $('#chk-remember').is(':checked') ? 1 : 0,
+                            _token: '{{ csrf_token() }}'
+                        }, function (datos) {
                             if (datos.logged_in) {
                                 window.location.href = '{{ route('home') }}';
                             }

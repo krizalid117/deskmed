@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ URL::to('css/variables_logged_out.css') }}">
     <link rel="stylesheet" href="{{ URL::to('css/main.css') }}?_<?php echo time(); ?>">
     <link rel="stylesheet" href="{{ URL::to('js/select2-4.0.3/dist/css/select2.min.css') }}?_<?php echo time(); ?>">
+    <link rel="stylesheet" href="{{ URL::to('css/pretty.css') }}">
     @yield('stylesheets')
 </head>
 <body>

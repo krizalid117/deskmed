@@ -96,7 +96,7 @@ class UsuarioController extends Controller
             "logged_in" => false,
         ];
 
-        if (Auth::attempt(['email' => mb_strtolower($request['email'], 'utf8'), 'password' => $request['password']])) {
+        if (Auth::attempt(['email' => mb_strtolower($request['email'], 'utf8'), 'password' => $request['password']], $request['remember'])) {
             $datos["logged_in"] = true;
         }
 
