@@ -30,5 +30,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(EspecialidadesMedicas::class);
         $this->call(TiposIDentificador::class);
+        $this->call(Sexos::class);
     }
 }

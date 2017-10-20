@@ -2,8 +2,11 @@
     --normal-background-color: rgb(238, 238, 238);
     --normal-text-color: #000000;
     --secondary-background-color: #f09006; /* #F0AA3D  #EDB97C */
+    --secondary-border-color: #f08005;
     --secondary-text-color: #ffffff;
     --menu-bg-color: #292929;
     --menu-bg-color-hover: #3b3b3b;
     --menu-icon-size: 32px;
+    /*--header-background-color: #f09d25;*/
+    --header-background-color: #f0980d;
 }

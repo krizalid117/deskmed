@@ -1,7 +1,7 @@
 <?php
     use \Illuminate\Support\Facades\Auth;
 
-    $usuario = Auth::user();
+    $usuario = Auth::user()["attributes"];
 ?>
 <!doctype html>
 <html>
@@ -30,12 +30,15 @@
     <div class="side-menu">
         @include('includes.menu')
     </div>
+    <div class="dm-header">
+        @include('includes.header')
+    </div>
     <div class="content">
-        <div class="container-fluid">
+        <div class="container-fluid dm-content">
             @yield('content')
         </div>
-        <div class="footer">
-            <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+        <div class="dm-footer">
+
         </div>
     </div>
 </div>
@@ -53,41 +56,85 @@
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
 
 <script> {{-- Scripts para el menu --}}
-    $(function () {
-        var menuCollapser = $('.side-menu-collapser').find('.img-menu');
+    var menuCollapser = $('.side-menu-collapser').find('.img-menu');
 
+    $(function () {
         menuCollapser.data('collapsed', true);
 
         menuCollapser.click(function () {
-            if (!menuCollapser.hasClass('menu-icon-disable')) {
 
-                var fadeTimeMs = 150;
+            if (menuCollapser.data('collapsed') === true) {
+                menuAbrir();
+            }
+            else {
+                menuCerrar();
+            }
 
-                menuCollapser.addClass('menu-icon-disable');
+        });
 
-                if (menuCollapser.data('collapsed') === true) {
-                    menuCollapser.data('collapsed', false);
+        $(document).click(function (e) {
+            var target = e.target;
 
-                    $('.side-menu-minified').css('width', '300px');
+            if (!$(target).is('.side-menu') && !$(target).parents().is('.side-menu')) {
+                menuCerrar();
+            }
+        });
 
-                    setTimeout(function () {
-                        $('.content-menu').fadeIn(150);
-                    }, 350);
-                }
-                else {
-                    menuCollapser.data('collapsed', true);
+        $('.img-menu').not('.img-menu-toggle').closest('.side-menu-item').click(function () {
+            if (!$(this).hasClass('side-menu-selected')) {
+                $('.side-menu-selected').removeClass('side-menu-selected');
 
-                    $('.side-menu-minified').css('width', '60px');
-
-                    $('.content-menu').fadeOut(10);
-                }
-
-                setTimeout(function () {
-                    menuCollapser.removeClass('menu-icon-disable');
-                }, 400);
+                $(this).addClass('side-menu-selected');
             }
         });
     });
+
+    function menuAbrir(callback) {
+        if (!menuCollapser.hasClass('menu-icon-disable') && menuCollapser.data('collapsed') === true) {
+            menuCollapser.addClass('menu-icon-disable');
+
+            menuCollapser.data('collapsed', false);
+
+            $('.side-menu-minified').css('width', '300px');
+            $('.side-menu-item').removeAttr('title');
+
+            setTimeout(function () {
+                $('.content-menu').fadeIn(150);
+            }, 350);
+
+            setTimeout(function () {
+                menuCollapser.removeClass('menu-icon-disable');
+
+                if (callback) {
+                    callback();
+                }
+            }, 400);
+        }
+    }
+
+    function menuCerrar(callback) {
+        if (!menuCollapser.hasClass('menu-icon-disable') && menuCollapser.data('collapsed') === false) {
+            menuCollapser.addClass('menu-icon-disable');
+
+            menuCollapser.data('collapsed', true);
+
+            $('.side-menu-minified').css('width', '60px');
+
+            $('.img-menu').not('.img-menu-toggle').each(function () {
+                $(this).closest('.side-menu-item').attr('title', $(this).data('title'));
+            });
+
+            $('.content-menu').fadeOut(10);
+
+            setTimeout(function () {
+                menuCollapser.removeClass('menu-icon-disable');
+
+                if (callback) {
+                    callback();
+                }
+            }, 400);
+        }
+    }
 </script>
 
 @yield('scripts')

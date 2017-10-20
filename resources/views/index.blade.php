@@ -7,15 +7,10 @@
 @endsection
 
 @section('content')
-    <?php
-//        use Illuminate\Support\Facades\Auth;
 
-        $usuario = Auth::user();
-    ?>
+    <?php $usuario = Auth::user()["attributes"]; ?>
 
-    Hola, {{ $usuario["attributes"]["nombres"] . " " . $usuario["attributes"]["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
-
-    contentttt
+    Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
 @endsection
 
 @section('scripts')

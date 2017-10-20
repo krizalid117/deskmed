@@ -24,6 +24,22 @@ html, body {
     height: 100%;
 }
 
+input[type="text"]::-webkit-input-placeholder, textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #b9b9b9;
+}
+
+input[type="text"]::-moz-placeholder, textarea::-moz-placeholder { /* Firefox 19+ */
+    color: #b9b9b9;
+}
+
+input[type="text"]:-ms-input-placeholder, textarea:-ms-input-placeholder { /* IE 10+ */
+    color: #b9b9b9;
+}
+
+input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- */
+    color: #b9b9b9;
+}
+
 /* FRAMEWORKS AND LIBRARIES FIXES */
 
 .select2-results__option
@@ -122,30 +138,173 @@ input, textarea {
 
 /**** APP ****/
 
-
 .main-container {
     display: flex;
     height: 100%;
 }
 
 .side-menu {
-    flex: 0 0 300px; /* do not grow, do not shrink, start at 300px */
+    flex: 0 0 auto;
+    position: fixed;
+    height: 100%;
+    z-index: 99;
 }
 
 .content {
     flex: 1;
+    margin-left: 60px;
 }
 
+.dm-header {
+    position: fixed;
+    width: 100%;
+}
 
-.footer {
+.dm-content {
+    margin-top: 50px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.dm-footer {
     position: fixed;
     bottom: 2px;
     padding-left: 5px;
 }
 
+/*** HEADER ***/
+
+.header-container {
+    height: 50px;
+    margin-left: 60px;
+    /*background-color: tomato;*/
+    background-color: var(--header-background-color);
+    color: var(--secondary-text-color);
+    border-bottom: 1px solid var(--secondary-border-color);
+}
+
+.header-content-wrapper {
+    max-width: 700px;
+    height: 100%;
+    margin: 0 auto;
+    /*background-color: tomato;*/
+
+    display: flex;
+}
+
+.header-content-wrapper > div {
+    /*border: 1px solid black;*/
+}
+
+.header-logo {
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.dm-logo {
+    position: relative;
+    background-repeat: no-repeat;
+    z-index: 1000;
+    display: inline-block;
+    vertical-align: middle;
+    text-indent: -99999px;
+    overflow: hidden;
+}
+
+.dm-logo-small {
+    width: 40px;
+    height: 40px;
+    background-image: url(../img/deskmed.png);
+    background-position: 50% 50%;
+    background-size: 60px 35px;
+}
+
+.header-search {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.header-search .input-group .input-group-addon {
+    top: 0 !important;
+}
+
+.header-user-ui {
+    flex: 0 0 120px;
+
+    display: flex;
+}
+
+.header-user-notifications
+, .header-user-settings {
+    width: 60px;
+    height: 100%;
+    /*border: 1px solid black;*/
+
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-a-notif {
+    width: 25px;
+    height: 25px;
+    position: relative;
+}
+
+.header-notifications-count {
+    position: absolute;
+    background-color: tomato;
+    color: white;
+    font-size: .7em;
+    padding: 0 4px;
+    right: -6px;
+    top: -2px;
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.header-a-notif > img
+, .header-a-profile > img {
+    width: 100%;
+    height: 100%;
+}
+
+.header-a-profile {
+    width: 35px;
+    height: 35px;
+}
+
+.header-a-profile > img {
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.txt-header-search {
+    width: 100%;
+    height: 35px;
+    color: black;
+    padding: 0 10px;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+    outline: 0 !important;
+}
+
+#btn-search {
+    cursor: pointer;
+}
 
 /*** MENU ***/
-
 
 .side-menu-container {
     display: flex;
@@ -160,6 +319,7 @@ input, textarea {
 .side-menu-minified {
     /*flex: 0 0 60px;*/
     width: 60px;
+    position: relative;
 
     -webkit-transition: width 350ms;
     -moz-transition: width 350ms;
@@ -184,7 +344,7 @@ input, textarea {
 }
 
 .side-menu-item-container .side-menu-collapser {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
 }
 
 .side-menu-item-container .img-menu {
@@ -197,6 +357,7 @@ input, textarea {
 
 .side-menu-item-container .side-menu-item {
     margin-bottom: 10px;
+    width: 100%;
     display: flex;
     align-items: center;
 
@@ -205,11 +366,11 @@ input, textarea {
     -ms-user-select: none;
     user-select: none;
 
-    -webkit-transition: background-color 200ms;
-    -moz-transition: background-color 200ms;
-    -ms-transition: background-color 200ms;
-    -o-transition: background-color 200ms;
-    transition: background-color 200ms;
+    -webkit-transition: background-color, border-right 200ms;
+    -moz-transition: background-color, border-right 200ms;
+    -ms-transition: background-color, border-right 200ms;
+    -o-transition: background-color, border-right 200ms;
+    transition: background-color, border-right 200ms;
 }
 
 .side-menu-item-container .side-menu-item:hover {
@@ -218,6 +379,7 @@ input, textarea {
 
 .side-menu-item-container > .side-menu-item.side-menu-selected {
     border-right: 5px solid var(--secondary-background-color);
+    background-color: var(--menu-bg-color-hover);
 }
 
 .img-menu {
@@ -259,34 +421,38 @@ input, textarea {
     border-radius: 5px;
 }
 
-.icon-search-menu {
-    position: absolute;
-    left: 18px;
-    top: 45%;
-    cursor: pointer;
-}
-
 .menu-pad-helper {
     padding-top: 3px;
 }
 
-.txt-search-menu {
-    padding-left: 25px;
-    width: 95%;
+.menu-chat {
+    position: absolute;
+    bottom: 0;
 }
 
-.txt-search-menu::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-    color: #b9b9b9;
+.menu-chat-messages-container {
+    position: relative;
 }
 
-.txt-search-menu::-moz-placeholder { /* Firefox 19+ */
-    color: #b9b9b9;
+.menu-chat-messages {
+    position: absolute;
+    background-color: tomato;
+    color: white;
+    font-size: .7em;
+    padding: 0 4px;
+    right: -6px;
+    top: 0;
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
 }
 
-.txt-search-menu:-ms-input-placeholder { /* IE 10+ */
-    color: #b9b9b9;
-}
 
-.txt-search-menu:-moz-placeholder { /* Firefox 18- */
-    color: #b9b9b9;
+/*** XS ***/
+
+@media (max-width: 767px) {
+    .header-search {
+        padding-left: 5px;
+    }
 }
