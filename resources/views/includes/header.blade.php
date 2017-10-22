@@ -1,3 +1,10 @@
+<?php
+    use \App\Http\Controllers\UsuarioController;
+
+    $currentView = Route::current()->getName();
+    $profilePic = UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]);
+?>
+
 <div class="header-container">
     <div class="header-content-wrapper">
         <div class="header-logo hidden-xs">
@@ -20,27 +27,21 @@
             </div>
             <div class="header-user-settings">
                 <a href="#" class="header-a-profile" title="Configuraciones de perfil">
-                    <?php
-
-                        $profilePic = "default_nonbinary.png";
-
-                        if (File::exists(public_path("profilePics/" . $usuario["id"] . ".jpg"))) {
-                            $profilePic = $usuario["id"] . ".jpg";
-                        }
-                        else {
-                            if (!is_null($usuario["id_sexo"])) {
-                                if ($usuario["id_sexo"] === 1) { //M
-                                    $profilePic = "default_male.png";
-                                }
-                                else if ($usuario["id_sexo"] === 2) { //F
-                                    $profilePic = "default_female.png";
-                                }
-                            }
-                        }
-
-                    ?>
                     <img src="{{ URL::to("profilePics/$profilePic") }}" alt="Perfil" aria-label="Perfil">
                 </a>
+                <div class="profile-row profile-menu"></div>
+                <div class="profile-window profile-menu">
+                    <ul>
+                        <li class="profile-setting profile-setting-config">
+                            <img src="{{ URL::to('img/settings.png') }}" alt="Perfil">
+                            <span>Perfil</span>
+                        </li>
+                        <li class="profile-setting profile-setting-logout">
+                            <img src="{{ URL::to('img/logout.png') }}" alt="Perfil">
+                            <span>Cerrar sesión</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

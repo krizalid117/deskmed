@@ -414,6 +414,7 @@ button.ui-button::-moz-focus-inner {
 	top: 2px;
 	width: 1.8em;
 	height: 1.8em;
+	cursor: pointer;
 }
 .ui-datepicker .ui-datepicker-prev-hover,
 .ui-datepicker .ui-datepicker-next-hover {
@@ -447,11 +448,13 @@ button.ui-button::-moz-focus-inner {
 }
 .ui-datepicker .ui-datepicker-title select {
 	font-size: 1em;
-	margin: 1px 0;
+	margin: 1px 2px;
+	cursor: pointer;
 }
 .ui-datepicker select.ui-datepicker-month,
 .ui-datepicker select.ui-datepicker-year {
 	width: 45%;
+	color: black !important;
 }
 .ui-datepicker table {
 	width: 100%;

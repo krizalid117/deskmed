@@ -10,7 +10,10 @@
 
     <?php $usuario = Auth::user()["attributes"]; ?>
 
-    Hola, {{ $usuario["nombres"] . " " . $usuario["apellidos"] }}. <a href="{{ route('usuario.logout') }}">Salir.</a>
+    <div class="dm-title1">
+        ¡Bienvenid{{ ($usuario["id_sexo"] === 2) ? "a" : "o" }} a Deskmed!
+        <img src="{{ URL::to('img/deskmed_full.png') }}" alt="Logo" style="margin-top: 20px;">
+    </div>
 @endsection
 
 @section('scripts')

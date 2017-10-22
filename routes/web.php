@@ -28,4 +28,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'HomeController@index')->name('home');
 
     Route::get('/logout', 'UsuarioController@logout')->name('usuario.logout');
+
+    Route::get('/profile', 'UsuarioController@profile')->name('usuario.profile');
 });

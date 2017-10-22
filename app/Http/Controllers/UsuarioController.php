@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class UsuarioController extends Controller
 {
@@ -109,11 +110,35 @@ class UsuarioController extends Controller
         return redirect()->route('usuario.login');
     }
 
+    public function profile() {
+        return view('profile');
+    }
+
     public static function downRut($rut) {
         return ltrim(str_replace(['.', '-'], ['', ''], $rut), '0');
     }
 
     public static function upRut($rut) {
         return number_format(substr($rut, 0, -1), 0, "", ".") . '-' . substr($rut, strlen($rut) - 1, 1);
+    }
+
+    public static function getProfilePic($path, $sex = 3) {
+        $profilePic = "default_nonbinary.png";
+
+        if (!is_null($path) && $path !== "" && File::exists(public_path("profilePics/{$path}"))) {
+            $profilePic = $path;
+        }
+        else {
+            if (!is_null($sex)) {
+                if ($sex === 1) { //M
+                    $profilePic = "default_male.png";
+                }
+                else if ($sex === 2) { //F
+                    $profilePic = "default_female.png";
+                }
+            }
+        }
+
+        return $profilePic;
     }
 }
