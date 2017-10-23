@@ -80,6 +80,10 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     border-width: 0;
 }
 
+.ui-datepicker {
+    z-index: 2 !important;
+}
+
 .select2-dropdown {
     z-index: 99 !important;
 }
@@ -310,6 +314,8 @@ input, textarea {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
+
+    -webkit-user-drag: none;
 }
 
 .profile-menu {

@@ -2,13 +2,18 @@ function sendPost(__url, __opt, __func, __loadimg) {
     mensajes.loading_open(__loadimg);
 
     $.post(__url, __opt, function (response) {
-        if (!response.error) {
-            __func(response);
-        }
-        else {
-            var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
+        try {
+            if (!response.error) {
+                __func(response);
+            }
+            else {
+                var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
 
-            mensajes.alerta(errorMsj);
+                mensajes.alerta(errorMsj);
+            }
+        }
+        catch (ex) {
+            mensajes.alerta("Error al ejecutar la acción.");
         }
     }, 'json')
         .fail(function (res) {

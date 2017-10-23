@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Usuario;
+use App\Sexos;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -74,6 +75,7 @@ class UsuarioController extends Controller
             }
             else {
                 $datos['error'] = true;
+                $datos['mensaje'] = "Hubo un error al registrar el usuario. Por favor, intente de nuevo más tarde.";
             }
         }
         else {
@@ -111,7 +113,20 @@ class UsuarioController extends Controller
     }
 
     public function profile() {
-        return view('profile');
+
+        $usuario = Auth::user()["attributes"];
+
+        return view('profile', [
+            "usuario" => $usuario,
+            "sexos" => Sexos::pluck('nombre', 'id'),
+            "tipoIdentificador" => DB::table('tipos_identificador')->where('id', $usuario["id_tipo_identificador"])->value('nombre'),
+            "profilePic" => UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]),
+            "opcionesPrivacidad" => DB::table('privacidad_opciones')->get()
+        ]);
+    }
+
+    public function edit(Request $request) {
+
     }
 
     public static function downRut($rut) {
@@ -140,5 +155,18 @@ class UsuarioController extends Controller
         }
 
         return $profilePic;
+    }
+
+    public static function getPrivacyIconClass($id) {
+        $icon = "glyphicon glyphicon-eye-open";
+
+        if (intval($id) === 2) {
+            $icon = "glyphicon glyphicon-user";
+        }
+        else if (intval($id) === 3) {
+            $icon = "glyphicon glyphicon-ban-circle";
+        }
+
+        return $icon;
     }
 }

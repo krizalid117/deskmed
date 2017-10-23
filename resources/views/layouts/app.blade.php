@@ -1,8 +1,3 @@
-<?php
-    use \Illuminate\Support\Facades\Auth;
-
-    $usuario = Auth::user()["attributes"];
-?>
 <!doctype html>
 <html>
 <head>

@@ -30,4 +30,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/logout', 'UsuarioController@logout')->name('usuario.logout');
 
     Route::get('/profile', 'UsuarioController@profile')->name('usuario.profile');
+
+    Route::post('/edit', 'UsuarioController@edit')->name('usuario.edit');
 });
