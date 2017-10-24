@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Usuario;
 use App\Sexos;
+use App\Http\Controllers\GlobalController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -125,8 +126,55 @@ class UsuarioController extends Controller
         ]);
     }
 
-    public function edit(Request $request) {
+    public function edit(Request $request, $id) {
 
+        $validar = [
+            'id_privacy' => 'required|exists:privacidad_opciones,id',
+            'nombres' => 'required|max:100',
+            'apellidos' => 'required|max:100',
+            'fecha_nacimiento' => 'required|max:10|date_format:"d-m-Y"',
+            'sexo' => 'required|exists:sexos,id',
+        ];
+
+        $nombres = [
+            'id_privacy' => 'Privacidad de identificador',
+            'nombres' => 'Nombres',
+            'apellidos' => 'Apellidos',
+            'fecha_nacimiento' => 'Fecha de nacimiento',
+            'sexo' => 'Sexo',
+        ];
+
+        $update = [
+            'id_privacidad_identificador' => $request["id_privacy"],
+            'nombres' => $request['nombres'],
+            'apellidos' => $request['apellidos'],
+            'email' => mb_strtolower($request['email'], 'utf8'),
+            'fecha_nacimiento' => $request["fecha_nacimiento"],
+            'id_sexo' => $request["sexo"],
+        ];
+
+        //Se agrega email en caso de que haya sido cambiado
+        if (Auth::user()["attributes"]["email"] !== mb_strtolower($request["email"], 'utf8')) {
+            $validar['email'] = 'required|email|max:100|unique:usuarios,email';
+            $nombres['email'] = 'Correo eléctronico';
+            $update['email'] = mb_strtolower($request["email"], 'utf8');
+        }
+
+        $this->validate($request, $validar, [], $nombres);
+
+        $datos = [
+            'error' => false
+        ];
+
+        $update = DB::table('usuarios')
+            ->where('id', $id)
+            ->update($update);
+
+        if (!$update) {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
     }
 
     public static function downRut($rut) {

@@ -72,7 +72,7 @@
     </div>
 
     <div class="basic-form-container form-horizontal">
-        <div class="form-group">
+        <div class="form-group" inp-name="id_privacy">
             <label for="txt-profile-id" class="col-sm-3 control-label">Identificador ({{ $tipoIdentificador }})</label>
             <div class="col-sm-9">
                 <div class="input-group">
@@ -97,32 +97,32 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" inp-name="nombres">
             <label for="txt-profile-nombres" class="col-sm-3 control-label">Nombres</label>
             <div class="col-sm-9">
                 <input type="text" id="txt-profile-nombres" class="form-control" value="{{ $usuario["nombres"] }}" disabled>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" inp-name="apellidos">
             <label for="txt-profile-apellidos" class="col-sm-3 control-label">Apellidos</label>
             <div class="col-sm-9">
                 <input type="text" id="txt-profile-apellidos" class="form-control" value="{{ $usuario["apellidos"] }}" disabled>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" inp-name="email">
             <label for="txt-profile-email" class="col-sm-3 control-label">Correo electrónico</label>
             <div class="col-sm-9">
                 <input type="email" id="txt-profile-email" class="form-control" value="{{ $usuario["email"] }}" disabled>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" inp-name="fecha_nacimiento">
             <label for="txt-profile-fnac" class="col-sm-3 control-label">Fecha de nacimiento</label>
             <div class="col-sm-9 date-container">
                 <input type="text" id="txt-profile-fnac" class="form-control" value="{{ date('d-m-Y', strtotime($usuario["fecha_nacimiento"])) }}" disabled readonly>
                 <span class="glyphicon glyphicon-calendar"></span>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" inp-name="sexo">
             <label for="txt-profile-sexo" class="col-sm-3 control-label">Sexo</label>
             <div class="col-sm-9">
                 <select id="txt-profile-sexo" class="form-control" disabled>
@@ -177,7 +177,7 @@
             });
 
             $('#btn-edit-cancel').click(function () {
-                cancelEdit();
+                location.reload();
             });
 
             $('#btn-edit-ok').click(function () {
@@ -196,11 +196,10 @@
             $('#txt-profile-sexo').prop('disabled', false);
 
             btnAllowEdit.css('visibility', 'hidden');
-            $('.edit-buttons-container').show();
-        }
 
-        function cancelEdit() {
-            location.reload();
+            $('.edit-buttons-container').show();
+
+            $('.profile-img-options').removeClass('hidden');
         }
 
         function guardarCambios() {
@@ -214,8 +213,10 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            sendPost('{{ route('usuario.edit') }}', datos, function (respuesta) {
-
+            sendPost('{{ route('usuario.edit', [$usuario["id"]]) }}', datos, function (respuesta) {
+                mensajes.alerta("Datos personales guardados correctamente.", "Guardado exitoso", function () {
+                    location.reload();
+                });
             });
         }
     </script>

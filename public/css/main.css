@@ -151,7 +151,7 @@ input, textarea {
     flex: 0 0 auto;
     position: fixed;
     height: 100%;
-    z-index: 2;
+    z-index: 3;
 }
 
 .content {
@@ -162,7 +162,7 @@ input, textarea {
 .dm-header {
     position: fixed;
     width: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 
 .dm-content {
@@ -363,8 +363,8 @@ input, textarea {
 
 .profile-setting > img {
     margin-right: 10px;
-    width: 28px;
-    height: 28px;
+    width: 18px;
+    height: 18px;
 }
 
 .profile-setting:hover {
@@ -542,9 +542,10 @@ input, textarea {
     height: 32px;
     font-size: 0;
     text-indent: -9999px;
-    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
     box-shadow: none;
-    border-radius: none;
+    border-radius: 0;
     border: none;
     cursor: pointer;
     transition: background 0.3s;

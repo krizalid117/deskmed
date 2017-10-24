@@ -31,5 +31,5 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/profile', 'UsuarioController@profile')->name('usuario.profile');
 
-    Route::post('/edit', 'UsuarioController@edit')->name('usuario.edit');
+    Route::post('/edit/{id}', 'UsuarioController@edit')->name('usuario.edit');
 });

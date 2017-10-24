@@ -1,3 +1,13 @@
+$.fn.removeClassPrefix = function(prefix) {
+    this.each(function(i, el) {
+        var classes = el.className.split(" ").filter(function(c) {
+            return c.lastIndexOf(prefix, 0) !== 0;
+        });
+        el.className = $.trim(classes.join(" "));
+    });
+    return this;
+};
+
 function sendPost(__url, __opt, __func, __loadimg) {
     mensajes.loading_open(__loadimg);
 
@@ -18,11 +28,18 @@ function sendPost(__url, __opt, __func, __loadimg) {
     }, 'json')
         .fail(function (res) {
             if (res.status === 422) {
+
                 var msg = '<p style="text-align: left;">Por favor, corrija los siguiente errores antes de continuar:</p> <ul class="post-error-list" style="padding-left: 30px;">';
 
                 $.each(res.responseJSON, function (key, value) {
                     for (var i = 0; i < value.length; i++) {
                         msg += '<li class="post-error-item">' + value[i] + '</li>';
+
+                        var elem = $('.form-group[inp-name="' + key + '"]');
+
+                        if (elem.length) {
+                            elem.removeClassPrefix('has-').addClass('has-error');
+                        }
                     }
                 });
 
