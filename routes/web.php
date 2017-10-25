@@ -29,7 +29,26 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/logout', 'UsuarioController@logout')->name('usuario.logout');
 
-    Route::get('/profile', 'UsuarioController@profile')->name('usuario.profile');
+    //Rutas sólo para admins...
+    Route::group(['middleware' => 'admins'], function () {
 
-    Route::post('/edit/{id}', 'UsuarioController@edit')->name('usuario.edit');
+    });
+
+    //Rutas sólo para doctores...
+    Route::group(['middleware' => 'doctors'], function () {
+        Route::get('/user/career', 'UsuarioController@profesion')->name('usuario.profesion');
+    });
+
+    //Rutas sólo para pacientes...
+    Route::group(['middleware' => 'patients'], function () {
+        Route::get('/user/record', 'UsuarioController@ficha')->name('usuario.ficha');
+    });
+
+    Route::get('/user/profile', 'UsuarioController@profile')->name('usuario.profile');
+
+    Route::post('/user/edit/{id}', 'UsuarioController@edit')->name('usuario.edit');
+
+    Route::post('/user/uploadpic/{id}', 'UsuarioController@uploadPic')->name('usuario.uploadpic');
+
+    Route::post('/user/deletepic/{id}', 'UsuarioController@deletePic')->name('usuario.deletepic');
 });

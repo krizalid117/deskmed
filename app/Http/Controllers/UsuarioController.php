@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -19,6 +20,30 @@ class UsuarioController extends Controller
 
     public function register() {
         return view('registro');
+    }
+
+    public function profile() {
+        $usuario = Auth::user()["attributes"];
+
+        return view('profile', [
+            "usuario" => $usuario,
+            "sexos" => Sexos::pluck('nombre', 'id'),
+            "tipoIdentificador" => DB::table('tipos_identificador')->where('id', $usuario["id_tipo_identificador"])->value('nombre'),
+            "profilePic" => UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]),
+            "opcionesPrivacidad" => DB::table('privacidad_opciones')->get()
+        ]);
+    }
+
+    public function profesion() {
+        return view('career', [
+            "usuario" => Auth::user()["attributes"],
+        ]);
+    }
+
+    public function ficha() {
+        return view('ficha', [
+            "usuario" => Auth::user()["attributes"],
+        ]);
     }
 
     public function store(Request $request) {
@@ -55,7 +80,7 @@ class UsuarioController extends Controller
         $usuario->nombres = $request['nombres'];
         $usuario->apellidos = $request['apellidos'];
         $usuario->email = mb_strtolower($request['email'], 'utf8');
-        $usuario->password = bcrypt($request['password']);
+        $usuario->password = Hash::make($request['password']);
         $usuario->fecha_nacimiento = null;
         $usuario->id_tipo_usuario = $request['tipo'];
         $usuario->id_tipo_identificador = $request['id_tipo_identificador'];
@@ -113,19 +138,6 @@ class UsuarioController extends Controller
         return redirect()->route('usuario.login');
     }
 
-    public function profile() {
-
-        $usuario = Auth::user()["attributes"];
-
-        return view('profile', [
-            "usuario" => $usuario,
-            "sexos" => Sexos::pluck('nombre', 'id'),
-            "tipoIdentificador" => DB::table('tipos_identificador')->where('id', $usuario["id_tipo_identificador"])->value('nombre'),
-            "profilePic" => UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]),
-            "opcionesPrivacidad" => DB::table('privacidad_opciones')->get()
-        ]);
-    }
-
     public function edit(Request $request, $id) {
 
         $validar = [
@@ -160,17 +172,117 @@ class UsuarioController extends Controller
             $update['email'] = mb_strtolower($request["email"], 'utf8');
         }
 
+        //si cambia de password, verificar que hayan datos en los 3 campos de password (nueva pass, confirmar nueva pass y pass actual), también revisar que la nueva pass  y la confirmación sean iguales
+        if (intval($request["chaging_pass"]) === 1) {
+            $validar['new_pw'] = 'required|max:50|min:6';
+            $validar['new_pwc'] = 'required|same:new_pw';
+            $validar['pw'] = 'required';
+
+            $nombres['new_pw'] = 'Nueva contraseña';
+            $nombres['new_pwc'] = 'Confirmar contraseña';
+            $nombres['pw'] = 'Contraseña actual';
+
+            $update['password'] = Hash::make($request["new_pw"]);
+        }
+
         $this->validate($request, $validar, [], $nombres);
 
         $datos = [
             'error' => false
         ];
 
-        $update = DB::table('usuarios')
-            ->where('id', $id)
-            ->update($update);
+        $continuar = true;
 
-        if (!$update) {
+        if (intval($request["chaging_pass"]) === 1 && !Hash::check($request["pw"], Auth::user()["attributes"]["password"])) {
+            $continuar = false;
+        }
+
+        if ($continuar) {
+
+            $update = DB::table('usuarios')
+                ->where('id', $id)
+                ->update($update);
+
+            if (!$update) {
+                $datos["error"] = true;
+            }
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "La contraseña actual es incorrecta";
+        }
+
+        return response()->json($datos);
+    }
+
+    public function uploadPic(Request $request, $idUsuario) {
+
+        $this->validate($request, [
+            'input_img' => 'required|image|mimes:jpg,png,jpeg,pneg|max:3000',
+        ], [
+            'input_img.max' => 'La imagen no puede pesar más de 3MB.'
+        ], [
+            'input_img' => 'Imagen de perfil'
+        ]);
+
+        $datos = [
+            'error' => false
+        ];
+
+        if ($request->hasFile('input_img')) {
+
+            $image = $request->file('input_img');
+
+            $name = hash("sha512", time()) . '.' . $image->getClientOriginalExtension();
+
+            $destinationPath = public_path('profilePics');
+
+            $image->move($destinationPath, $name);
+
+            //Imagen antigua...
+            $oldImage = Auth::user()["attributes"]["profile_pic_path"];
+
+            $update = DB::table('usuarios')
+                ->where('id', $idUsuario)
+                ->update(['profile_pic_path' => $name]);
+
+            if ($update) {
+                //Se elimina imagen anterior
+                if (File::exists(public_path('profilePics/' . $oldImage))) {
+                    File::delete(public_path('profilePics/' . $oldImage));
+                }
+            }
+            else {
+                $datos["error"] = true;
+            }
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Por favor, incluir imagen a subir.";
+        }
+
+        return response()->json($datos);
+    }
+
+    public function deletePic(Request $request, $idUsuario) {
+
+        $oldImage = Auth::user()["attributes"]["profile_pic_path"];
+
+        $datos = [
+            'error' => false
+        ];
+
+        $update = DB::table('usuarios')
+            ->where('id', $idUsuario)
+            ->update(['profile_pic_path' => null]);
+
+        if ($update) {
+            //Se elimina imagen anterior
+            if (File::exists(public_path('profilePics/' . $oldImage))) {
+                File::delete(public_path('profilePics/' . $oldImage));
+            }
+        }
+        else {
             $datos["error"] = true;
         }
 
@@ -218,3 +330,6 @@ class UsuarioController extends Controller
         return $icon;
     }
 }
+
+//乇乂ㄒ尺卂 ㄒ卄丨匚匚
+//乇乂ㄒ尺卂 ㄒ卂乂丨匚

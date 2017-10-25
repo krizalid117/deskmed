@@ -23,4 +23,12 @@ class Usuario extends Model implements Authenticatable
     public function especialidades() {
         return $this->belongsToMany('App\EspecialidadesMedicas', 'usuarios_especialidades', 'usuario_id', 'especialidad_id');
     }
+
+    public function solicitudes_verificacion() {
+        return $this->hasMany('App\SolicitudesVerificacion', 'id_usuario');
+    }
+
+    public function verificaciones() {
+        return $this->hasMany('App\Verificaciones', 'id_usuario');
+    }
 }

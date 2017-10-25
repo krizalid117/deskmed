@@ -126,6 +126,12 @@
             else if ($(this).hasClass('profile-setting-logout')) {
                 window.location = '{{ route('logout') }}';
             }
+            else if ($(this).hasClass('profile-setting-career')) {
+                window.location = '{{ route('usuario.profesion') }}';
+            }
+            else if ($(this).hasClass('profile-setting-ficha')) {
+                window.location = '{{ route('usuario.ficha') }}';
+            }
         });
 
         /* Click en foto de perfil */

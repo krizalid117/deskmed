@@ -24,6 +24,10 @@ html, body {
     height: 100%;
 }
 
+body {
+    min-width: 360px;
+}
+
 input[type="text"]::-webkit-input-placeholder, textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */
     color: #b9b9b9;
 }
@@ -186,6 +190,7 @@ input, textarea {
 .header-container {
     height: 50px;
     margin-left: 60px;
+    min-width: 300px;
     /*background-color: tomato;*/
     background-color: var(--header-background-color);
     color: var(--secondary-text-color);
@@ -723,7 +728,33 @@ input, textarea {
 
 /* Animate menu END */
 
-/*** GLOBAL ***/
+/* Global animations */
+
+.loading-deskmed {
+    animation: .8s infinite beatHeart;
+}
+
+@keyframes beatHeart {
+    0% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1);
+    }
+    40% {
+        transform: scale(1);
+    }
+    60% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/*****************
+   Global rules
+*****************/
 
 .dm-title1 {
     width: 100%;
@@ -778,12 +809,6 @@ select {
     cursor: pointer;
 }
 
-.btn-profile-allow-edit {
-    position: absolute;
-    top: 0;
-    right: 15px;
-}
-
 .profile-img-container {
     position: relative;
     width: 205px;
@@ -807,21 +832,10 @@ select {
     user-select: none;
 
     -webkit-user-drag: none;
-}
 
-.profile-img-options {
-    position: absolute;
-    bottom: 5px;
-    right: 0;
-}
-
-.profile-img-options span {
-    cursor: pointer;
-    opacity: .5;
-}
-
-.profile-img-options span:hover {
-    opacity: 1;
+    -webkit-box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
+    -moz-box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
+    box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
 }
 
 /*** XS ***/
@@ -842,5 +856,10 @@ select {
         box-shadow: none;
 
         border-bottom: 1px solid var(--secondary-background-color);
+    }
+
+    .dialog-responsive {
+        width: 300px !important;
+        left: 30px !important;
     }
 }

@@ -28,32 +28,69 @@ function sendPost(__url, __opt, __func, __loadimg) {
     }, 'json')
         .fail(function (res) {
             if (res.status === 422) {
-
-                var msg = '<p style="text-align: left;">Por favor, corrija los siguiente errores antes de continuar:</p> <ul class="post-error-list" style="padding-left: 30px;">';
-
-                $.each(res.responseJSON, function (key, value) {
-                    for (var i = 0; i < value.length; i++) {
-                        msg += '<li class="post-error-item">' + value[i] + '</li>';
-
-                        var elem = $('.form-group[inp-name="' + key + '"]');
-
-                        if (elem.length) {
-                            elem.removeClassPrefix('has-').addClass('has-error');
-                        }
-                    }
-                });
-
-                msg += '</ul>';
-
-                mensajes.alerta(msg);
+                mensajes.throwValidationsErrors(res.responseJSON);
             }
             else {
-                mensajes.alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde.');
+                mensajes.alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde. Si el error persiste, recargue la página y vuelva a intentar.');
             }
         })
         .always(function () {
             mensajes.loading_close();
         });
+}
+
+//Para hacer requests con ajax que tengan archivos
+function sendXhrPost(__url, __datos, __func, __loadimg) {
+    mensajes.loading_open(__loadimg);
+
+    var data, xhr;
+
+    data = new FormData();
+
+    for (var key in __datos) {
+        if (__datos.hasOwnProperty(key)) {
+            data.append(key, __datos[key]);
+        }
+    }
+
+    xhr = new XMLHttpRequest();
+
+    xhr.open('POST', __url, true);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200 || xhr.status === 422) {
+
+                mensajes.loading_close();
+
+                var datos = JSON.parse(xhr.responseText);
+
+                if (xhr.status === 200) {
+                    if (!datos.error) {
+
+                        if (__func) {
+                            __func();
+                        }
+                    }
+                    else {
+                        mensajes.alerta(datos.mensaje, 'Error');
+                    }
+                }
+                else { //422
+                    mensajes.throwValidationsErrors(datos);
+                }
+            }
+            else {
+                mensajes.loading_close();
+                mensajes.alerta("Hubo un error inesperado.", 'Error');
+            }
+        }
+    };
+
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.setRequestHeader("Accept", "application/json");
+
+    xhr.send(data);
 }
 
 var mensajes = {
@@ -63,6 +100,7 @@ var mensajes = {
         $('<div class="div-alerta">' + msg + '</div>').dialog({
             title: title,
             width: 350,
+            classes: { 'ui-dialog': 'dialog-responsive' },
             resizable: false,
             modal: true,
             autoOpen: true,
@@ -85,15 +123,76 @@ var mensajes = {
             ]
         });
     },
-    loading_open: function (__loadimg) {
-        __loadimg = __loadimg || 'img/loading.gif';
+    confirmacion_sino: function (msg, funcSi, funcNo) {
+        $('<div class="div-alerta">' + msg + '</div>').dialog({
+            title: "Confirmación",
+            width: 350,
+            classes: { 'ui-dialog': 'dialog-responsive' },
+            resizable: false,
+            modal: true,
+            autoOpen: true,
+            close: function () {
+                $(this).dialog('destroy').remove();
+            },
+            closeOnEscape: false,
+            buttons: [
+                {
+                    text: "No",
+                    'class': 'btn',
+                    click: function () {
+                        $(this).dialog('close');
 
-        $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: black; opacity: .6; z-index: 1000;">' +
-            '<img src="' + __loadimg + '" style="width: 100px; height: 100px; user-select: none; -webkit-user-select: none; -moz-user-select: none;">' +
+                        if (funcNo) {
+                            funcNo();
+                        }
+                    }
+                },
+                {
+                    text: "Sí",
+                    'class': 'btn btn-primary',
+                    click: function () {
+                        $(this).dialog('close');
+
+                        if (funcSi) {
+                            funcSi();
+                        }
+                    }
+                }
+            ]
+        });
+    },
+    loading_open: function (__loadimg) {
+        __loadimg = __loadimg || '/img/deskmed3.png';
+
+        $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, .4); z-index: 1000;">' +
+            '<img src="' + __loadimg + '" class="loading-deskmed">' +
         '</div>');
     },
     loading_close: function () {
         $('#loading-div').remove();
+    },
+    throwValidationsErrors: function (errores) {
+        $('.form-group').each(function () {
+            $(this).removeClassPrefix('has-');
+        });
+
+        var msg = '<p style="text-align: left;">Por favor, corrija los siguiente errores antes de continuar:</p> <ul class="post-error-list" style="padding-left: 30px;">';
+
+        $.each(errores, function (key, value) {
+            for (var i = 0; i < value.length; i++) {
+                msg += '<li class="post-error-item">' + value[i] + '</li>';
+
+                var elem = $('.form-group[inp-name="' + key + '"]');
+
+                if (elem.length) {
+                    elem.addClass('has-error');
+                }
+            }
+        });
+
+        msg += '</ul>';
+
+        mensajes.alerta(msg);
     }
 };
 

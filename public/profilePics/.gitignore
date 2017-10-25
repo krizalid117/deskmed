@@ -3,6 +3,8 @@
 *.png
 *.pneg
 
+tmp/*
+
 !default_female.png
 !default_male.png
 !default_nonbinary.png

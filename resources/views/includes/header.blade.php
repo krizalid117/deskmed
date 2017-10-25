@@ -26,18 +26,30 @@
                 </a>
             </div>
             <div class="header-user-settings">
-                <a href="#" class="header-a-profile" title="Configuraciones de perfil">
-                    <img src="{{ URL::to("profilePics/$profilePic") }}" alt="Perfil" aria-label="Perfil">
+                <a href="#" class="header-a-profile" title="Mi cuenta">
+                    <img src="{{ URL::to("profilePics/$profilePic") }}" alt="Cuenta" aria-label="Cuenta">
                 </a>
                 <div class="profile-row profile-menu"></div>
                 <div class="profile-window profile-menu">
                     <ul>
+                        @if ($usuario["id_tipo_usuario"] === 2)
+                        <li class="profile-setting profile-setting-career">
+                            <img src="{{ URL::to('img/doc.png') }}" alt="Perfil profesional">
+                            <span>Perfil profesional</span>
+                        </li>
+                        @endif
+                        @if ($usuario["id_tipo_usuario"] === 3)
+                        <li class="profile-setting profile-setting-ficha">
+                            <img src="{{ URL::to('img/ficha.png') }}" alt="Ficha de salud">
+                            <span>Ficha de salud</span>
+                        </li>
+                        @endif
                         <li class="profile-setting profile-setting-config">
-                            <img src="{{ URL::to('img/settings.png') }}" alt="Perfil">
-                            <span>Perfil</span>
+                            <img src="{{ URL::to('img/settings.png') }}" alt="Cuenta">
+                            <span>Cuenta</span>
                         </li>
                         <li class="profile-setting profile-setting-logout">
-                            <img src="{{ URL::to('img/logout.png') }}" alt="Perfil">
+                            <img src="{{ URL::to('img/logout.png') }}" alt="Salir">
                             <span>Cerrar sesión</span>
                         </li>
                     </ul>
