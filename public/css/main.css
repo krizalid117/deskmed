@@ -75,6 +75,25 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     color: black;
 }
 
+.panel-deskmed2 {
+
+}
+
+.panel-deskmed2 > .panel-heading {
+    color: var(--secondary-text-color);
+    background-color: rgba(240, 144, 6, .7);
+    border-color: #ddd;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .65);
+    padding: 10px;
+}
+
+.panel-deskmed2 > .panel-body {
+    color: black;
+    padding: 10px 9px;
+    min-height: 42px;
+}
+
 .ui-widget-overlay {
     background: #000;
     opacity: .3;
@@ -838,9 +857,23 @@ select {
     box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
 }
 
+.font-title-normal-on-xs {
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+.deskmed-icon-help {
+    cursor: help;
+}
+
 /*** XS ***/
 
 @media (max-width: 767px) {
+    .font-title-normal-on-xs {
+        font-size: 1em;
+        font-weight: 500;
+    }
+
     .header-search {
         padding-left: 10px;
     }

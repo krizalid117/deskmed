@@ -101,6 +101,10 @@
             }
         });
 
+        $(document).on('click', '.deskmed-icon-help', function () {
+            mensajes.alerta('<div style="text-align: justify;">' + $(this).attr('title') + '</div>', 'Información');
+        });
+
         /* Click en elementos del menú */
         $('.side-menu-item').click(function (e) {
 
