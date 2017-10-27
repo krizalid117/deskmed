@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Usuario;
 use App\Sexos;
+use App\SolicitudesVerificacion;
 use App\Http\Controllers\GlobalController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -283,6 +284,121 @@ class UsuarioController extends Controller
             }
         }
         else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function sendVerification(Request $request) {
+        $usuario = Auth::user()["attributes"];
+
+        $idUsuario = $usuario["id"];
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        if ($usuario["autenticidad_profesional_verificada"]) {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Usted ya se encuentra verificado.";
+        }
+        else {
+            $solicitudesUsuario = DB::table('solicitud_verificacion')->where('id_usuario', $idUsuario);
+            $solicitudesAnteriores = $solicitudesUsuario->get();
+
+            $datos["solicitudes_anteriores"] = $solicitudesAnteriores;
+
+            $estado = 0; //0 = enviar, 1 = Ya hay solicitud pendiente, 2 = tiene más de 3 solicitudes rechazadas
+
+            if ($solicitudesUsuario) {
+                if (count($solicitudesAnteriores) > 0) {
+                    $solicitudesPendientes = $solicitudesUsuario->where('estado', '0')->get();
+
+                    if (count($solicitudesPendientes) > 0) {
+                        $estado = 1;
+                    } else {
+                        $solicitudesRechazadas = $solicitudesUsuario->where('estado', '2')->get();
+
+                        if (count($solicitudesRechazadas) > 2) {
+                            $estado = 2;
+                        }
+                    }
+                }
+            } else {
+                $datos["error"] = true;
+            }
+
+            if ($datos["error"] !== true) {
+                switch ($estado) {
+                    case 0: //Enviar
+
+                        $solicitud = new SolicitudesVerificacion();
+
+                        $solicitud->id_usuario = $idUsuario;
+
+                        if ($solicitud->save()) {
+                            $datos["mensaje"] = "Su solicitud ha sido enviada. Tendrá una respuesta en un plazo máximo de 48 horas hábiles. Le llegará un email de notificación cuando haya respuesta.";
+                        }
+                        else {
+                            $datos["error"] = true;
+                        }
+
+                        break;
+                    case 1: //Ya tiene solicitud pendiente
+
+                        $datos["mensaje"] = "Ya hay una solicitud de verificación pendiente para su usuario";
+
+                        break;
+                    case 2: //Tiene 3 o más solicitudes rechazadas
+
+                        $datos["mensaje"] = "Usted ya cuenta con 3 o más solicitudes de verificación rechazadas. Por favor vaya a la sección \"Soporte\" para conseguir ayuda.";
+
+                        break;
+                }
+            }
+        }
+
+        return response()->json($datos);
+    }
+
+    public function guardarPPTemporal( Request $request) {
+        $idUsuario = Auth::user()["attributes"]["id"];
+
+        $this->validate($request, [
+            'titulo' => 'max:255',
+            'institucion' => 'max:255',
+            'especialidad' => 'max:255',
+            'nregistro' => 'max:100',
+            'fregistro' => 'max:10|date_format:"d-m-Y"',
+            'antecedente' => 'max:255',
+        ], [
+
+        ], [
+            'titulo' => 'Título',
+            'institucion' => 'Intitución',
+            'especialidad' => 'Especialidad',
+            'nregistro' => 'N° registro',
+            'fregistro' => 'Fecha registro',
+            'antecedente' => 'Antecedente de título',
+        ]);
+
+        $datos = [
+            "error" => false,
+        ];
+
+        $update = DB::table('usuarios')
+            ->where('id', $idUsuario)
+            ->update([
+                'titulo_segun_usuario' => $request["titulo"],
+                'institucion_habilitante_segun_usuario' => $request["institucion"],
+                'especialidad_segun_usuario' => $request["especialidad"],
+                'nregistro_segun_usuario' => $request["nregistro"],
+                'fecha_registro_segun_usuario' => $request["fregistro"],
+                'antecedente_titulo_segun_usuario' => $request["antecedente"],
+            ]);
+
+        if (!$update) {
             $datos["error"] = true;
         }
 

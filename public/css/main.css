@@ -18,7 +18,7 @@
 html, body {
     background-color: var(--normal-background-color);
     font-family: "Varela Round", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
-    font-size: 1em;
+    font-size: .92em;
     -webkit-font-smoothing: antialiased;
     color: var(--normal-text-color);
     height: 100%;
@@ -57,6 +57,10 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
 
 .ui-dialog .ui-dialog-buttonpane {
     padding: .05em .5em .5em .4em;
+}
+
+.input-group {
+    z-index: 1;
 }
 
 .panel-deskmed {
@@ -104,7 +108,7 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
 }
 
 .ui-datepicker {
-    z-index: 2 !important;
+    /*z-index: 2 !important;*/
 }
 
 .select2-dropdown {
@@ -381,7 +385,7 @@ input, textarea {
     display: flex;
     align-items: center;
     padding: 10px;
-    font-size: .75em;
+    font-size: .8em;
     font-weight: bold;
 }
 
@@ -828,6 +832,10 @@ select {
     cursor: pointer;
 }
 
+fieldset {
+    margin: 15px;
+}
+
 .profile-img-container {
     position: relative;
     width: 205px;
@@ -866,6 +874,127 @@ select {
     cursor: help;
 }
 
+.professional-profile-header {
+    width: 100%;
+    padding: 5px 25px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pp-pic-container img {
+    width: 130px;
+    height: 130px;
+    padding: 5px;
+    background-color: var(--secondary-background-color);
+
+    position: absolute;
+    top: 3px;
+    left: 20px;
+
+    z-index: 1;
+
+    flex: none;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-user-drag: none;
+
+    -webkit-box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
+    -moz-box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
+    box-shadow: 0 0 10px 1px rgba(0,0,0,0.55);
+}
+
+.pp-presentation {
+    width: 100%;
+    height: 120px;
+    margin-left: 60px;
+    /*padding-left: 65px;*/
+
+    position: relative;
+    z-index: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    flex: auto;
+
+    text-align: center;
+
+    color: #fff;
+
+    border-bottom-right-radius: 15px;
+
+    -webkit-box-shadow: -2px 3px 5px 1px rgba(0,0,0,0.55);
+    -moz-box-shadow: -2px 3px 5px 1px rgba(0,0,0,0.55);
+    box-shadow: -2px 3px 5px 1px rgba(0,0,0,0.55);
+}
+
+.pp-presentation.doctor {
+    background-color: #337ab7;
+}
+
+.pp-presentation.paciente {
+    background-color: rgb(21, 195, 108);
+}
+
+.pp-presentation > div {
+    padding-right: 5px;
+}
+
+.pp-fold {
+
+    position: absolute;
+    top: -10px;
+    right: 0;
+
+    width: 15px;
+    height: 10px;
+    border-top-right-radius: 100%;
+}
+
+.pp-fold.doctor {
+    background-color: #286090;
+}
+
+.pp-fold.paciente {
+    background-color: rgb(23, 136, 79);
+}
+
+.fs-cllapsable {
+
+}
+
+.fs-collapsable-title {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-shadow: black 0 1px 0.01em;
+    font-size: 1.2em;
+    color: var(--secondary-background-color);
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.fs-cllapsable > legend > span.ui-icon {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.fs-collapsable-content {
+    padding: 0 20px;
+}
+
 /*** XS ***/
 
 @media (max-width: 767px) {
@@ -894,5 +1023,40 @@ select {
     .dialog-responsive {
         width: 300px !important;
         left: 30px !important;
+    }
+
+    .pp-presentation {
+        font-size: .75em;
+        padding-left: 65px;
+        padding-right: 5px;
+    }
+
+    .pp-title {
+        display: none;
+    }
+
+    .pp-presentation > div {
+        padding-right: 5px;
+    }
+
+    .pp-presentation
+    , .pp-pic-container img {
+        box-shadow: none;
+    }
+
+    .professional-profile-header {
+        margin-bottom: 70px;
+    }
+
+    fieldset {
+        margin: 5px;
+    }
+
+    .fs-collapsable-content {
+        padding: 0;
+    }
+
+    .fs-collapsable-title {
+        /*font-size: .8em;*/
     }
 }

@@ -31,4 +31,8 @@ class Usuario extends Model implements Authenticatable
     public function verificaciones() {
         return $this->hasMany('App\Verificaciones', 'id_usuario');
     }
+
+    public function sexo() {
+        return $this->belongsTo('App\Sexos', 'id_sexo');
+    }
 }

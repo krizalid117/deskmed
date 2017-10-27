@@ -105,6 +105,34 @@
             mensajes.alerta('<div style="text-align: justify;">' + $(this).attr('title') + '</div>', 'Información');
         });
 
+        $(document).on('click', '.fs-collapsable-title', function () {
+            var $this = $(this);
+            var icon = $this.find('.ui-icon');
+            var fs = $this.closest('.fs-cllapsable');
+            var content = fs.find('.fs-collapsable-content');
+
+            if (!$this.hasClass("fs-collapsing")) {
+                $this.addClass("fs-collapsing");
+
+                if (fs.data("collapsed")) {
+                    icon.removeClass('ui-icon-plus');
+                    icon.addClass('ui-icon-minus');
+                }
+                else {
+                    icon.removeClass('ui-icon-minus');
+                    icon.addClass('ui-icon-plus');
+                }
+
+                fs.data("collapsed", !fs.data("collapsed"));
+
+                content.animate({
+                    height: "toggle"
+                }, 350, function () {
+                    $this.removeClass("fs-collapsing");
+                });
+            }
+        });
+
         /* Click en elementos del menú */
         $('.side-menu-item').click(function (e) {
 

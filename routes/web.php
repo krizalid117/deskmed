@@ -37,6 +37,10 @@ Route::group(['middleware' => 'auth'], function () {
     //Rutas sólo para doctores...
     Route::group(['middleware' => 'doctors'], function () {
         Route::get('/user/career', 'UsuarioController@profesion')->name('usuario.profesion');
+
+        Route::post('/user/career/verify', 'UsuarioController@sendVerification')->name('usuario.profesion.verify');
+
+        Route::post('/user/career/savetemp', 'UsuarioController@guardarPPTemporal')->name('usuario.profesion.savetemp');
     });
 
     //Rutas sólo para pacientes...
