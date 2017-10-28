@@ -46,6 +46,8 @@ Route::group(['middleware' => 'auth'], function () {
     //Rutas sólo para pacientes...
     Route::group(['middleware' => 'patients'], function () {
         Route::get('/user/record', 'UsuarioController@ficha')->name('usuario.ficha');
+
+        Route::post('/user/familyrec/save_activation', 'UsuarioController@saveActivacionAntFam')->name('usuarios.ficha.saveActivacionAntFam');
     });
 
     Route::get('/user/profile', 'UsuarioController@profile')->name('usuario.profile');

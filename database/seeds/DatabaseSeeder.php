@@ -32,5 +32,8 @@ class DatabaseSeeder extends Seeder
         $this->call(TiposIDentificador::class);
         $this->call(Sexos::class);
         $this->call(PrivacidadOpciones::class);
+        $this->call(AntecedentesFamiliaresOpciones::class);
+        $this->call(Parentescos::class);
+        $this->call(EstadosSalud::class);
     }
 }

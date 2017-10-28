@@ -115,16 +115,24 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     z-index: 99 !important;
 }
 
+.pretty i:before {
+    z-index: 1 !important;
+}
+
+.pretty > input[type='checkbox'], .pretty > input[type='radio'] {
+    z-index: 1 !important;
+}
+
 
 /* OTHER CSS RULES */
 
 
 .bold {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .bolder {
-    font-weight: bolder;
+    font-weight: bolder !important;
 }
 
 .esconder {

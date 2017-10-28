@@ -14,7 +14,9 @@ function sendPost(__url, __opt, __func, __loadimg) {
     $.post(__url, __opt, function (response) {
         try {
             if (!response.error) {
-                __func(response);
+                if (__func) {
+                    __func(response);
+                }
             }
             else {
                 var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
@@ -164,7 +166,7 @@ var mensajes = {
     loading_open: function (__loadimg) {
         __loadimg = __loadimg || '/img/deskmed3.png';
 
-        $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, .4); z-index: 1000;">' +
+        $('body').append('<div id="loading-div" style="height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, .2); z-index: 1000;">' +
             '<img src="' + __loadimg + '" class="loading-deskmed">' +
         '</div>');
     },

@@ -35,4 +35,8 @@ class Usuario extends Model implements Authenticatable
     public function sexo() {
         return $this->belongsTo('App\Sexos', 'id_sexo');
     }
+
+    public function antecedentesFamiliares() {
+        return $this->hasMany('App\UsuarioAntecedentesFamiliares', 'id_usuario');
+    }
 }

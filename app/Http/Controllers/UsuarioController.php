@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Usuario;
 use App\Sexos;
 use App\SolicitudesVerificacion;
+use \App\UsuarioAntecedentesFamiliares;
 use App\Http\Controllers\GlobalController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -44,6 +45,7 @@ class UsuarioController extends Controller
     public function ficha() {
         return view('ficha', [
             "usuario" => Auth::user()["attributes"],
+            "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get()
         ]);
     }
 
@@ -362,6 +364,7 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    //Perfil profesional
     public function guardarPPTemporal( Request $request) {
         $idUsuario = Auth::user()["attributes"]["id"];
 
@@ -400,6 +403,48 @@ class UsuarioController extends Controller
 
         if (!$update) {
             $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    //guarda activación de antecedente familiar en ficha de salud (paciente)
+    public function saveActivacionAntFam(Request $request) {
+        $this->validate($request, [
+            "id" => 'exists:antecedentes_familiares_opciones,id'
+        ]);
+
+        $idUsuario = Auth::user()["attributes"]["id"];
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        if (intval($request["checked"]) === 1) { //insert
+
+            $doesntExists = is_null(DB::table('usuario_antecedentes_familiares')->where('id_usuario', $idUsuario)->where('id_antecedentes_familiares_opciones', $request["id"])->first());
+
+            if ($doesntExists) { //no existe registro, se inserta
+                $insert = DB::table('usuario_antecedentes_familiares')->insert([
+                    "id_usuario" => $idUsuario,
+                    "id_antecedentes_familiares_opciones" => $request["id"]
+                ]);
+
+                if (!$insert) {
+                    $datos["error"] = true;
+                }
+            }
+        }
+        else { //delete
+            $exists = DB::table('usuario_antecedentes_familiares')->where('id_usuario', $idUsuario)->where('id_antecedentes_familiares_opciones', $request["id"])->first();
+
+            if (!is_null($exists)) {
+
+                $id = $exists->id;
+
+                $del = UsuarioAntecedentesFamiliares::destroy($id);
+            }
         }
 
         return response()->json($datos);
