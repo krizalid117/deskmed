@@ -12,31 +12,50 @@ class Usuario extends Model implements Authenticatable
 
     protected $table = "usuarios";
 
-    public function tipo_usuario() {
+    public function tipo_usuario()
+    {
         return $this->belongsTo('App\tiposUsuario', 'id_tipo_usuario');
     }
 
-    public function tipo_identificador() {
+    public function tipo_identificador()
+    {
         return $this->belongsTo('App\TiposIdentificador', 'id_tipo_identificador');
     }
 
-    public function especialidades() {
+    public function especialidades()
+    {
         return $this->belongsToMany('App\EspecialidadesMedicas', 'usuarios_especialidades', 'usuario_id', 'especialidad_id');
     }
 
-    public function solicitudes_verificacion() {
+    public function solicitudes_verificacion()
+    {
         return $this->hasMany('App\SolicitudesVerificacion', 'id_usuario');
     }
 
-    public function verificaciones() {
+    public function verificaciones()
+    {
         return $this->hasMany('App\Verificaciones', 'id_usuario');
     }
 
-    public function sexo() {
+    public function sexo()
+    {
         return $this->belongsTo('App\Sexos', 'id_sexo');
     }
 
-    public function antecedentesFamiliares() {
+    public function antecedentesFamiliares()
+    {
         return $this->hasMany('App\UsuarioAntecedentesFamiliares', 'id_usuario');
+    }
+
+    public function integrantesNucleoFamiliar() {
+        return $this->hasMany('App\IntegrantesNucleoFamiliar', 'id_usuario');
+    }
+
+    public function enfermedadesActuales() {
+        return $this->hasMany('App\UsuarioEnfermedadesActuales', 'id_usuario');
+    }
+
+    public function enfermedadesHistoricas() {
+        return $this->hasMany('App\UsuarioEnfermedadesHistoricas', 'id_usuario');
     }
 }

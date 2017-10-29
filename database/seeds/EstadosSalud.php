@@ -17,6 +17,7 @@ class EstadosSalud extends Seeder
             [ "nombre" => "Más o menos" ],
             [ "nombre" => "Mal" ],
             [ "nombre" => "Grave" ],
+            [ "nombre" => "Fallecido" ],
         ]);
     }
 }

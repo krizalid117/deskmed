@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Usuario;
 use App\Sexos;
 use App\SolicitudesVerificacion;
-use \App\UsuarioAntecedentesFamiliares;
+use App\UsuarioAntecedentesFamiliares;
+use App\IntegrantesNucleoFamiliar;
+use App\UsuarioEnfermedadesHistoricas;
+use App\UsuarioEnfermedadesActuales;
 use App\Http\Controllers\GlobalController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -43,9 +46,55 @@ class UsuarioController extends Controller
     }
 
     public function ficha() {
+        $usuario = Auth::user()["attributes"];
+
+        $nucleoFamiliar = DB::table('integrantes_nucleo_familiar as inf')
+                            ->join('parentescos as p', 'p.id', '=', 'inf.id_parentesco')
+                            ->join('estados_salud as e', 'e.id', '=', 'inf.id_estado_salud')
+                            ->where('id_usuario', '=', $usuario["id"])
+                            ->select('inf.*', 'p.nombre as nombre_parentesco', 'e.nombre as nombre_estado')->get();
+
+        $antecedentesFamiliares = DB::table('usuario_antecedentes_familiares as uaf')
+            ->join('antecedentes_familiares_opciones as afo', 'uaf.id_antecedentes_familiares_opciones', '=', 'afo.id')
+            ->where('uaf.id_usuario', '=', $usuario["id"])
+            ->select('afo.id', 'afo.nombre', 'uaf.especificacion', 'afo.necesita_especificacion', 'uaf.id as id_usuario_antecedente_familiar')->orderBy('afo.nombre', 'asc')->get();
+
+        $enfermedades = DB::table('enfermedades_antecedentes_personales as eap')->orderBy('eap.nombre', 'asc')->get();
+
+        $enfermedadesActualesUsuario = DB::table('enfermedades_antecedentes_personales as eap')
+            ->join('usuario_enfermedades_actuales as uea', 'uea.id_enfermedad', '=', 'eap.id')
+            ->where('uea.id_usuario', '=', $usuario["id"])
+            ->select('eap.id')
+            ->get();
+
+        $enfermedadesActuales = [];
+
+        foreach ($enfermedadesActualesUsuario as $ea) {
+            $enfermedadesActuales[] = $ea->id;
+        }
+
+        $enfermedadesHistoricasUsuario = DB::table('enfermedades_antecedentes_personales as eap')
+            ->join('usuario_enfermedades_historicas as ueh', 'ueh.id_enfermedad', '=', 'eap.id')
+            ->where('ueh.id_usuario', '=', $usuario["id"])
+            ->select('eap.id')
+            ->get();
+
+        $enfermedadesHistoricas = [];
+
+        foreach ($enfermedadesHistoricasUsuario as $ea) {
+            $enfermedadesHistoricas[] = $ea->id;
+        }
+
         return view('ficha', [
-            "usuario" => Auth::user()["attributes"],
-            "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get()
+            "usuario" => $usuario,
+            "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get(), //Opciones de antecedentes familiares
+            "parentescos" => DB::table('parentescos')->orderBy('nombre', 'asc')->get(), //Opciones de parentesco
+            "estadosSalud" => DB::table('estados_salud')->orderBy('id', 'asc')->get(), //Opciones de estado de salud
+            "afu" => $antecedentesFamiliares, //afu = antecedentes familiares usuario
+            "nucleoFamiliar" => $nucleoFamiliar->toArray(),
+            "enfermedades" => $enfermedades,
+            "enfermedadesActuales" => $enfermedadesActuales,
+            "enfermedadesHistoricas" => $enfermedadesHistoricas,
         ]);
     }
 
@@ -426,12 +475,17 @@ class UsuarioController extends Controller
             $doesntExists = is_null(DB::table('usuario_antecedentes_familiares')->where('id_usuario', $idUsuario)->where('id_antecedentes_familiares_opciones', $request["id"])->first());
 
             if ($doesntExists) { //no existe registro, se inserta
-                $insert = DB::table('usuario_antecedentes_familiares')->insert([
+                $insert = DB::table('usuario_antecedentes_familiares')->insertGetId([
                     "id_usuario" => $idUsuario,
-                    "id_antecedentes_familiares_opciones" => $request["id"]
+                    "id_antecedentes_familiares_opciones" => $request["id"],
+                    "created_at" =>  \Carbon\Carbon::now(), # \Datetime()
+                    "updated_at" => \Carbon\Carbon::now(),  # \Datetime()
                 ]);
 
-                if (!$insert) {
+                if ($insert) {
+                    $datos["id"] = $insert;
+                }
+                else {
                     $datos["error"] = true;
                 }
             }
@@ -445,6 +499,213 @@ class UsuarioController extends Controller
 
                 $del = UsuarioAntecedentesFamiliares::destroy($id);
             }
+        }
+
+        return response()->json($datos);
+    }
+
+    public function saveEspecificacionAntFam(Request $request)
+    {
+        $this->validate($request, [
+            "id" => 'exists:usuario_antecedentes_familiares,id',
+            "especificacion" => 'max:255'
+        ]);
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $update = DB::table('usuario_antecedentes_familiares')
+            ->where('id', $request["id"])
+            ->update([
+                "especificacion" => $request["especificacion"]
+            ]);
+
+        if (!$update) {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function addEditIntegrante (Request $request) {
+        $idUsuario = Auth::user()["attributes"]["id"];
+
+        $validations = [
+            "parentesco" => "required|exists:parentescos,id",
+            "edad" => "required|integer|min:0|max:120",
+            "estado_salud" => "required|exists:estados_salud,id",
+        ];
+
+        $messages = [];
+
+        $names = [
+            "parentesco" => "Parentesco",
+            "edad" => "Edad",
+            "estado_salud" => "Estado de salud",
+        ];
+
+        $insertArray = [
+            "id_usuario" => $idUsuario,
+            "id_parentesco" => $request["parentesco"],
+            "edad" => $request["edad"],
+            "id_estado_salud" => $request["estado_salud"],
+
+        ];
+
+        $updateArray = [
+            "id_parentesco" => $request["parentesco"],
+            "edad" => $request["edad"],
+            "id_estado_salud" => $request["estado_salud"],
+        ];
+
+        if ($request["action"] === "edit") {
+            $validations["id"] = "exists:integrantes_nucleo_familiar,id";
+            $messages["id.exists"] = "El integrante no se puede editar ya que no existe.";
+            $names["id"] = "Integrante";
+        }
+
+        if (intval($request["estado_salud"]) === 6) {
+            $validations["edad_muerte"] = "required|integer|min:0|max:120";
+            $names["edad_muerte"] = "Edad al morir";
+
+            $validations["causa_muerte"] = "required|max:255";
+            $names["causa_muerte"] = "Causa de muerte";
+
+            $insertArray["edad_muerte"] = $request["edad_muerte"];
+            $insertArray["causa_muerte"] = $request["causa_muerte"];
+
+            $updateArray["edad_muerte"] = $request["edad_muerte"];
+            $updateArray["causa_muerte"] = $request["causa_muerte"];
+        }
+
+        $this->validate($request, $validations, $messages, $names);
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        if ($request["action"] === "add") { //insert
+            $insert = DB::table('integrantes_nucleo_familiar')->insert($insertArray);
+
+            if (!$insert) {
+                $datos["error"] = true;
+            }
+        }
+        else if ($request["action"] === "edit") { //update
+            $update = DB::table('integrantes_nucleo_familiar')
+                ->where('id', $request["id"])
+                ->update($updateArray);
+
+            if (!$update) {
+                $datos["error"] = true;
+            }
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Acción no válida";
+        }
+
+        return response()->json($datos);
+    }
+
+    public function removerIntegrante(Request $request) {
+        $datos = [
+            "error" => false
+        ];
+
+        $delete = IntegrantesNucleoFamiliar::destroy($request["id"]);
+
+        if (!$delete) {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function cambioCondicion(Request $request) {
+        $idUsuario = Auth::user()["attributes"]["id"];
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $tabla = "usuario_enfermedades_";
+
+        if ($request["tipo"] === "actual") {
+            $tabla .= "actuales";
+        }
+        else if ($request["tipo"] === "historica") {
+            $tabla .= "historicas";
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Tipo de condición inválida.";
+        }
+
+        if ($request["error"] !== true) {
+            if ($request["accion"] === "add") {
+                $insert = DB::table($tabla)->insert([
+                    "id_usuario" => $idUsuario,
+                    "id_enfermedad" => $request["id"],
+                ]);
+
+                if (!$insert) {
+                    $datos["error"] = true;
+                }
+            }
+            else if ($request["accion"] === "remove") {
+                $detele = DB::table($tabla)->where('id_usuario', $idUsuario)->where('id_enfermedad', $request["id"])->delete();
+
+                if (!$detele) {
+                    $datos["error"] = true;
+                }
+            }
+            else {
+                $datos["error"] = true;
+                $datos["mensaje"] = "Acción inválida.";
+            }
+        }
+
+        return response()->json($datos);
+    }
+
+    public function cambioCondicionComentario(Request $request) {
+        $this->validate($request, [
+            "texto" => "max:500",
+        ], [], [
+            "texto" => "Comentario"
+        ]);
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $campo = "comentario_condiciones_";
+
+        if ($request["tipo"] === "actual") {
+            $campo .= "actuales";
+        }
+        else if ($request["tipo"] === "historica") {
+            $campo .= "historicas";
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Tipo de condición inválida.";
+        }
+
+        $update = DB::table('usuarios')
+            ->where('id', Auth::user()["attributes"]["id"])
+            ->update([
+                $campo => $request["texto"],
+            ]);
+
+        if (!$update) {
+            $datos["error"] = true;
         }
 
         return response()->json($datos);

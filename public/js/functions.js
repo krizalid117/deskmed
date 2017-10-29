@@ -8,8 +8,8 @@ $.fn.removeClassPrefix = function(prefix) {
     return this;
 };
 
-function sendPost(__url, __opt, __func, __loadimg) {
-    mensajes.loading_open(__loadimg);
+function sendPost(__url, __opt, __func, __errorcb) {
+    mensajes.loading_open();
 
     $.post(__url, __opt, function (response) {
         try {
@@ -21,10 +21,19 @@ function sendPost(__url, __opt, __func, __loadimg) {
             else {
                 var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
 
-                mensajes.alerta(errorMsj);
+                mensajes.alerta(errorMsj, "Error", function () {
+                    if (__errorcb) {
+                        __errorcb(response);
+                    }
+                });
             }
         }
         catch (ex) {
+            if (__errorcb) {
+                __errorcb(null);
+            }
+
+            mensajes.loading_close();
             mensajes.alerta("Error al ejecutar la acción.");
         }
     }, 'json')
@@ -33,6 +42,10 @@ function sendPost(__url, __opt, __func, __loadimg) {
                 mensajes.throwValidationsErrors(res.responseJSON);
             }
             else {
+                if (__errorcb) {
+                    __errorcb(null);
+                }
+
                 mensajes.alerta('Ha ocurrido un error inesperado. Por favor, intente de nuevo más tarde. Si el error persiste, recargue la página y vuelva a intentar.');
             }
         })
@@ -42,8 +55,8 @@ function sendPost(__url, __opt, __func, __loadimg) {
 }
 
 //Para hacer requests con ajax que tengan archivos
-function sendXhrPost(__url, __datos, __func, __loadimg) {
-    mensajes.loading_open(__loadimg);
+function sendXhrPost(__url, __datos, __func) {
+    mensajes.loading_open();
 
     var data, xhr;
 

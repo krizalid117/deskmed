@@ -24,6 +24,9 @@ class Parentescos extends Seeder
             [ "nombre" => "Hija" ],
             [ "nombre" => "Primo" ],
             [ "nombre" => "Prima" ],
+            [ "nombre" => "Pareja" ],
+            [ "nombre" => "Novio/esposo" ],
+            [ "nombre" => "Novia/esposa" ],
         ]);
     }
 }

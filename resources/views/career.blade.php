@@ -112,6 +112,10 @@ switch ($estadoVerificacion) {
             .pp-estado-verificacion {
                 display: flex;
             }
+
+            .professional-profile-header {
+                margin-bottom: 70px;
+            }
         }
     </style>
 @endsection

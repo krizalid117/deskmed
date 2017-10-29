@@ -35,5 +35,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AntecedentesFamiliaresOpciones::class);
         $this->call(Parentescos::class);
         $this->call(EstadosSalud::class);
+        $this->call(Enfermedades::class);
     }
 }

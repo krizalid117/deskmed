@@ -46,6 +46,10 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
 
 /* FRAMEWORKS AND LIBRARIES FIXES */
 
+@-moz-document url-prefix() {
+    fieldset { display: table-cell; }
+}
+
 .select2-results__option
 , .select2-search__field {
     color: #000;
@@ -149,6 +153,16 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
 
 input, textarea {
     outline: none;
+}
+
+.txta-vert {
+    resize: vertical;
+    min-height: 50px;
+    max-height: 200px;
+}
+
+.hr2 {
+    border-top: #c3c3c3 1px solid;
 }
 
 .flex-center-all {
@@ -880,6 +894,13 @@ fieldset {
 
 .deskmed-icon-help {
     cursor: help;
+
+    background-color: var(--secondary-background-color);
+    background-image: url(../js/jquery-ui-1.12.1.custom/images/ui-icons_ffffff_256x240.png);
+
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
 }
 
 .professional-profile-header {
@@ -997,6 +1018,8 @@ fieldset {
 .fs-cllapsable > legend > span.ui-icon {
     display: inline-block;
     margin-right: 5px;
+    margin-top: 3px;
+    float: left;
 }
 
 .fs-collapsable-content {
@@ -1052,10 +1075,6 @@ fieldset {
         box-shadow: none;
     }
 
-    .professional-profile-header {
-        margin-bottom: 70px;
-    }
-
     fieldset {
         margin: 5px;
     }
@@ -1066,5 +1085,9 @@ fieldset {
 
     .fs-collapsable-title {
         /*font-size: .8em;*/
+    }
+
+    .table-responsive {
+        max-width: 230px;
     }
 }

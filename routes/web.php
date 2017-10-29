@@ -48,6 +48,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/user/record', 'UsuarioController@ficha')->name('usuario.ficha');
 
         Route::post('/user/familyrec/save_activation', 'UsuarioController@saveActivacionAntFam')->name('usuarios.ficha.saveActivacionAntFam');
+        Route::post('/user/familyrec/save_especif', 'UsuarioController@saveEspecificacionAntFam')->name('usuarios.ficha.saveEspecificacionAntFam');
+        Route::post('/user/add_edit_member', 'UsuarioController@addEditIntegrante')->name('usuarios.ficha.addEditIntegrante');
+        Route::post('/user/remove_member', 'UsuarioController@removerIntegrante')->name('usuarios.ficha.removerIntegrante');
+        Route::post('/user/cambio_condicion', 'UsuarioController@cambioCondicion')->name('usuarios.ficha.cambioCondicion');
+        Route::post('/user/cambio_condicion_comentario', 'UsuarioController@cambioCondicionComentario')->name('usuarios.ficha.cambioCondicionComentario');
     });
 
     Route::get('/user/profile', 'UsuarioController@profile')->name('usuario.profile');
