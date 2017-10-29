@@ -1,6 +1,6 @@
 agregar comuna de residencia a usuario
 agregar aviso de guardado de datos automaticos en ficha de salud
 agregar en ficha de salud:
-- tipo de sangre (predefinidas)
-- vacunas (predefinidas)
-- operaciones (lista, no predefinidas)
+    - tipo de sangre (predefinidas)
+    - vacunas (predefinidas)
+    - operaciones (lista, no predefinidas)
