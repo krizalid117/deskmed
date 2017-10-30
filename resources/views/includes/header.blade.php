@@ -14,7 +14,7 @@
         </div>
         <div class="header-search">
             <div class="input-group">
-                <input type="text" class="form-control txt-header-search" placeholder="Buscar..." aria-label="Buscar..." aria-describedby="btn-search">
+                <input type="search" class="form-control txt-header-search" placeholder="Buscar..." aria-label="Buscar..." aria-describedby="btn-search">
                 <span class="input-group-addon glyphicon glyphicon-search" id="btn-search"></span>
             </div>
         </div>

@@ -178,6 +178,24 @@
                 profileCerrar();
             }
         });
+
+        $('.txt-header-search').keydown(function (e) {
+            if (e.which === 13) {
+                var keyword = $.trim($(this).val());
+
+                if (keyword !== "") {
+                    buscar(keyword);
+                }
+            }
+        });
+
+        $('#btn-search').click(function () {
+            var keyword = $.trim($('.txt-header-search').val());
+
+            if (keyword !== "") {
+                buscar(keyword);
+            }
+        });
     });
 
     function menuAbrir(callback) {
@@ -263,6 +281,12 @@
                     callback();
                 }
             });
+        }
+    }
+
+    function buscar(keyword) {
+        if (keyword.length > 2) {
+            window.location = '/search/' + keyword;
         }
     }
 </script>

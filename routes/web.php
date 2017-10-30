@@ -31,7 +31,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     //Rutas sólo para admins...
     Route::group(['middleware' => 'admins'], function () {
+        Route::post('/test/users/create/{amaunt}', 'TestController@createUsers')->name('test.users.create');
 
+        Route::get('/test/users/create/{amaunt}', 'TestController@createUsers')->name('test.users.create');
     });
 
     //Rutas sólo para doctores...
@@ -62,4 +64,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/uploadpic/{id}', 'UsuarioController@uploadPic')->name('usuario.uploadpic');
 
     Route::post('/user/deletepic/{id}', 'UsuarioController@deletePic')->name('usuario.deletepic');
+
+    Route::get('/search/{keyword}', 'GlobalController@search')->name('search');
 });

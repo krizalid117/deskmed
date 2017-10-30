@@ -195,7 +195,7 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
                                     </tr>
                                 @endforeach
                             @else
-                                <tr class=""><td colspan="5" style="text-align: center;">No ha agregado integrantes a su núcleo familiar</td></tr>
+                                <tr class=""><td colspan="6" style="text-align: center;">No ha agregado integrantes a su núcleo familiar</td></tr>
                             @endif
                         </tbody>
                     </table>

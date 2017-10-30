@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 class GlobalController
@@ -13,6 +16,10 @@ class GlobalController
     }
 
     public static function edad($fechaInicio) {
+        if (!$fechaInicio || is_null($fechaInicio)) {
+            return "Fecha de nacimiento no indicada.";
+        }
+
         $diaActual = date("j");
         $mesActual = date("n");
         $anioActual = date("Y");
@@ -83,5 +90,83 @@ class GlobalController
         return \DateTime::createFromFormat('Y-m-d', $fecha, $tz)
             ->diff(new \DateTime('now', $tz))
             ->y;
+    }
+
+    public function search(Request $request, $keyword) {
+
+//        DB::enableQueryLog();
+
+        DB::listen(function ($sql) {
+            GlobalController::log($sql->sql);
+        });
+
+        $usuario = Auth::user()["attributes"];
+
+        $consulta = "
+            select u.*
+            , coalesce(v.titulo_habilitante_legal, nullif(u.titulo_segun_usuario, ''), 'Sin especificar') as titulo
+            , coalesce(v.especialidad, nullif(u.especialidad_segun_usuario, ''), 'Sin especificar') as especialidad
+            , s.alias_adulto
+            , s.alias_infantil
+            , case
+                when u.autenticidad_profesional_verificada is true and v.habilitado is true then
+                    'verified'
+                when exists(select 1 from solicitud_verificacion sv where sv.id_usuario = u.id and sv.estado = 0) then
+                    'waiting'
+                else 'question'
+            end as icon
+            from usuarios u
+            join sexos s
+              on s.id = u.id_sexo
+            left join verificaciones v 
+              on v.id_usuario = u.id 
+              and v.habilitado is true
+            where (
+                translate(u.nombres, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                or translate(u.apellidos, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                or translate(split_part(u.email, '@', 1), 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                or (
+                    v.id is not null and (
+                        translate(v.titulo_habilitante_legal, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                        or translate(v.especialidad, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                    )
+                )
+                or (
+                    v.id is null and (
+                        translate(u.titulo_segun_usuario, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                        or translate(u.especialidad_segun_usuario, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                    )
+                ) 
+                or (
+                    u.id_privacidad_identificador = 1
+                    and translate(u.identificador, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') ilike '%' || translate(:keyword, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn') || '%'
+                )
+            )
+            and u.id <> :id
+            and u.id_tipo_usuario = :tipo
+            
+            order by translate(u.nombres, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn'), translate(u.apellidos, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn')
+        ";
+
+        $resultsDocs = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario["id"] . "", "tipo" => 2 ]); //doctores
+        $resultsPat = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario["id"] . "", "tipo" => 3 ]); //pacientes
+
+        $results = [
+            "d" => [
+                "count" => count($resultsDocs),
+                "results" => $resultsDocs,
+            ],
+            "p" => [
+                "count" => count($resultsPat),
+                "results" => $resultsPat,
+            ]
+        ];
+
+        return view('search', [
+            "usuario" => $usuario,
+            "results" => $results,
+            "keyword" => $keyword,
+//            "log" => DB::getQueryLog(),
+        ]);
     }
 }
