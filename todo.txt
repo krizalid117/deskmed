@@ -4,3 +4,6 @@ agregar en ficha de salud:
     - tipo de sangre (predefinidas)
     - vacunas (predefinidas)
     - operaciones (lista, no predefinidas)
+agregar sexo al registro
+agregar fecha nacimiento al registro
+quitar especialidades médicas al registro de doctores

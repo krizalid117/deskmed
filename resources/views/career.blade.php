@@ -261,45 +261,43 @@ switch ($estadoVerificacion) {
                 e.preventDefault();
 
                 $('<div>' +
-                    '<div class="row">' +
-                        '<div class="col-sm-12">' +
-                            'La información proporcionada en este formulario será temporal hasta que verifique la validez de su título profesional.<hr>' +
+                    '<div class="col-sm-12">' +
+                        'La información proporcionada en este formulario será temporal hasta que verifique la validez de su título profesional.<hr>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="titulo">' +
+                            '<label for="pp-temp-titulo" class="form-label">Título</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-titulo" autocomplete="off" value="{{ $usuario["titulo_segun_usuario"] }}">' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="titulo">' +
-                                '<label for="pp-temp-titulo" class="form-label">Título</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-titulo" autocomplete="off" value="{{ $usuario["titulo_segun_usuario"] }}">' +
-                            '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="institucion">' +
+                            '<label for="pp-temp-institucion" class="form-label">Intitución</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-institucion" autocomplete="off" value="{{ $usuario["institucion_habilitante_segun_usuario"] }}">' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="institucion">' +
-                                '<label for="pp-temp-institucion" class="form-label">Intitución</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-institucion" autocomplete="off" value="{{ $usuario["institucion_habilitante_segun_usuario"] }}">' +
-                            '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="especialidad">' +
+                            '<label for="pp-temp-especialidad" class="form-label">Especialidad</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-especialidad" autocomplete="off" value="{{ $usuario["especialidad_segun_usuario"] }}">' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="especialidad">' +
-                                '<label for="pp-temp-especialidad" class="form-label">Especialidad</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-especialidad" autocomplete="off" value="{{ $usuario["especialidad_segun_usuario"] }}">' +
-                            '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="nregistro">' +
+                            '<label for="pp-temp-nregistro" class="form-label">N° registro</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-nregistro" autocomplete="off" value="{{ $usuario["nregistro_segun_usuario"] }}">' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="nregistro">' +
-                                '<label for="pp-temp-nregistro" class="form-label">N° registro</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-nregistro" autocomplete="off" value="{{ $usuario["nregistro_segun_usuario"] }}">' +
-                            '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="fregistro">' +
+                            '<label for="pp-temp-fregistro" class="form-label">Fecha registro</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-fregistro" style="background-color: #fff; cursor: text;" autocomplete="off" readonly value="{{ $usuario["fecha_registro_segun_usuario"] }}">' +
                         '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="fregistro">' +
-                                '<label for="pp-temp-fregistro" class="form-label">Fecha registro</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-fregistro" style="background-color: #fff; cursor: text;" autocomplete="off" readonly value="{{ $usuario["fecha_registro_segun_usuario"] }}">' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="col-sm-6">' +
-                            '<div class="form-group" inp-name="antecedente">' +
-                                '<label for="pp-temp-antecedente" class="form-label">Antecedente de título</label>' +
-                                '<input type="text" class="form-control" id="pp-temp-antecedente" autocomplete="off" value="{{ $usuario["antecedente_titulo_segun_usuario"] }}">' +
-                            '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6">' +
+                        '<div class="form-group" inp-name="antecedente">' +
+                            '<label for="pp-temp-antecedente" class="form-label">Antecedente de título</label>' +
+                            '<input type="text" class="form-control" id="pp-temp-antecedente" autocomplete="off" value="{{ $usuario["antecedente_titulo_segun_usuario"] }}">' +
                         '</div>' +
                     '</div>' +
                 '</div>').dialog({

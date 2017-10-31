@@ -94,10 +94,6 @@
             use Illuminate\Support\Facades\Session;
 
             $identificadores = TiposIdentificador::pluck('nombre', 'id');
-
-//            $especialidades = EspecialidadesMedicas::all();
-
-            $especialidades = DB::table('especialidades_medicas')->select('id', 'nombre as text')->get();
     ?>
 
     <div class="container" style="padding-top: 30px;">
@@ -205,6 +201,12 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="paciente-fnac" class="control-label col-xs-12">Fecha nacimiento</label>
+                                        <div class="col-xs-12">
+                                            <input type="text" id="paciente-fnac" class="form-control">
+                                        </div>
+                                    </div>
                                 </form>
 
                             </div>
@@ -265,9 +267,9 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="doctor-esp" class="control-label col-xs-12">Especialidad</label>
+                                        <label for="doctor-fnac" class="control-label col-xs-12">Fecha nacimiento</label>
                                         <div class="col-xs-12">
-                                            <select id="doctor-esp" style="width: 100%;"></select>
+                                            <input type="text" id="doctor-fnac" class="form-control">
                                         </div>
                                     </div>
                                 </form>
@@ -286,9 +288,13 @@
 @section('scripts')
     <script type="text/javascript">
         $(function () {
-            $('#doctor-esp').select2({
-                data: eval(<?php echo json_encode($especialidades); ?>),
-                language: "es"
+
+            $('#doctor-fnac').datepicker({
+                maxDate: "{{ date('d-m-Y') }}"
+            });
+
+            $('#paciente-fnac').datepicker({
+                maxDate: "{{ date('d-m-Y') }}"
             });
 
             $('.inp-id').RutValidation(function () {
@@ -332,13 +338,13 @@
                 else { //Finalización de registro
                     var datos = {
                         _token: '{{ csrf_token() }}',
-                        tipo: esPaciente ? 1 : 2,
+                        tipo: esPaciente ? 3 : 2,
                         email: esPaciente ? $('#paciente-email').val() : $('#doctor-email').val(),
                         nombres: esPaciente ? $('#paciente-nombres').val() : $('#doctor-nombres').val(),
                         apellidos: esPaciente ? $('#paciente-apellidos').val() : $('#doctor-apellidos').val(),
                         identificador: esPaciente ? $('#paciente-identificador').val() : $('#doctor-identificador').val(),
                         id_tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
-                        especialidad: esPaciente ? null : $('#doctor-esp').val(),
+                        fecha_nacimiento: esPaciente ? $('#paciente-fnac').val('') : $('#doctor-fnac').val(''),
                         password: esPaciente ? $('#paciente-password').val() : $('#doctor-password').val()
                     };
 

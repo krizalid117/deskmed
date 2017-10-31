@@ -99,6 +99,10 @@ class UsuarioController extends Controller
     }
 
     public function store(Request $request) {
+        if ($request['tipo'] === "1") { //No se pueden crear usuarios administradores a través del formulario de registro
+            return response()->json([ "error" => true ]);
+        }
+
         $this->validate($request, [
             'tipo' => 'required|exists:tipos_usuario,id',
             'email' => 'required|email|max:100|unique:usuarios,email',
@@ -106,10 +110,9 @@ class UsuarioController extends Controller
             'apellidos' => 'required|max:100',
             'identificador' => 'required|max:50|unique_with:usuarios,id_tipo_identificador = id_tipo_identificador',
             'id_tipo_identificador' => 'required|exists:tipos_identificador,id',
-            'especialidad' => 'required_if:tipo,2|exists:especialidades_medicas,id',
+            'fecha_nacimiento' => 'required|max:10|date_format:"d-m-Y"',
             'password' => 'required|max:50|min:6',
         ], [
-            'especialidad.required_if' => 'El campo "Especialidad" es obligatorio.',
             'identificador.unique_with' => 'El identificador "' . $request['identificador'] . '" ya existe para el tipo de identificación seleccionada.',
         ], [
             'tipo' => 'Tipo de usuario',
@@ -118,8 +121,8 @@ class UsuarioController extends Controller
             'apellidos' => 'Apellidos',
             'identificador' => 'Identificador',
             'tipo_identificador' => 'Tipo de identificador',
-            'especialidad' => 'Especialidad',
             'password' => 'Contraseña',
+            'fecha_nacimiento' => 'Fecha de nacimiento',
         ]);
 
         $datos = [
@@ -136,6 +139,7 @@ class UsuarioController extends Controller
         $usuario->fecha_nacimiento = null;
         $usuario->id_tipo_usuario = $request['tipo'];
         $usuario->id_tipo_identificador = $request['id_tipo_identificador'];
+        $usuario->fecha_nacimiento = $request["fecha_nacimiento"];
 
         $nUsuariosMismoIdTipoId = DB::table('usuarios')->where('identificador', '=', $usuario->identificador)->where('id_tipo_identificador', '=', $usuario->id_tipo_identificador)->count();
 
@@ -143,11 +147,11 @@ class UsuarioController extends Controller
         if (intval($nUsuariosMismoIdTipoId) === 0) {
             if ($usuario->save()) {
 
-                if (intval($usuario->id_tipo_usuario) !== 1) {
-                    $usuario->especialidades()->sync([
-                        1 => $request['especialidad']
-                    ], false);
-                }
+//                if (intval($usuario->id_tipo_usuario) !== 1) {
+//                    $usuario->especialidades()->sync([
+//                        1 => $request['especialidad']
+//                    ], false);
+//                }
 
                 Auth::login($usuario);
             }
