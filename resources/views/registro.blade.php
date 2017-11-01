@@ -19,6 +19,8 @@
             -webkit-border-radius: 4px;
             -moz-border-radius: 4px;
             border-radius: 4px;
+
+            border: 1px solid transparent;
         }
 
         .register-option:hover {
@@ -66,36 +68,31 @@
             margin-top: 10px;
         }
 
-        .id-tipo-paciente .ui-icon-check,
-        .id-tipo-doctor .ui-icon-check,
-        .especialidad .ui-icon-check {
+        .id-tipo-usuario .ui-icon-check {
             display: none;
         }
 
-        .id-tipo-doctor-selected,
-        .id-tipo-paciente-selected,
-        .especialidad-selected {
+        .id-tipo-usuario-selected {
             background-color: #f1f1f1;
         }
 
-        .id-tipo-doctor-selected .ui-icon-check,
-        .id-tipo-paciente-selected .ui-icon-check,
-        .especialidad-selected .ui-icon-check {
+        .id-tipo-usuario-selected .ui-icon-check {
             display: inline-block;
+        }
+
+        .panel-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .panel-footer > a {
+            margin-right: auto;
         }
     </style>
 @endsection
 
 @section('content')
-
-    <?php
-            use App\TiposIdentificador;
-            use Illuminate\Support\Facades\DB;
-            use Illuminate\Support\Facades\Session;
-
-            $identificadores = TiposIdentificador::pluck('nombre', 'id');
-    ?>
-
     <div class="container" style="padding-top: 30px;">
         <div class="row">
             <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -146,138 +143,82 @@
                             </div>
                             <div style="display: none;" class="register-content reg-count-2">
                                 {{--<span class="bold">Registro de Pacientes</span>--}}
-                                <form>
-                                    <div class="form-group">
-                                        <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
-                                        <div class="col-xs-12">
-                                            <input type="email" class="form-control" id="paciente-email" placeholder="correo@ejemplo.com">
-                                        </div>
+                                <div class="form-group" inp-name="email">
+                                    <label for="usuario-email" class="control-label col-xs-12">Correo electrónico</label>
+                                    <div class="col-xs-12">
+                                        <input type="email" class="form-control" id="usuario-email" placeholder="correo@ejemplo.com">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="paciente-password" class="control-label col-xs-12">Contraseña</label>
-                                        <div class="col-xs-12">
-                                            <input type="password" class="form-control" id="paciente-password" placeholder="">
-                                        </div>
+                                </div>
+                                <div class="form-group" inp-name="password">
+                                    <label for="usuario-password" class="control-label col-xs-12">Contraseña</label>
+                                    <div class="col-xs-12">
+                                        <input type="password" class="form-control" id="usuario-password" placeholder="">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="paciente-nombres" class="control-label col-xs-12">Nombres</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" class="form-control" id="paciente-nombres" placeholder="">
-                                        </div>
+                                </div>
+                                <div class="form-group" inp-name="nombres">
+                                    <label for="usuario-nombres" class="control-label col-xs-12">Nombres</label>
+                                    <div class="col-xs-12">
+                                        <input type="text" class="form-control" id="usuario-nombres" placeholder="">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="paciente-apellidos" class="control-label col-xs-12">Apellidos</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" class="form-control" id="paciente-apellidos" placeholder="">
-                                        </div>
+                                </div>
+                                <div class="form-group" inp-name="apellidos">
+                                    <label for="usuario-apellidos" class="control-label col-xs-12">Apellidos</label>
+                                    <div class="col-xs-12">
+                                        <input type="text" class="form-control" id="usuario-apellidos" placeholder="">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="paciente-identificador" class="control-label col-xs-12">Identificador</label>
-                                        <div class="col-xs-12">
-                                            <div class="input-group">
-                                                <div class="input-group-btn">
-                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="id-tipo-paciente-sel-text">{{ $identificadores[1] }}</span> <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <?php
-                                                            $count = 0;
+                                </div>
+                                <div class="form-group" inp-name="identificador">
+                                    <label for="usuario-identificador" class="control-label col-xs-12">Identificador</label>
+                                    <div class="col-xs-12">
+                                        <div class="input-group">
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                    <span class="id-tipo-usuario-sel-text">{{ $identificadores[1] }}</span> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <?php
+                                                        $count = 0;
 
-                                                            foreach ($identificadores as $id => $identificador) {
-                                                        ?>
-                                                            <li>
-                                                                <a href="#" class="id-tipo-paciente <?php echo ($count === 0 ? "id-tipo-paciente-selected" : ""); ?>" data-tipo="{{ $id }}">
-                                                                    <span class="id-tipo-text">{{ $identificador }}</span>
-                                                                    <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
-                                                                </a>
-                                                            </li>
-                                                        <?php
-                                                                $count++;
-                                                            }
-                                                        ?>
-                                                    </ul>
-                                                </div>
-                                                <input type="text" class="form-control inp-id" id="paciente-identificador" data-tipo="1">
+                                                        foreach ($identificadores as $id => $identificador) {
+                                                    ?>
+                                                        <li>
+                                                            <a href="#" class="id-tipo-usuario <?php echo ($count === 0 ? "id-tipo-usuario-selected" : ""); ?>" data-tipo="{{ $id }}">
+                                                                <span class="id-tipo-text">{{ $identificador }}</span>
+                                                                <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
+                                                            </a>
+                                                        </li>
+                                                    <?php
+                                                            $count++;
+                                                        }
+                                                    ?>
+                                                </ul>
                                             </div>
+                                            <input type="text" class="form-control inp-id" id="usuario-identificador" data-tipo="1">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="paciente-fnac" class="control-label col-xs-12">Fecha nacimiento</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" id="paciente-fnac" class="form-control">
-                                        </div>
+                                </div>
+                                <div class="form-group" inp-name="fecha_nacimiento">
+                                    <label for="usuario-fnac" class="control-label col-xs-12">Fecha nacimiento</label>
+                                    <div class="col-xs-12">
+                                        <input type="text" id="usuario-fnac" class="form-control">
                                     </div>
-                                </form>
-
-                            </div>
-                            <div style="display: none;" class="register-content reg-count-3">
-                                <form>
-                                    <div class="form-group">
-                                        <label for="paciente-email" class="control-label col-xs-12">Correo electrónico</label>
-                                        <div class="col-xs-12">
-                                            <input type="email" class="form-control" id="doctor-email" placeholder="correo@ejemplo.com">
-                                        </div>
+                                </div>
+                                <div class="form-group" inp-name="sexo">
+                                    <label for="usuario-gen" class="control-label col-xs-12">Sexo</label>
+                                    <div class="col-xs-12">
+                                        <select id="usuario-gen" class="form-control">
+                                            @foreach($sexos as $id => $sexo)
+                                                <option value="{{ $id }}">{{ $sexo }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="doctor-password" class="control-label col-xs-12">Contraseña</label>
-                                        <div class="col-xs-12">
-                                            <input type="password" class="form-control" id="doctor-password" placeholder="">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="paciente-nombres" class="control-label col-xs-12">Nombres</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" class="form-control" id="doctor-nombres" placeholder="">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="paciente-apellidos" class="control-label col-xs-12">Apellidos</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" class="form-control" id="doctor-apellidos" placeholder="">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="doctor-identificador" class="control-label col-xs-12">Identificador</label>
-                                        <div class="col-xs-12">
-                                            <div class="input-group">
-                                                <div class="input-group-btn">
-                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="id-tipo-doctor-sel-text">{{ $identificadores[1] }}</span> <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <?php
-                                                            $count = 0;
-
-                                                            foreach ($identificadores as $id => $identificador) {
-                                                        ?>
-                                                            <li>
-                                                                <a href="#" class="id-tipo-doctor <?php echo ($count === 0 ? "id-tipo-doctor-selected" : ""); ?>" data-tipo="{{ $id }}">
-                                                                    <span class="id-tipo-text">{{ $identificador }}</span>
-                                                                    <span class="ui-icon ui-icon-check" style="float: right; margin-top: 1px;"></span>
-                                                                </a>
-                                                            </li>
-                                                        <?php
-                                                                $count++;
-                                                            }
-                                                        ?>
-                                                    </ul>
-                                                </div>
-                                                <input type="text" class="form-control inp-id" id="doctor-identificador" data-tipo="1">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="doctor-fnac" class="control-label col-xs-12">Fecha nacimiento</label>
-                                        <div class="col-xs-12">
-                                            <input type="text" id="doctor-fnac" class="form-control">
-                                        </div>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="panel-footer clearfix">
-                        <button id="btn-register-continue" class="btn btn-primary" style="float: right;" data-step="1" disabled>Continuar &rightarrow;</button>
+                        <a href="{{ route('usuario.login') }}">Atrás</a>
+                        <button id="btn-register-continue" class="btn btn-primary" data-step="1" disabled>Continuar &rightarrow;</button>
                     </div>
                 </div>
             </div>
@@ -289,11 +230,7 @@
     <script type="text/javascript">
         $(function () {
 
-            $('#doctor-fnac').datepicker({
-                maxDate: "{{ date('d-m-Y') }}"
-            });
-
-            $('#paciente-fnac').datepicker({
+            $('#usuario-fnac').datepicker({
                 maxDate: "{{ date('d-m-Y') }}"
             });
 
@@ -312,13 +249,13 @@
             //Se selecciona un tipo de cuenta
             $('#btn-register-continue').click(function () {
                 var $btn = $(this),
-                        selected = $('.register-option-selected'),
-                        esPaciente = (selected.data('tipo') === "paciente");
+                    selected = $('.register-option-selected'),
+                    esPaciente = (selected.data('tipo') === "paciente");
 
                 if ($btn.data('step') === 1) {
 
                     if (selected.length) {
-                        var nextContainer = esPaciente ? $('.reg-count-2') : $('.reg-count-3');
+                        var nextContainer = $('.reg-count-2');
 
                         $('.reg-count-1').toggle("slide", { direction: "left" }, 500);
 
@@ -339,13 +276,14 @@
                     var datos = {
                         _token: '{{ csrf_token() }}',
                         tipo: esPaciente ? 3 : 2,
-                        email: esPaciente ? $('#paciente-email').val() : $('#doctor-email').val(),
-                        nombres: esPaciente ? $('#paciente-nombres').val() : $('#doctor-nombres').val(),
-                        apellidos: esPaciente ? $('#paciente-apellidos').val() : $('#doctor-apellidos').val(),
-                        identificador: esPaciente ? $('#paciente-identificador').val() : $('#doctor-identificador').val(),
-                        id_tipo_identificador: esPaciente ? $('.id-tipo-paciente-selected').data('tipo') : $('.id-tipo-doctor-selected').data('tipo'),
-                        fecha_nacimiento: esPaciente ? $('#paciente-fnac').val('') : $('#doctor-fnac').val(''),
-                        password: esPaciente ? $('#paciente-password').val() : $('#doctor-password').val()
+                        email: $('#usuario-email').val(),
+                        nombres: $('#usuario-nombres').val(),
+                        apellidos: $('#usuario-apellidos').val(),
+                        identificador: $('#usuario-identificador').val(),
+                        id_tipo_identificador: $('.id-tipo-usuario-selected').data('tipo'),
+                        fecha_nacimiento: $('#usuario-fnac').val(),
+                        sexo: $('#usuario-gen').val(),
+                        password: $('#usuario-password').val()
                     };
 
                     sendPost('{{ route('usuario.signup') }}', datos, function () {
@@ -354,28 +292,16 @@
                 }
             });
 
-            $('.id-tipo-paciente').click(function () {
+            $('.id-tipo-usuario').click(function () {
                 var $this = $(this);
 
-                $('.id-tipo-paciente-selected').removeClass('id-tipo-paciente-selected');
+                $('.id-tipo-usuario-selected').removeClass('id-tipo-usuario-selected');
 
-                $this.addClass('id-tipo-paciente-selected');
+                $this.addClass('id-tipo-usuario-selected');
 
-                $('.id-tipo-paciente-sel-text').text($this.find('.id-tipo-text').text());
+                $('.id-tipo-usuario-sel-text').text($this.find('.id-tipo-text').text());
 
-                $('#paciente-identificador').data('tipo', $this.data('tipo')).blur();
-            });
-
-            $('.id-tipo-doctor').click(function () {
-                var $this = $(this);
-
-                $('.id-tipo-doctor-selected').removeClass('id-tipo-doctor-selected');
-
-                $this.addClass('id-tipo-doctor-selected');
-
-                $('.id-tipo-doctor-sel-text').text($this.find('.id-tipo-text').text());
-
-                $('#doctor-identificador').data('tipo', $this.data('tipo')).blur();
+                $('#usuario-identificador').data('tipo', $this.data('tipo')).blur();
             });
         });
     </script>

@@ -7,11 +7,11 @@ use App\Sexos;
 use App\SolicitudesVerificacion;
 use App\UsuarioAntecedentesFamiliares;
 use App\IntegrantesNucleoFamiliar;
+use App\TiposIdentificador;
 use App\UsuarioEnfermedadesHistoricas;
 use App\UsuarioEnfermedadesActuales;
 use App\Http\Controllers\GlobalController;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -24,7 +24,10 @@ class UsuarioController extends Controller
     }
 
     public function register() {
-        return view('registro');
+        return view('registro', [
+            "sexos" => Sexos::pluck('nombre', 'id'),
+            "identificadores" => TiposIdentificador::pluck('nombre', 'id'),
+        ]);
     }
 
     public function profile() {
@@ -110,8 +113,9 @@ class UsuarioController extends Controller
             'apellidos' => 'required|max:100',
             'identificador' => 'required|max:50|unique_with:usuarios,id_tipo_identificador = id_tipo_identificador',
             'id_tipo_identificador' => 'required|exists:tipos_identificador,id',
-            'fecha_nacimiento' => 'required|max:10|date_format:"d-m-Y"',
             'password' => 'required|max:50|min:6',
+            'fecha_nacimiento' => 'required|max:10|date_format:"d-m-Y"',
+            'sexo' => 'required|exists:sexos,id',
         ], [
             'identificador.unique_with' => 'El identificador "' . $request['identificador'] . '" ya existe para el tipo de identificación seleccionada.',
         ], [
@@ -120,9 +124,10 @@ class UsuarioController extends Controller
             'nombres' => 'Nombres',
             'apellidos' => 'Apellidos',
             'identificador' => 'Identificador',
-            'tipo_identificador' => 'Tipo de identificador',
+            'id_tipo_identificador' => 'Tipo de identificador',
             'password' => 'Contraseña',
             'fecha_nacimiento' => 'Fecha de nacimiento',
+            'sexo' => 'Sexo',
         ]);
 
         $datos = [
@@ -140,6 +145,7 @@ class UsuarioController extends Controller
         $usuario->id_tipo_usuario = $request['tipo'];
         $usuario->id_tipo_identificador = $request['id_tipo_identificador'];
         $usuario->fecha_nacimiento = $request["fecha_nacimiento"];
+        $usuario->id_sexo = $request["sexo"];
 
         $nUsuariosMismoIdTipoId = DB::table('usuarios')->where('identificador', '=', $usuario->identificador)->where('id_tipo_identificador', '=', $usuario->id_tipo_identificador)->count();
 
