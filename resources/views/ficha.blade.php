@@ -8,8 +8,10 @@ use \App\UsuarioAntecedentesFamiliares;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
-$anios = GlobalController::edad_anios($usuario["fecha_nacimiento"]);
-$sexo =  Usuario::find($usuario["id"])->sexo()->first();
+$usuarioDB = Usuario::find($id);
+
+$anios = GlobalController::edad_anios($usuarioDB->fecha_nacimiento);
+$sexo =  $usuarioDB->sexo()->first();
 
 $usuarioAntFamId = []; //id de antecedentes familiares ya seteados por el usuario
 $nespecificaciones = 0;
@@ -18,7 +20,7 @@ foreach ($afu as $a) {
     $usuarioAntFamId[] = $a->id;
 }
 
-$titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . GlobalController::edad($usuario["fecha_nacimiento"]));
+$titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . GlobalController::edad($usuarioDB->fecha_nacimiento));
 
 //var_dump($enfermedadesActuales);
 //var_dump($enfermedadesHistoricas);
@@ -111,12 +113,12 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
 
     <div class="professional-profile-header">
         <div class="pp-pic-container">
-            <img src="{{ URL::to('profilePics/' . UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"])) }}" class="img-circle">
+            <img src="{{ URL::to('profilePics/' . UsuarioController::getProfilePic($usuarioDB->profile_pic_path, $usuarioDB->id_sexo)) }}" class="img-circle">
         </div>
         <div class="pp-presentation paciente">
             <div class="pp-fold paciente"></div>
             <div class="pp-name font-title-normal-on-xs" title="Nombre completo del profesional">
-                {{ $usuario["nombres"] . ' ' . $usuario["apellidos"] }}
+                {{ $usuarioDB->nombres . ' ' . $usuarioDB->apellidos }}
             </div>
             <div class="pp-title" title="Sexo, edad.">
                 {{ $titulo }}
@@ -220,7 +222,7 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
                 </div>
                 <div class="form-group">
                     <label for="ant-per-act-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">tenga actualmente</span>:</label>
-                    <textarea class="form-control txta-vert" id="ant-per-act-etc" data-original="{{ $usuario["comentario_condiciones_actuales"] }}">{{ $usuario["comentario_condiciones_actuales"] }}</textarea>
+                    <textarea class="form-control txta-vert" id="ant-per-act-etc" data-original="{{ $usuarioDB->comentario_condiciones_actuales }}">{{ $usuarioDB->comentario_condiciones_actuales }}</textarea>
                 </div>
                 <hr class="hr2">
                 <div class="form-group">
@@ -233,7 +235,7 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
                 </div>
                 <div class="form-group">
                     <label for="ant-per-hist-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">haya tenido</span>:</label>
-                    <textarea class="form-control txta-vert" id="ant-per-hist-etc" data-original="{{ $usuario["comentario_condiciones_historicas"] }}">{{ $usuario["comentario_condiciones_historicas"] }}</textarea>
+                    <textarea class="form-control txta-vert" id="ant-per-hist-etc" data-original="{{ $usuarioDB->comentario_condiciones_historicas }}">{{ $usuarioDB->comentario_condiciones_historicas }}</textarea>
                 </div>
             </div>
         </fieldset>

@@ -43,62 +43,31 @@ class UsuarioController extends Controller
     }
 
     public function profesion() {
+        $usuario = Auth::user()["attributes"];
+
         return view('career', [
-            "usuario" => Auth::user()["attributes"],
+            "usuario" => $usuario,
+            "id" => $usuario["id"],
+            "isOwnUser" => true,
         ]);
     }
 
-    public function ficha() {
-        $usuario = Auth::user()["attributes"];
-
-        $nucleoFamiliar = DB::table('integrantes_nucleo_familiar as inf')
-                            ->join('parentescos as p', 'p.id', '=', 'inf.id_parentesco')
-                            ->join('estados_salud as e', 'e.id', '=', 'inf.id_estado_salud')
-                            ->where('id_usuario', '=', $usuario["id"])
-                            ->select('inf.*', 'p.nombre as nombre_parentesco', 'e.nombre as nombre_estado')->get();
-
-        $antecedentesFamiliares = DB::table('usuario_antecedentes_familiares as uaf')
-            ->join('antecedentes_familiares_opciones as afo', 'uaf.id_antecedentes_familiares_opciones', '=', 'afo.id')
-            ->where('uaf.id_usuario', '=', $usuario["id"])
-            ->select('afo.id', 'afo.nombre', 'uaf.especificacion', 'afo.necesita_especificacion', 'uaf.id as id_usuario_antecedente_familiar')->orderBy('afo.nombre', 'asc')->get();
-
-        $enfermedades = DB::table('enfermedades_antecedentes_personales as eap')->orderBy('eap.nombre', 'asc')->get();
-
-        $enfermedadesActualesUsuario = DB::table('enfermedades_antecedentes_personales as eap')
-            ->join('usuario_enfermedades_actuales as uea', 'uea.id_enfermedad', '=', 'eap.id')
-            ->where('uea.id_usuario', '=', $usuario["id"])
-            ->select('eap.id')
-            ->get();
-
-        $enfermedadesActuales = [];
-
-        foreach ($enfermedadesActualesUsuario as $ea) {
-            $enfermedadesActuales[] = $ea->id;
-        }
-
-        $enfermedadesHistoricasUsuario = DB::table('enfermedades_antecedentes_personales as eap')
-            ->join('usuario_enfermedades_historicas as ueh', 'ueh.id_enfermedad', '=', 'eap.id')
-            ->where('ueh.id_usuario', '=', $usuario["id"])
-            ->select('eap.id')
-            ->get();
-
-        $enfermedadesHistoricas = [];
-
-        foreach ($enfermedadesHistoricasUsuario as $ea) {
-            $enfermedadesHistoricas[] = $ea->id;
-        }
-
-        return view('ficha', [
-            "usuario" => $usuario,
-            "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get(), //Opciones de antecedentes familiares
-            "parentescos" => DB::table('parentescos')->orderBy('nombre', 'asc')->get(), //Opciones de parentesco
-            "estadosSalud" => DB::table('estados_salud')->orderBy('id', 'asc')->get(), //Opciones de estado de salud
-            "afu" => $antecedentesFamiliares, //afu = antecedentes familiares usuario
-            "nucleoFamiliar" => $nucleoFamiliar->toArray(),
-            "enfermedades" => $enfermedades,
-            "enfermedadesActuales" => $enfermedadesActuales,
-            "enfermedadesHistoricas" => $enfermedadesHistoricas,
+    public function doctorProfile(Request $request, $id) {
+        return view('career', [
+            "usuario" => Auth::user()["attributes"],
+            "id" => $id,
+            "isOwnUser" => false,
         ]);
+    }
+
+    //un usuario paciente ve su pripia ficha...
+    public function ficha() {
+        return view('ficha', $this->getDatosFicha(Auth::user()["attributes"]["id"], true));
+    }
+
+    //Un usuario ve la ficha de otro usuario paciente
+    public function patientProfile(Request $request, $id) {
+        return view('ficha', $this->getDatosFicha($id, false));
     }
 
     public function store(Request $request) {
@@ -760,6 +729,60 @@ class UsuarioController extends Controller
         }
 
         return $icon;
+    }
+
+    private function getDatosFicha($id, $isOwnUser) {
+
+        $nucleoFamiliar = DB::table('integrantes_nucleo_familiar as inf')
+            ->join('parentescos as p', 'p.id', '=', 'inf.id_parentesco')
+            ->join('estados_salud as e', 'e.id', '=', 'inf.id_estado_salud')
+            ->where('id_usuario', '=', $id)
+            ->select('inf.*', 'p.nombre as nombre_parentesco', 'e.nombre as nombre_estado')->get();
+
+        $antecedentesFamiliares = DB::table('usuario_antecedentes_familiares as uaf')
+            ->join('antecedentes_familiares_opciones as afo', 'uaf.id_antecedentes_familiares_opciones', '=', 'afo.id')
+            ->where('uaf.id_usuario', '=', $id)
+            ->select('afo.id', 'afo.nombre', 'uaf.especificacion', 'afo.necesita_especificacion', 'uaf.id as id_usuario_antecedente_familiar')->orderBy('afo.nombre', 'asc')->get();
+
+        $enfermedades = DB::table('enfermedades_antecedentes_personales as eap')->orderBy('eap.nombre', 'asc')->get();
+
+        $enfermedadesActualesUsuario = DB::table('enfermedades_antecedentes_personales as eap')
+            ->join('usuario_enfermedades_actuales as uea', 'uea.id_enfermedad', '=', 'eap.id')
+            ->where('uea.id_usuario', '=', $id)
+            ->select('eap.id')
+            ->get();
+
+        $enfermedadesActuales = [];
+
+        foreach ($enfermedadesActualesUsuario as $ea) {
+            $enfermedadesActuales[] = $ea->id;
+        }
+
+        $enfermedadesHistoricasUsuario = DB::table('enfermedades_antecedentes_personales as eap')
+            ->join('usuario_enfermedades_historicas as ueh', 'ueh.id_enfermedad', '=', 'eap.id')
+            ->where('ueh.id_usuario', '=', $id)
+            ->select('eap.id')
+            ->get();
+
+        $enfermedadesHistoricas = [];
+
+        foreach ($enfermedadesHistoricasUsuario as $ea) {
+            $enfermedadesHistoricas[] = $ea->id;
+        }
+
+        return [
+            "id" => $id,
+            "usuario" => Auth::user()["attributes"],
+            "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get(), //Opciones de antecedentes familiares
+            "parentescos" => DB::table('parentescos')->orderBy('nombre', 'asc')->get(), //Opciones de parentesco
+            "estadosSalud" => DB::table('estados_salud')->orderBy('id', 'asc')->get(), //Opciones de estado de salud
+            "afu" => $antecedentesFamiliares, //afu = antecedentes familiares usuario
+            "nucleoFamiliar" => $nucleoFamiliar->toArray(),
+            "enfermedades" => $enfermedades,
+            "enfermedadesActuales" => $enfermedadesActuales,
+            "enfermedadesHistoricas" => $enfermedadesHistoricas,
+            "isOwnUser" => $isOwnUser,
+        ];
     }
 }
 

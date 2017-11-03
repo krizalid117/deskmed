@@ -3,20 +3,20 @@
 use \App\Http\Controllers\UsuarioController;
 use \App\Usuario;
 
-$usuarioDB = Usuario::find($usuario["id"]);
+$usuarioDB = Usuario::find($id);
 
 $verificacion = $usuarioDB->verificaciones()->orderby('updated_at', 'desc')->first();
 
 $solicitudVerificacion = $usuarioDB->solicitudes_verificacion()->orderby('updated_at', 'desc')->first();
 
-$profesionalVerificado = ($usuario["autenticidad_profesional_verificada"] && $verificacion);
+$profesionalVerificado = ($usuarioDB->autenticidad_profesional_verificada && $verificacion);
 
-$titulo = $profesionalVerificado ? $verificacion->titulo_habilitante_legal : (($usuario["titulo_segun_usuario"] && $usuario["titulo_segun_usuario"] !== "") ? $usuario["titulo_segun_usuario"] : "Sin especificar");
-$institucion = $profesionalVerificado ? $verificacion->institucion_habilitante : (($usuario["institucion_habilitante_segun_usuario"] && $usuario["institucion_habilitante_segun_usuario"] !== "") ? $usuario["institucion_habilitante_segun_usuario"] : "Sin especificar");
-$especialidad = $profesionalVerificado ? $verificacion->especialidad : (($usuario["especialidad_segun_usuario"] && $usuario["especialidad_segun_usuario"] !== "") ? $usuario["especialidad_segun_usuario"] : "Sin especificar");
-$nregistro = $profesionalVerificado ? $verificacion->nregistro : (($usuario["nregistro_segun_usuario"] && $usuario["nregistro_segun_usuario"] !== "") ? $usuario["nregistro_segun_usuario"] : "Sin especificar");
-$fechaRegistro = $profesionalVerificado ? $verificacion->fecha_registro : (($usuario["fecha_registro_segun_usuario"] && $usuario["fecha_registro_segun_usuario"] !== "") ? $usuario["fecha_registro_segun_usuario"] : "Sin especificar");
-$antecedenteTitulo = $profesionalVerificado ? $verificacion->antecedente_titulo : (($usuario["antecedente_titulo_segun_usuario"] && $usuario["antecedente_titulo_segun_usuario"] !== "") ? $usuario["antecedente_titulo_segun_usuario"] : "Sin especificar");
+$titulo = $profesionalVerificado ? $verificacion->titulo_habilitante_legal : (($usuarioDB->titulo_segun_usuario && $usuarioDB->titulo_segun_usuario !== "") ? $usuarioDB->titulo_segun_usuario : "Sin especificar");
+$institucion = $profesionalVerificado ? $verificacion->institucion_habilitante : (($usuarioDB->institucion_habilitante_segun_usuario && $usuarioDB->institucion_habilitante_segun_usuario !== "") ? $usuarioDB->institucion_habilitante_segun_usuario : "Sin especificar");
+$especialidad = $profesionalVerificado ? $verificacion->especialidad : (($usuarioDB->especialidad_segun_usuario && $usuarioDB->especialidad_segun_usuario !== "") ? $usuarioDB->especialidad_segun_usuario : "Sin especificar");
+$nregistro = $profesionalVerificado ? $verificacion->nregistro : (($usuarioDB->nregistro_segun_usuario && $usuarioDB->nregistro_segun_usuario !== "") ? $usuarioDB->nregistro_segun_usuario : "Sin especificar");
+$fechaRegistro = $profesionalVerificado ? $verificacion->fecha_registro : (($usuarioDB->fecha_registro_segun_usuario && $usuarioDB->fecha_registro_segun_usuario !== "") ? $usuarioDB->fecha_registro_segun_usuario : "Sin especificar");
+$antecedenteTitulo = $profesionalVerificado ? $verificacion->antecedente_titulo : (($usuarioDB->antecedente_titulo_segun_usuario && $usuarioDB->antecedente_titulo_segun_usuario !== "") ? $usuarioDB->antecedente_titulo_segun_usuario : "Sin especificar");
 
 //1 = verificado, 2 = verificacion en curso, 0 = no verificado
 $estadoVerificacion = ($profesionalVerificado ? 1 : ($solicitudVerificacion && $solicitudVerificacion->estado === 0 ? 2 : 0));
@@ -124,12 +124,12 @@ switch ($estadoVerificacion) {
 
     <div class="professional-profile-header">
         <div class="pp-pic-container">
-            <img src="{{ URL::to('profilePics/' . UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"])) }}" class="img-circle">
+            <img src="{{ URL::to('profilePics/' . UsuarioController::getProfilePic($usuarioDB->profile_pic_path, $usuarioDB->id_sexo)) }}" class="img-circle">
         </div>
         <div class="pp-presentation doctor">
             <div class="pp-fold doctor"></div>
             <div class="pp-name font-title-normal-on-xs" title="Nombre completo del profesional">
-                {{ $usuario["nombres"] . ' ' . $usuario["apellidos"] }}
+                {{ $usuarioDB->nombres . ' ' . $usuarioDB->apellidos }}
             </div>
             <div class="pp-title" title="Título o habilitación profesional">
                 {{ $titulo }}
@@ -267,37 +267,37 @@ switch ($estadoVerificacion) {
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="titulo">' +
                             '<label for="pp-temp-titulo" class="form-label">Título</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-titulo" autocomplete="off" value="{{ $usuario["titulo_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-titulo" autocomplete="off" value="{{ $usuarioDB->titulo_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="institucion">' +
                             '<label for="pp-temp-institucion" class="form-label">Intitución</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-institucion" autocomplete="off" value="{{ $usuario["institucion_habilitante_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-institucion" autocomplete="off" value="{{ $usuarioDB->institucion_habilitante_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="especialidad">' +
                             '<label for="pp-temp-especialidad" class="form-label">Especialidad</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-especialidad" autocomplete="off" value="{{ $usuario["especialidad_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-especialidad" autocomplete="off" value="{{ $usuarioDB->especialidad_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="nregistro">' +
                             '<label for="pp-temp-nregistro" class="form-label">N° registro</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-nregistro" autocomplete="off" value="{{ $usuario["nregistro_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-nregistro" autocomplete="off" value="{{ $usuarioDB->nregistro_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="fregistro">' +
                             '<label for="pp-temp-fregistro" class="form-label">Fecha registro</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-fregistro" style="background-color: #fff; cursor: text;" autocomplete="off" readonly value="{{ $usuario["fecha_registro_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-fregistro" style="background-color: #fff; cursor: text;" autocomplete="off" readonly value="{{ $usuarioDB->fecha_registro_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                     '<div class="col-sm-6">' +
                         '<div class="form-group" inp-name="antecedente">' +
                             '<label for="pp-temp-antecedente" class="form-label">Antecedente de título</label>' +
-                            '<input type="text" class="form-control" id="pp-temp-antecedente" autocomplete="off" value="{{ $usuario["antecedente_titulo_segun_usuario"] }}">' +
+                            '<input type="text" class="form-control" id="pp-temp-antecedente" autocomplete="off" value="{{ $usuarioDB->antecedente_titulo_segun_usuario }}">' +
                         '</div>' +
                     '</div>' +
                 '</div>').dialog({

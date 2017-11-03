@@ -95,10 +95,10 @@ use \App\Http\Controllers\GlobalController;
                         <ul class="search-results-list search-docs">
                             @foreach ($results["d"]["results"] as $r)
                                 <li class="search-result-item-d">
-                                    <a href="#">
+                                    <a href="{{ route('doctors.profile', $r->id) }}" class="result-item">
                                         <div class="result-profile-pic">
 {{--                                            <img class="profile-pic" src="{{ '/profilePics/' . UsuarioController::getProfilePic($r->profile_pic_path, $r->id_sexo) }}" alt="{{ $r->nombres }}">--}}
-                                            <img class="profile-pic img-circle" src="{{ "http://graph.facebook.com/v2.5/" . random_int(555, 10000) . "/picture?width=200&height=200" }}" alt="{{ $r->nombres }}">
+                                            <img class="profile-pic img-circle" src="{{ "http://graph.facebook.com/v2.5/" . random_int(555, 10000) . "/picture?width=400&height=400" }}" alt="{{ $r->nombres }}">
                                             <img class="estado" src="/img/{{ $r->icon }}.png" alt="{{ $r->icon }}" title="{{ ($r->icon === "verified" ? "Profesional de la salud verificado" : ($r->icon === "waiting" ? "Verificación profesional en proceso" : "Profesional sin verificación")) }}">
                                         </div>
                                         <div class="result-name">
@@ -121,10 +121,10 @@ use \App\Http\Controllers\GlobalController;
                         <ul class="search-results-list search-pat">
                             @foreach ($results["p"]["results"] as $r)
                                 <li class="search-result-item-p">
-                                    <a href="#">
+                                    <a href="{{ route('patients.profile', $r->id) }}" class="result-item">
                                         <div class="result-profile-pic">
                                             {{--<img class="profile-pic" src="{{ '/profilePics/' . UsuarioController::getProfilePic($r->profile_pic_path, $r->id_sexo) }}" alt="{{ $r->nombres }}">--}}
-                                            <img class="profile-pic img-circle" src="{{ "http://graph.facebook.com/v2.5/" . random_int(1, 10000) . "/picture?width=200&height=200" }}" alt="{{ $r->nombres }}">
+                                            <img class="profile-pic img-circle" src="{{ "http://graph.facebook.com/v2.5/" . random_int(1, 10000) . "/picture?width=400&height=400" }}" alt="{{ $r->nombres }}">
                                         </div>
                                         <div class="result-name">
                                             <span class="bold">{{ $r->nombres . " " . $r->apellidos }}</span>
@@ -148,6 +148,10 @@ use \App\Http\Controllers\GlobalController;
 
 @section('scripts')
     <script type="text/javascript">
-
+//        $('.result-item').click(function (e) {
+//            e.preventDefault();
+//
+//
+//        });
     </script>
 @endsection
