@@ -194,18 +194,20 @@ switch ($estadoVerificacion) {
                 </div>
             </div>
         </div>
-        @if ($estadoVerificacion === 0)
-        <div class="pp-extra-option">
-            <a href="#" id="solicitar-verificacion">Solicitar verificación de título</a>
-            <span class="ui-icon ui-icon-help deskmed-icon-help" title="Solicite que el equipo de Deskmed verifique la autenticidad de su título como profesional de la salud. Esto se hace consultando con la Superintendencia de Salud. Puede tardar 48 horas hábiles como máximo. Todos sus datos como profesional serán cargados automáticamente. Mientras, puede agregarlos por usted mismo, pero se le advertirá a cualquier otro usuario viendo su perfil profesional que aun no está verificado."></span>
-        </div>
-        @endif
-
-        @if ($estadoVerificacion === 0 || $estadoVerificacion === 2)
+        @if ($isOwnUser)
+            @if ($estadoVerificacion === 0)
             <div class="pp-extra-option">
-                <a href="#" id="editar-pp-temporal">Agregar/editar datos temporales</a>
-                <span class="ui-icon ui-icon-help deskmed-icon-help" title="Puede cambiar los datos de su perfil profesional de forma temporal mientras no esté verificado."></span>
+                <a href="#" id="solicitar-verificacion">Solicitar verificación de título</a>
+                <span class="ui-icon ui-icon-help deskmed-icon-help" title="Solicite que el equipo de Deskmed verifique la autenticidad de su título como profesional de la salud. Esto se hace consultando con la Superintendencia de Salud. Puede tardar 48 horas hábiles como máximo. Todos sus datos como profesional serán cargados automáticamente. Mientras, puede agregarlos por usted mismo, pero se le advertirá a cualquier otro usuario viendo su perfil profesional que aun no está verificado."></span>
             </div>
+            @endif
+
+            @if ($estadoVerificacion === 0 || $estadoVerificacion === 2)
+                <div class="pp-extra-option">
+                    <a href="#" id="editar-pp-temporal">Agregar/editar datos temporales</a>
+                    <span class="ui-icon ui-icon-help deskmed-icon-help" title="Puede cambiar los datos de su perfil profesional de forma temporal mientras no esté verificado."></span>
+                </div>
+            @endif
         @endif
     </div>
 @endsection

@@ -285,8 +285,14 @@
     }
 
     function buscar(keyword) {
-        if (keyword.length > 2) {
-            window.location = '/search/' + keyword;
+
+        var kword = keyword.replace(/[\.\+,\-_!\|°"#\$%&/\^\(\)=\?¿¡\*]/g, "");
+
+        if (kword.length > 0) {
+            window.location = '/search/' + kword;
+        }
+        else {
+            alert("lala");
         }
     }
 </script>

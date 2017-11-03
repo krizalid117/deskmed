@@ -57,9 +57,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/cambio_condicion_comentario', 'UsuarioController@cambioCondicionComentario')->name('usuarios.ficha.cambioCondicionComentario');
     });
 
-    Route::get('/user/patients/{id}/record', 'UsuarioController@patientProfile')->name('patients.profile');
+    Route::get('/patients/{id}/record', 'UsuarioController@patientProfile')->name('patients.profile');
 
-    Route::get('/user/professionals/{id}/profile', 'UsuarioController@doctorProfile')->name('doctors.profile');
+    Route::get('/professionals/{id}/profile', 'UsuarioController@doctorProfile')->name('doctors.profile');
 
     Route::get('/user/profile', 'UsuarioController@profile')->name('usuario.profile');
 

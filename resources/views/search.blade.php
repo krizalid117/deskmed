@@ -9,7 +9,7 @@ use \App\Http\Controllers\GlobalController;
 
 @extends('layouts.app')
 
-@section('title', '| Búsqueda')
+@section('title', '| Búsqueda: ' . $keyword)
 
 @section('stylesheets')
     <style type="text/css">
@@ -148,10 +148,8 @@ use \App\Http\Controllers\GlobalController;
 
 @section('scripts')
     <script type="text/javascript">
-//        $('.result-item').click(function (e) {
-//            e.preventDefault();
-//
-//
-//        });
+        $(function () {
+            $('.txt-header-search').focus().select();
+        });
     </script>
 @endsection
