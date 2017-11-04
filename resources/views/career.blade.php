@@ -9,7 +9,7 @@ $verificacion = $usuarioDB->verificaciones()->orderby('updated_at', 'desc')->fir
 
 $solicitudVerificacion = $usuarioDB->solicitudes_verificacion()->orderby('updated_at', 'desc')->first();
 
-$profesionalVerificado = ($usuarioDB->autenticidad_profesional_verificada && $verificacion);
+$profesionalVerificado = (!is_null($verificacion) && $verificacion->habilitado);
 
 $titulo = $profesionalVerificado ? $verificacion->titulo_habilitante_legal : (($usuarioDB->titulo_segun_usuario && $usuarioDB->titulo_segun_usuario !== "") ? $usuarioDB->titulo_segun_usuario : "Sin especificar");
 $institucion = $profesionalVerificado ? $verificacion->institucion_habilitante : (($usuarioDB->institucion_habilitante_segun_usuario && $usuarioDB->institucion_habilitante_segun_usuario !== "") ? $usuarioDB->institucion_habilitante_segun_usuario : "Sin especificar");
@@ -85,14 +85,85 @@ switch ($estadoVerificacion) {
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
 
-            bottom: calc(-30% - 20px);
+            bottom: calc(-30% - 14px);
             left: 50%;
             transform: translateX(-45%);
+
+            min-height: 58px;
         }
 
         .pp-extra-option {
             text-align: right;
             padding-right: 15px;
+        }
+
+        .professional-options {
+            position: absolute;
+            top: 12px;
+            right: 8px;
+
+            cursor: pointer;
+            background-color: transparent;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            border-radius: 50%;
+
+            -webkit-transition: background-color 200ms;
+            -moz-transition: background-color 200ms;
+            -ms-transition: background-color 200ms;
+            -o-transition: background-color 200ms;
+            transition: background-color 200ms;
+        }
+
+        .professional-options:hover {
+            background-color: #335e9b;
+        }
+
+        .professional-options-container {
+            position: absolute;
+            top: 27px;
+            right: 41px;
+            padding: 3px 0;
+            background-color: var(--normal-background-color);
+            text-align: left;
+            color: black;
+            list-style: none;
+            margin-bottom: 0;
+            border: 1px solid #d2d2d2;
+            z-index: 1;
+
+            display: none;
+
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        .professional-options-container > li:not(.divider) {
+            height: 30px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            cursor: pointer;
+
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .professional-options-container > li:not(.divider):hover {
+            background-color: #d2d2d2;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 5px 7px;
+            overflow: hidden;
+            background-color: #e5e5e5;
         }
 
         @media (max-width: 767px) {
@@ -135,17 +206,23 @@ switch ($estadoVerificacion) {
                 {{ $titulo }}
             </div>
             <span class="is-verified" title="{{ $estadoTitle }}"></span>
+
+            @if(!$isOwnUser)
+                <span class="professional-options glyphicon glyphicon-option-vertical"></span>
+            @endif
         </div>
         <div class="pp-estado-verificacion">
             {{ $estadoTitle }}
         </div>
+        @if(!$isOwnUser)
+            <ul class="professional-options-container">
+                <li>Añadir a&nbsp;"<span class="bold">Mis profesionales de la salud</span>"</li>
+                <li class="divider"></li>
+                <li>Reportar</li>
+            </ul>
+        @endif
     </div>
     <div class="basic-form-container">
-        {{--<div style="text-align: right; padding: 0 15px; margin-bottom: 15px;">--}}
-            {{--<button class="btn btn-primary">--}}
-                {{--<span class="glyphicon glyphicon-pencil"></span>--}}
-            {{--</button>--}}
-        {{--</div>--}}
         <div class="col-sm-12 point titulo-body">
             <div class="panel panel-primary">
                 <div class="panel-heading">Título o habilitación profesional</div>
@@ -215,6 +292,8 @@ switch ($estadoVerificacion) {
 @section('scripts')
 
     <script type="text/javascript">
+        var container = $('.professional-options-container');
+
         $(function () {
             $('#solicitar-verificacion').click(function (e) {
                 e.preventDefault();
@@ -347,7 +426,34 @@ switch ($estadoVerificacion) {
                     maxDate: "{{ date('d-m-Y') }}"
                 });
             });
+
+            $('.professional-options').click(function () {
+                if (!container.hasClass('active-cont')) {
+                    container.fadeIn(400, function () {
+                        container.addClass('active-cont');
+                    });
+                }
+                else {
+                    cerrarContainerOptions();
+                }
+            });
+
+            $(document).click(function (e) {
+                var $target = $(e.target);
+
+                if (!$target.is('.professional-options-container') && !$target.parents().is('.professional-options-container')) {
+                    cerrarContainerOptions();
+                }
+            });
         });
+
+        function cerrarContainerOptions() {
+            if (container.hasClass('active-cont')) {
+                container.fadeOut(400, function () {
+                    container.removeClass('active-cont');
+                });
+            }
+        }
     </script>
 
 @endsection

@@ -466,13 +466,13 @@ input, textarea {
     list-style: none;
 }
 
-.side-menu-item-container .side-menu-collapser
+.side-menu-collapser
 , .side-menu-item-container .side-menu-item {
     /*padding: 5px 10px 5px 15px;*/
     padding: 5px 13px;
 }
 
-.side-menu-item-container .side-menu-collapser {
+.side-menu-collapser {
     margin-bottom: 3px;
     display: flex;
     align-items: center;
@@ -944,7 +944,7 @@ fieldset {
     width: 100%;
     height: 120px;
     margin-left: 60px;
-    /*padding-left: 65px;*/
+    padding-right: 60px;
 
     position: relative;
     z-index: 0;
@@ -1027,9 +1027,24 @@ fieldset {
     padding: 0 20px;
 }
 
+.side-menu-xs {
+    height: 50px;
+
+    border-bottom: 1px solid black;
+
+    webkit-box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
+    box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
+}
+
 /*** XS ***/
 
 @media (max-width: 767px) {
+
+    .content {
+        margin-left: 0;
+    }
+
     .font-title-normal-on-xs {
         font-size: 1.4em;
         font-weight: 500;
@@ -1060,7 +1075,7 @@ fieldset {
     .pp-presentation {
         font-size: .75em;
         padding-left: 65px;
-        padding-right: 5px;
+        padding-right: 0;
     }
 
     .pp-title {
@@ -1089,7 +1104,7 @@ fieldset {
     }
 
     .table-responsive {
-        max-width: 260px;
+        max-width: 320px;
     }
 
     .basic-form-container {

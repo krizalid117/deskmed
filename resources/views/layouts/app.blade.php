@@ -73,14 +73,20 @@
 <script> {{-- Scripts para el menu --}}
 
     var menuCollapser = $('.side-menu-collapser').find('button');
+    var menuContenedorItems = $('.side-menu-item-container');
+    var menuLateral = $('.side-menu-minified');
     var profile = $('.header-a-profile');
 
     $(function () {
+        setXsClasses();
+
         menuCollapser.data('collapsed', true);
         profile.data('open', false);
 
         /* Colapsar y descolapsar menú lateral */
         menuCollapser.click(function () {
+            console.log(document.documentElement.clientWidth);
+
             if (menuCollapser.data('collapsed') === true) {
                 menuAbrir();
             }
@@ -196,7 +202,22 @@
                 buscar(keyword);
             }
         });
+
+        $(window).resize(function () {
+            setXsClasses();
+        });
     });
+
+    function setXsClasses() {
+        if (document.documentElement.clientWidth <= 767) {
+            menuContenedorItems.addClass('hidden');
+            menuLateral.addClass('side-menu-xs');
+        }
+        else {
+            menuContenedorItems.removeClass('hidden');
+            menuLateral.removeClass('side-menu-xs');
+        }
+    }
 
     function menuAbrir(callback) {
         if (!menuCollapser.hasClass('menu-icon-disable') && menuCollapser.data('collapsed') === true) {
@@ -205,7 +226,13 @@
             menuCollapser.data('collapsed', false);
 
             menuCollapser.addClass('is-active');
-            $('.side-menu-minified').css('width', '300px');
+
+            if (document.documentElement.clientWidth <= 767) {
+                menuContenedorItems.removeClass('hidden');
+                menuLateral.removeClass('side-menu-xs');
+            }
+
+            menuLateral.css('width', '300px');
             $('.side-menu-item').removeAttr('title');
 
             setTimeout(function () {
@@ -229,7 +256,8 @@
             menuCollapser.data('collapsed', true);
 
             menuCollapser.removeClass('is-active');
-            $('.side-menu-minified').css('width', '60px');
+
+            menuLateral.css('width', '60px');
 
             $('.img-menu').not('.img-menu-toggle').each(function () {
                 $(this).closest('.side-menu-item').attr('title', $(this).data('title'));
@@ -239,6 +267,11 @@
 
             setTimeout(function () {
                 menuCollapser.removeClass('menu-icon-disable');
+
+                if (document.documentElement.clientWidth <= 767) {
+                    menuContenedorItems.addClass('hidden');
+                    menuLateral.addClass('side-menu-xs');
+                }
 
                 if (callback) {
                     callback();

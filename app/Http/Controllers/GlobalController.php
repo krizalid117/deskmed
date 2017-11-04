@@ -109,7 +109,7 @@ class GlobalController
             , s.alias_adulto
             , s.alias_infantil
             , case
-                when u.autenticidad_profesional_verificada is true and v.habilitado is true then
+                when coalesce(v.habilitado, false) is true then
                     'verified'
                 when exists(select 1 from solicitud_verificacion sv where sv.id_usuario = u.id and sv.estado = 0) then
                     'waiting'

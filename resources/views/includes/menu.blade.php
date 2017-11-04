@@ -1,15 +1,17 @@
 <?php
     $currentView = Route::current()->getName();
+
+    $labelTratamientos = ($usuario["id_tipo_usuario"] === 2 ? "Tratamientos" : ($usuario["id_tipo_usuario"] === 3 ? "Mis tratamientos" : "Tratamientos de pacientes"));
 ?>
 
 <div class="side-menu-container">
     <div class="side-menu-minified">
+        <div class="side-menu-collapser">
+            <button class="c-hamburger c-hamburger--htx">
+                <span>toggle menu</span>
+            </button>
+        </div>
         <ul class="side-menu-item-container">
-            <li class="side-menu-collapser">
-                <button class="c-hamburger c-hamburger--htx">
-                    <span>toggle menu</span>
-                </button>
-            </li>
             <li class="side-menu-item menu-home {{ ($currentView === "home" ? "side-menu-selected" : "") }}" title="Inicio">
                 <img class="img-menu" src="{{ URL::to('img/home.png') }}" alt="home" data-title="Inicio">
                 <div class="content-menu">Inicio</div>
@@ -25,7 +27,6 @@
                     <div class="content-menu">Mis doctores</div>
                 </li>
             @endif
-            <?php $labelTratamientos = ($usuario["id_tipo_usuario"] === 2 ? "Tratamientos" : ($usuario["id_tipo_usuario"] === 3 ? "Mis tratamientos" : "Tratamientos de pacientes")); ?>
             <li class="side-menu-item menu-tratamientos {{ ($currentView === "tratamientos" ? "side-menu-selected" : "") }}" title="{{ $labelTratamientos }}">
                 <img class="img-menu" src="{{ URL::to('img/tablets.png') }}" alt="tratamientos" data-title="{{ $labelTratamientos }}">
                 <div class="content-menu">{{ $labelTratamientos }}</div>
