@@ -55,9 +55,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/remove_member', 'UsuarioController@removerIntegrante')->name('usuarios.ficha.removerIntegrante');
         Route::post('/user/cambio_condicion', 'UsuarioController@cambioCondicion')->name('usuarios.ficha.cambioCondicion');
         Route::post('/user/cambio_condicion_comentario', 'UsuarioController@cambioCondicionComentario')->name('usuarios.ficha.cambioCondicionComentario');
+
+        Route::post('/user/add_doctor/{id}', 'UsuarioController@addDoctorToList')->name('patients.addDoctor');
     });
 
-    Route::get('/patients/{id}/record', 'UsuarioController@patientProfile')->name('patients.profile');
+    Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');
 
     Route::get('/professionals/{id}/profile', 'UsuarioController@doctorProfile')->name('doctors.profile');
 
@@ -70,4 +72,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/deletepic/{id}', 'UsuarioController@deletePic')->name('usuario.deletepic');
 
     Route::get('/search/{keyword}', 'GlobalController@search')->name('search');
+
+    Route::get('/getnotif', 'GlobalController@getNotifications')->name('usuario.getnotification');
 });

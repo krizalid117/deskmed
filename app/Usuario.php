@@ -5,10 +5,12 @@ namespace App;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Notifications\Notifiable;
 
 class Usuario extends Model implements Authenticatable
 {
     use \Illuminate\Auth\Authenticatable;
+    use Notifiable;
 
     protected $table = "usuarios";
 
@@ -57,5 +59,9 @@ class Usuario extends Model implements Authenticatable
 
     public function enfermedadesHistoricas() {
         return $this->hasMany('App\UsuarioEnfermedadesHistoricas', 'id_usuario');
+    }
+
+    public function doctors() {
+        return $this->hasMany('App\UsuarioDoctores', 'id_usuario');
     }
 }

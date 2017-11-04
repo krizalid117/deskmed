@@ -319,9 +319,6 @@ input, textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.header-user-settings {
     position: relative;
 }
 
@@ -378,21 +375,38 @@ input, textarea {
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-bottom: 5px solid var(--menu-bg-color);;
-
     bottom: -1px;
     right: 18px;
 }
 
+.profile-row-p {
+    border-bottom: 5px solid var(--menu-bg-color);
+}
+
+.profile-row-n {
+    border-bottom: 5px solid #f1f1f1;
+}
+
 .profile-window {
-    width: 150px;
-    background-color: var(--menu-bg-color);
-    top: calc(100% + 1px);
-    right: 0;
     padding: 5px 0;
 
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
+
+    top: calc(100% + 1px);
+    right: 0;
+}
+
+.profile-window-p {
+    background-color: var(--menu-bg-color);
+    width: 150px;
+}
+
+.profile-window-n {
+    background-color: #f1f1f1;
+    color: #000;
+    border: 1px solid #d6d6d6;
+    width: 250px;
 }
 
 .profile-window > ul {
@@ -411,13 +425,21 @@ input, textarea {
     font-weight: bold;
 }
 
+.profile-setting.not:not(:last-child) {
+    border-bottom: 1px solid #e5e5e5;
+}
+
 .profile-setting > img {
     margin-right: 10px;
     width: 18px;
     height: 18px;
 }
 
-.profile-setting:hover {
+.profile-setting.not:hover {
+    background-color: #d6d6d6;
+}
+
+.profile-setting.per:hover {
     background-color: var(--menu-bg-color-hover);
 }
 
@@ -1035,6 +1057,19 @@ fieldset {
     webkit-box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
     box-shadow: -2px 0 10px 1px rgba(0, 0, 0, 0.75);
+}
+
+.notification-item {
+    color: #000 !important;
+}
+
+.notification-item-read > li
+, .profile-setting.no-not {
+    font-weight: normal !important;
+}
+
+.profile-setting.no-not {
+    cursor: default;
 }
 
 /*** XS ***/

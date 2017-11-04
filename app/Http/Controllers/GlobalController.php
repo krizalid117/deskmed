@@ -169,4 +169,10 @@ class GlobalController
 //            "log" => DB::getQueryLog(),
         ]);
     }
+
+    public function getNotifications() {
+        return view('layouts.partials.all_notifications', [
+            "unreadNotifCount" => count(Auth::user()->unreadNotifications),
+        ]);
+    }
 }

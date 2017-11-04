@@ -8,6 +8,8 @@ use App\SolicitudesVerificacion;
 use App\UsuarioAntecedentesFamiliares;
 use App\IntegrantesNucleoFamiliar;
 use App\TiposIdentificador;
+use App\Notifications\DoctorAddedToList;
+use App\UsuarioDoctores;
 use App\UsuarioEnfermedadesHistoricas;
 use App\UsuarioEnfermedadesActuales;
 use App\Http\Controllers\GlobalController;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use \Carbon\Carbon;
 
 class UsuarioController extends Controller
 {
@@ -66,7 +69,15 @@ class UsuarioController extends Controller
     }
 
     //Un usuario ve la ficha de otro usuario paciente
-    public function patientProfile(Request $request, $id) {
+    public function patientProfile(Request $request, $id, $notification_uuid = null) {
+        if (!is_null($notification_uuid)) {
+            $n = Auth::user()->unreadNotifications()->where('id', $notification_uuid)->first();
+
+            if ($n) {
+                $n->update(['read_at' => Carbon::now()]);
+            }
+        }
+
         return view('ficha', $this->getDatosFicha($id, false));
     }
 
@@ -685,6 +696,35 @@ class UsuarioController extends Controller
 
         if (!$update) {
             $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function addDoctorToList(Request $request, $id) {
+        $userId = Auth::user()["attributes"]["id"];
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $doc = new UsuarioDoctores();
+
+        $doc->id_usuario = $userId;
+        $doc->id_usuario_doctor = $id;
+        $doc->timestamps = false;
+
+        $user = Usuario::find($userId);
+
+        if (!is_null($doc)) {
+            $user->doctors()->save($doc);
+
+            Usuario::find($id)->notify(new DoctorAddedToList(Usuario::find($userId)));
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "El doctor no pudo ser encontrado.";
         }
 
         return response()->json($datos);

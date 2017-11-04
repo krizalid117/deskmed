@@ -216,9 +216,11 @@ switch ($estadoVerificacion) {
         </div>
         @if(!$isOwnUser)
             <ul class="professional-options-container">
-                <li>Añadir a&nbsp;"<span class="bold">Mis profesionales de la salud</span>"</li>
-                <li class="divider"></li>
-                <li>Reportar</li>
+                @if()
+                    <li class="add-doctor-to-list">Añadir a&nbsp;"<span class="bold">Mis profesionales de la salud</span>"</li>
+                    <li class="divider"></li>
+                @endif
+                <li class="report-doctor">Reportar</li>
             </ul>
         @endif
     </div>
@@ -436,6 +438,16 @@ switch ($estadoVerificacion) {
                 else {
                     cerrarContainerOptions();
                 }
+            });
+
+            $('.add-doctor-to-list').click(function () {
+                sendPost('{{ route('patients.addDoctor', $id) }}', {
+                    _token: '{{ csrf_token() }}'
+                }, function () {
+                    mensajes.alerta("El profesional ha sido agregado a tu lista.", "Alerta", function () {
+                        location.reload();
+                    });
+                });
             });
 
             $(document).click(function (e) {
