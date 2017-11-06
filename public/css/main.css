@@ -143,6 +143,10 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     display: none;
 }
 
+.underline {
+    text-decoration: underline;
+}
+
 .div-alerta {
     padding: 15px !important;
 }
@@ -1019,7 +1023,7 @@ fieldset {
     background-color: rgb(23, 136, 79);
 }
 
-.fs-cllapsable {
+.fs-collapsable {
 
 }
 
@@ -1038,7 +1042,7 @@ fieldset {
     user-select: none;
 }
 
-.fs-cllapsable > legend > span.ui-icon {
+.fs-collapsable > legend > span.ui-icon {
     display: inline-block;
     margin-right: 5px;
     margin-top: 3px;
@@ -1118,7 +1122,7 @@ fieldset {
     }
 
     .pp-presentation > div {
-        padding-right: 5px;
+        padding-right: 10px;
     }
 
     .pp-presentation

@@ -121,7 +121,7 @@
         $(document).on('click', '.fs-collapsable-title', function () {
             var $this = $(this);
             var icon = $this.find('.ui-icon');
-            var fs = $this.closest('.fs-cllapsable');
+            var fs = $this.closest('.fs-collapsable');
             var content = fs.find('.fs-collapsable-content');
 
             if (!$this.hasClass("fs-collapsing")) {
@@ -159,6 +159,9 @@
             if (!$(this).hasClass('menu-chat')) {
                 if ($(this).hasClass('menu-home')) {
                     window.location = '{{ route('home') }}';
+                }
+                else if ($(this).hasClass('menu-doctores')) {
+                    window.location = '{{ route('paciente.doctores') }}';
                 }
             }
         });
@@ -230,6 +233,10 @@
 
     function setXsClasses() {
         if (document.documentElement.clientWidth <= 767) {
+            if (menuCollapser.data('collapsed') !== true) {
+                menuCerrar();
+            }
+
             menuContenedorItems.addClass('hidden');
             menuLateral.addClass('side-menu-xs');
         }
@@ -390,9 +397,13 @@
         $.get('{{ route('usuario.getnotification') }}', { _token: '{{ csrf_token() }}'}, function (data) {
             $('.profile-window-n').html(data);
 
+            var text = "";
+
             if ($('#unread-notif-count').length && $('#unread-notif-count').val() !== "0") {
-                $('.header-notifications-count').text($('#unread-notif-count').val());
+                text = $('#unread-notif-count').val();
             }
+
+            $('.header-notifications-count').text(text);
         });
     }
 </script>

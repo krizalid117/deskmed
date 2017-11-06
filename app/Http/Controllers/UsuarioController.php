@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\AddListRequest;
 use App\Usuario;
 use App\Sexos;
 use App\SolicitudesVerificacion;
@@ -730,6 +731,28 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    public function sendAddListRequest(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        Usuario::find($request["id_paciente"])->notify(new AddListRequest(Auth::user()));
+
+        return response()->json($datos);
+    }
+
+    public function listaDoctores() {
+        $usuario = Auth::user();
+
+        return view('patient_doctors_list', [
+            "usuario" => $usuario,
+            "doctores" => $usuario->doctors()->get(),
+        ]);
+    }
+
+    /* funciones estáticas */
+
     public static function downRut($rut) {
         return ltrim(str_replace(['.', '-'], ['', ''], $rut), '0');
     }
@@ -740,6 +763,8 @@ class UsuarioController extends Controller
 
     public static function getProfilePic($path, $sex = 3) {
         $profilePic = "default_nonbinary.png";
+
+//        dd($path, $sex);
 
         if (!is_null($path) && $path !== "" && File::exists(public_path("profilePics/{$path}"))) {
             $profilePic = $path;

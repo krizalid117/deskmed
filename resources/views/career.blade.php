@@ -216,7 +216,7 @@ switch ($estadoVerificacion) {
         </div>
         @if(!$isOwnUser)
             <ul class="professional-options-container">
-                @if()
+                @if(is_null(Auth::user()->doctors()->where('id_usuario_doctor', $id)->first()))
                     <li class="add-doctor-to-list">Añadir a&nbsp;"<span class="bold">Mis profesionales de la salud</span>"</li>
                     <li class="divider"></li>
                 @endif

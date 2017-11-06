@@ -22,9 +22,9 @@
                     <div class="content-menu">Mis pacientes</div>
                 </li>
             @elseif ($usuario["id_tipo_usuario"] === 3) <!-- Paciente -->
-                <li class="side-menu-item menu-doctores {{ ($currentView === "doctores" ? "side-menu-selected" : "") }}" title="Mis doctores">
+                <li class="side-menu-item menu-doctores {{ ($currentView === "paciente.doctores" ? "side-menu-selected" : "") }}" title="Mis doctores">
                     <img class="img-menu" src="{{ URL::to('img/doc.png') }}" alt="doctores" data-title="Mis doctores">
-                    <div class="content-menu">Mis doctores</div>
+                    <div class="content-menu">Mis profesionales de la salud</div>
                 </li>
             @endif
             <li class="side-menu-item menu-tratamientos {{ ($currentView === "tratamientos" ? "side-menu-selected" : "") }}" title="{{ $labelTratamientos }}">

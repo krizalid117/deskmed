@@ -43,11 +43,14 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/career/verify', 'UsuarioController@sendVerification')->name('usuario.profesion.verify');
 
         Route::post('/user/career/savetemp', 'UsuarioController@guardarPPTemporal')->name('usuario.profesion.savetemp');
+
+        Route::post('/sendaddlistrequest', 'UsuarioController@sendAddListRequest')->name('usuario.sendaddlistrequest');
     });
 
     //Rutas sólo para pacientes...
     Route::group(['middleware' => 'patients'], function () {
         Route::get('/user/record', 'UsuarioController@ficha')->name('usuario.ficha');
+        Route::get('/patient/list', 'UsuarioController@listaDoctores')->name('paciente.doctores');
 
         Route::post('/user/familyrec/save_activation', 'UsuarioController@saveActivacionAntFam')->name('usuarios.ficha.saveActivacionAntFam');
         Route::post('/user/familyrec/save_especif', 'UsuarioController@saveEspecificacionAntFam')->name('usuarios.ficha.saveEspecificacionAntFam');

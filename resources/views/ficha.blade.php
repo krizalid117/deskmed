@@ -127,126 +127,162 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
         </div>
     </div>
 
-    <div class="basic-form-container">
-        <p class="pp-title-sub">{{ $titulo }}</p>
-        <fieldset class="fs-cllapsable" data-collapsed="false">
-            <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Antecedentes familiares</legend>
-            <div class="fs-collapsable-content">
-                <div class="ficha-header">Indique las enfermedades que haya padecido <span class="bold">algún familiar cercano</span>:</div>
-                <ul class="ant-fam-list">
-                    @foreach ($ant_fam_op as $afo)
-                        <li>
-                            <div class="pretty o-danger curvy">
-                                <input type="checkbox" data-ant-fam="{{ $afo->id }}" id="ant-fam-op-{{ $afo->id }}" data-especifica="{{ ($afo->necesita_especificacion ? "true" : "false") }}" {{ (in_array($afo->id, $usuarioAntFamId) !== false ? "checked" : "") }} {{ ($isOwnUser ? "" : "disabled") }}>
-                                <label for="ant-fam-op-{{ $afo->id }}" class="bold"><i class="glyphicon glyphicon-ok"></i> {{ $afo->nombre }}</label>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-                <div class="ant-fam-esp panel panel-danger {{ (count($usuarioAntFamId) > 0 ? "" : "hidden") }}">
-                    <div class="panel-heading">Especificaciones <span class="ui-icon ui-icon-help deskmed-icon-help" title="Por favor, especifique el parentesco del familiar que sufre o sufrió la enfermedad. Si es necesario, especificar el tipo del padecimiento. Ejemplo: Cáncer (Tía, a la piel)."></span></div>
-                    <div class="panel-body">
-                        <ul class="ant-fam-list ant-fam-list-esp">
-                            @foreach ($afu as $a)
-                                <li class="ant-fam-esp-item" id="ant-fam-esp-item-{{ $a->id }}">
-                                    <div class="form-group">
-                                        <label class="form-label" for="ant-fam-esp-txt-{{ $a->id }}">{{ $a->nombre }}</label>
-                                        <input type="text" class="form-control" us-ant-fam="{{ $a->id_usuario_antecedente_familiar }}" id="ant-fam-esp-txt-{{ $a->id }}" value="{{ $a->especificacion }}" {{ ($isOwnUser ? "" : "readonly") }}>
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-        <fieldset class="fs-cllapsable" data-collapsed="false">
-            <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Núcleo familiar</legend>
-            <div class="fs-collapsable-content">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-condensed">
-                        <thead>
-                            <tr>
-                                <th>Parentesco</th>
-                                <th>Edad</th>
-                                <th>Estado salud</th>
-                                <th>Edad al morir</th>
-                                <th>Causa de muerte</th>
-                                @if ($isOwnUser)
-                                    <th>Acciones</th>
-                                @endif
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (count($nucleoFamiliar) > 0)
-                                @foreach($nucleoFamiliar as $nf)
-                                    <tr data-datos="{{ json_encode([
-                                        "id" => $nf->id,
-                                        "id_parentesco" => $nf->id_parentesco,
-                                        "edad" => $nf->edad,
-                                        "id_estado_salud" => $nf->id_estado_salud,
-                                        "edad_muerte" => $nf->edad_muerte,
-                                        "causa_muerte" => $nf->causa_muerte,
-                                    ]) }}" class="{{ ($nf->id_estado_salud === 6 ? "danger" : "") }}">
-                                        <td>{{ $nf->nombre_parentesco }}</td>
-                                        <td>{{ $nf->edad }}</td>
-                                        <td>{{ $nf->nombre_estado }}</td>
-                                        <td>{!! ($nf->id_estado_salud === 6) ? $nf->edad_muerte : '<span class="glyphicon glyphicon-ban-circle">' !!}</td>
-                                        <td>{!! ($nf->id_estado_salud === 6) ? $nf->causa_muerte : '<span class="glyphicon glyphicon-ban-circle">' !!}</td>
-                                        @if ($isOwnUser)
-                                            <td style="width: 50px; text-align: center;">
-                                                <span class="ui-icon ui-icon-pencil nf-actions nf-action-edit" title="Editar este integrante"></span>
-                                                <span class="ui-icon ui-icon-trash nf-actions nf-action-delete" title="Remover este integrante de la lista"></span>
-                                            </td>
-                                        @endif
-                                    </tr>
+    @if($isOwnUser || !is_null($usuarioDB->doctors()->where('id_usuario_doctor', $usuario["id"])->first()))
+
+        <div class="basic-form-container">
+            <p class="pp-title-sub">{{ $titulo }}</p>
+            <fieldset class="fs-collapsable" data-collapsed="false">
+                <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Antecedentes familiares</legend>
+                <div class="fs-collapsable-content">
+                    <div class="ficha-header">Indique las enfermedades que haya padecido <span class="bold">algún familiar cercano</span>:</div>
+                    <ul class="ant-fam-list">
+                        @foreach ($ant_fam_op as $afo)
+                            <li>
+                                <div class="pretty o-danger curvy">
+                                    <input type="checkbox" data-ant-fam="{{ $afo->id }}" id="ant-fam-op-{{ $afo->id }}" data-especifica="{{ ($afo->necesita_especificacion ? "true" : "false") }}" {{ (in_array($afo->id, $usuarioAntFamId) !== false ? "checked" : "") }} {{ ($isOwnUser ? "" : "disabled") }}>
+                                    <label for="ant-fam-op-{{ $afo->id }}" class="bold"><i class="glyphicon glyphicon-ok"></i> {{ $afo->nombre }}</label>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                    <div class="ant-fam-esp panel panel-danger {{ (count($usuarioAntFamId) > 0 ? "" : "hidden") }}">
+                        <div class="panel-heading">Especificaciones <span class="ui-icon ui-icon-help deskmed-icon-help" title="Por favor, especifique el parentesco del familiar que sufre o sufrió la enfermedad. Si es necesario, especificar el tipo del padecimiento. Ejemplo: Cáncer (Tía, a la piel)."></span></div>
+                        <div class="panel-body">
+                            <ul class="ant-fam-list ant-fam-list-esp">
+                                @foreach ($afu as $a)
+                                    <li class="ant-fam-esp-item" id="ant-fam-esp-item-{{ $a->id }}">
+                                        <div class="form-group">
+                                            <label class="form-label" for="ant-fam-esp-txt-{{ $a->id }}">{{ $a->nombre }}</label>
+                                            <input type="text" class="form-control" us-ant-fam="{{ $a->id_usuario_antecedente_familiar }}" id="ant-fam-esp-txt-{{ $a->id }}" value="{{ $a->especificacion }}" {{ ($isOwnUser ? "" : "readonly") }}>
+                                        </div>
+                                    </li>
                                 @endforeach
-                            @else
-                                <tr class=""><td colspan="6" style="text-align: center;">No ha agregado integrantes a su núcleo familiar</td></tr>
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-                @if ($isOwnUser)
-                    <div style="text-align: right;">
-                        <button class="btn btn-success btn-xs" id="btn-add-integrante">
-                            Agregar integrante
-                        </button>
+                            </ul>
+                        </div>
                     </div>
-                @endif
-            </div>
-        </fieldset>
-        <fieldset class="fs-cllapsable" data-collapsed="false">
-            <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Antecedentes personales</legend>
-            <div class="fs-collapsable-content">
-                <div class="form-group">
-                    <label for="ant-per-enf-act" class="form-label" style="font-weight: normal;">Indique a continuación las condiciones médicas que <span class="bold">tenga actualmente</span>:</label>
-                    <select class="form-control" id="ant-per-enf-act" style="width: 100% !important;" multiple="multiple" {{ ($isOwnUser ? "" : "disabled") }}>
-                        @foreach ($enfermedades as $enf)
-                            <option value="{{ $enf->id }}" {{ (in_array($enf->id, $enfermedadesActuales) !== false ? "selected" : "") }}>{{ $enf->nombre }}</option>
-                        @endforeach
-                    </select>
                 </div>
-                <div class="form-group">
-                    <label for="ant-per-act-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">tenga actualmente</span>:</label>
-                    <textarea class="form-control txta-vert" id="ant-per-act-etc" data-original="{{ $usuarioDB->comentario_condiciones_actuales }}" {{ ($isOwnUser ? "" : "readonly") }}>{{ $usuarioDB->comentario_condiciones_actuales }}</textarea>
+            </fieldset>
+            <fieldset class="fs-collapsable" data-collapsed="false">
+                <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Núcleo familiar</legend>
+                <div class="fs-collapsable-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Parentesco</th>
+                                    <th>Edad</th>
+                                    <th>Estado salud</th>
+                                    <th>Edad al morir</th>
+                                    <th>Causa de muerte</th>
+                                    @if ($isOwnUser)
+                                        <th>Acciones</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($nucleoFamiliar) > 0)
+                                    @foreach($nucleoFamiliar as $nf)
+                                        <tr data-datos="{{ json_encode([
+                                            "id" => $nf->id,
+                                            "id_parentesco" => $nf->id_parentesco,
+                                            "edad" => $nf->edad,
+                                            "id_estado_salud" => $nf->id_estado_salud,
+                                            "edad_muerte" => $nf->edad_muerte,
+                                            "causa_muerte" => $nf->causa_muerte,
+                                        ]) }}" class="{{ ($nf->id_estado_salud === 6 ? "danger" : "") }}">
+                                            <td>{{ $nf->nombre_parentesco }}</td>
+                                            <td>{{ $nf->edad }}</td>
+                                            <td>{{ $nf->nombre_estado }}</td>
+                                            <td>{!! ($nf->id_estado_salud === 6) ? $nf->edad_muerte : '<span class="glyphicon glyphicon-ban-circle">' !!}</td>
+                                            <td>{!! ($nf->id_estado_salud === 6) ? $nf->causa_muerte : '<span class="glyphicon glyphicon-ban-circle">' !!}</td>
+                                            @if ($isOwnUser)
+                                                <td style="width: 50px; text-align: center;">
+                                                    <span class="ui-icon ui-icon-pencil nf-actions nf-action-edit" title="Editar este integrante"></span>
+                                                    <span class="ui-icon ui-icon-trash nf-actions nf-action-delete" title="Remover este integrante de la lista"></span>
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr class=""><td colspan="6" style="text-align: center;">No ha agregado integrantes a su núcleo familiar</td></tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                    @if ($isOwnUser)
+                        <div style="text-align: right;">
+                            <button class="btn btn-success btn-xs" id="btn-add-integrante">
+                                Agregar integrante
+                            </button>
+                        </div>
+                    @endif
                 </div>
-                <hr class="hr2">
-                <div class="form-group">
-                    <label for="ant-per-enf-hist" class="form-label" style="font-weight: normal;">Indique a continuación las condiciones médicas que <span class="bold">haya tenido</span>:</label>
-                    <select class="form-control" id="ant-per-enf-hist" style="width: 100% !important;" multiple="multiple" {{ ($isOwnUser ? "" : "disabled") }}>
-                        @foreach ($enfermedades as $enf)
-                            <option value="{{ $enf->id }}" {{ (in_array($enf->id, $enfermedadesHistoricas) !== false ? "selected" : "") }}>{{ $enf->nombre }}</option>
-                        @endforeach
-                    </select>
+            </fieldset>
+            <fieldset class="fs-collapsable" data-collapsed="false">
+                <legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Antecedentes personales</legend>
+                <div class="fs-collapsable-content">
+                    <div class="form-group">
+                        <label for="ant-per-enf-act" class="form-label" style="font-weight: normal;">Indique a continuación las condiciones médicas que <span class="bold">tenga actualmente</span>:</label>
+                        <select class="form-control" id="ant-per-enf-act" style="width: 100% !important;" multiple="multiple" {{ ($isOwnUser ? "" : "disabled") }}>
+                            @foreach ($enfermedades as $enf)
+                                <option value="{{ $enf->id }}" {{ (in_array($enf->id, $enfermedadesActuales) !== false ? "selected" : "") }}>{{ $enf->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ant-per-act-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">tenga actualmente</span>:</label>
+                        <textarea class="form-control txta-vert" id="ant-per-act-etc" data-original="{{ $usuarioDB->comentario_condiciones_actuales }}" {{ ($isOwnUser ? "" : "readonly") }}>{{ $usuarioDB->comentario_condiciones_actuales }}</textarea>
+                    </div>
+                    <hr class="hr2">
+                    <div class="form-group">
+                        <label for="ant-per-enf-hist" class="form-label" style="font-weight: normal;">Indique a continuación las condiciones médicas que <span class="bold">haya tenido</span>:</label>
+                        <select class="form-control" id="ant-per-enf-hist" style="width: 100% !important;" multiple="multiple" {{ ($isOwnUser ? "" : "disabled") }}>
+                            @foreach ($enfermedades as $enf)
+                                <option value="{{ $enf->id }}" {{ (in_array($enf->id, $enfermedadesHistoricas) !== false ? "selected" : "") }}>{{ $enf->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ant-per-hist-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">haya tenido</span>:</label>
+                        <textarea class="form-control txta-vert" id="ant-per-hist-etc" data-original="{{ $usuarioDB->comentario_condiciones_historicas }}" {{ ($isOwnUser ? "" : "readonly") }}>{{ $usuarioDB->comentario_condiciones_historicas }}</textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="ant-per-hist-etc" class="form-label" style="font-weight: normal;">Otros comentarios sobre las condiciones médicas que <span class="bold">haya tenido</span>:</label>
-                    <textarea class="form-control txta-vert" id="ant-per-hist-etc" data-original="{{ $usuarioDB->comentario_condiciones_historicas }}" {{ ($isOwnUser ? "" : "readonly") }}>{{ $usuarioDB->comentario_condiciones_historicas }}</textarea>
-                </div>
-            </div>
-        </fieldset>
-    </div>
+            </fieldset>
+        </div>
+
+    @else
+
+        <?php
+            $consulta = "
+                select 1
+                from notifications
+                where notifications.notifiable_id = :notifiable_id
+                and notifiable_id is not null
+                and notifiable_type = 'App\Usuario'
+                and type = 'App\Notifications\AddListRequest'
+                and (data::json->'doctor'->>'id') = :doctor_id
+                order by created_at
+                desc limit 1
+            ";
+
+            $resultado = DB::select($consulta, [
+                "notifiable_id" => $usuarioDB->id,
+                "doctor_id" => $usuario["id"],
+            ]);
+
+            $solicitud = count($resultado) === 0;
+        ?>
+
+        <div style="text-align: center; margin-top: 30px;">
+            ¡Pídele a <span class="bold">{{ $usuarioDB->nombres }}</span> que te agregue a su lista de profesionales de salud para ver su <span class="underline">ficha médica</span>!
+        </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-primary btn-lg" id="enviar-solicitud-lista" {{ ($solicitud ? "" : "disabled") }}>
+                {{ ($solicitud ? "Enviar solicitud" : "Solicitud enviada") }}
+            </button>
+        </div>
+
+    @endif
 
 @endsection
 
@@ -351,6 +387,17 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
                     removerFamiliar($(this).closest('tr').data('datos').id);
                 });
             @endif
+
+            $('#enviar-solicitud-lista').click(function () {
+                sendPost('{{ route('usuario.sendaddlistrequest') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id_paciente: '{{ $usuarioDB->id }}'
+                }, function () {
+                    mensajes.alerta("Solicitud enviada correctamente.", "Alerta", function () {
+                        location.reload();
+                    });
+                });
+            });
         });
 
         @if ($isOwnUser)
