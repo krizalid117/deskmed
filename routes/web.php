@@ -34,6 +34,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/test/users/create/{amaunt}', 'TestController@createUsers')->name('test.users.create');
 
         Route::get('/test/users/create/{amaunt}', 'TestController@createUsers')->name('test.users.create');
+
+        Route::get('/admin/validations/', function () {
+            return view('admin.validations', [ "usuario" => Auth::user()["attributes"] ]);
+        })->name('admin.validations');
     });
 
     //Rutas sólo para doctores...

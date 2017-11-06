@@ -333,15 +333,16 @@ class UsuarioController extends Controller
     }
 
     public function sendVerification(Request $request) {
-        $usuario = Auth::user()["attributes"];
-
-        $idUsuario = $usuario["id"];
+        $usuario = Auth::user();
+        $idUsuario = $usuario->id;
         $datos = [
             "error" => false,
             "mensaje" => "",
         ];
 
-        if ($usuario["autenticidad_profesional_verificada"]) {
+        $verificacion = $usuario->verificaciones()->first();
+
+        if (!is_null($verificacion) && $verificacion->habilitado) {
             $datos["error"] = true;
             $datos["mensaje"] = "Usted ya se encuentra verificado.";
         }

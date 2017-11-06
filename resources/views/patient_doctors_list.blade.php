@@ -18,8 +18,6 @@
             justify-content: flex-start;
 
             margin-bottom: 15px;
-            /*margin-right: 5px;*/
-            /*margin-left: 5px;*/
             padding-right: 30px;
             padding-top: 10px;
             padding-bottom: 10px;

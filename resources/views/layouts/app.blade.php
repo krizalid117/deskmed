@@ -87,7 +87,6 @@
 
         /* Colapsar y descolapsar menú lateral */
         menuCollapser.click(function () {
-            console.log(document.documentElement.clientWidth);
 
             if (menuCollapser.data('collapsed') === true) {
                 menuAbrir();
@@ -180,6 +179,11 @@
             else if ($(this).hasClass('profile-setting-ficha')) {
                 window.location = '{{ route('usuario.ficha') }}';
             }
+            @if ($usuario["id_tipo_usuario"] === 1)
+                else if ($(this).hasClass('profile-setting-validations')) {
+                    window.location = '{{ route('admin.validations') }}';
+                }
+            @endif
         });
 
         /* Click en foto de perfil */

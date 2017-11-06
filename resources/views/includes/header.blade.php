@@ -33,12 +33,18 @@
                 </div>
             </div>
             <div class="header-user-settings">
-                <a href="#" class="header-a-profile" title="Mi cuenta">
+                <a href="#" class="header-a-profile" title="{{ Auth::user()->nombres . " " . Auth::user()->apellidos }}">
                     <img src="{{ URL::to("profilePics/$profilePic") }}" alt="Cuenta" aria-label="Cuenta">
                 </a>
                 <div class="profile-row profile-row-p profile-menu profile-menu-p"></div>
                 <div class="profile-window profile-window-p profile-menu profile-menu-p">
                     <ul>
+                        @if ($usuario["id_tipo_usuario"] === 1)
+                        <li class="profile-setting per profile-setting-validations">
+                            <img src="{{ URL::to('img/validations.png') }}" style="filter: invert(100%);" alt="Solicitudes de valiación">
+                            <span>Solicitudes de validación</span>
+                        </li>
+                        @endif
                         @if ($usuario["id_tipo_usuario"] === 2)
                         <li class="profile-setting per profile-setting-career">
                             <img src="{{ URL::to('img/doc.png') }}" alt="Perfil profesional">
