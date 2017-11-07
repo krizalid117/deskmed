@@ -16,7 +16,7 @@ class AdminsOnly
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()["attributes"]["id_tipo_usuario"] !== 1) { //Si no es administrador...
+        if (Auth::user()->id_tipo_usuario !== 1) { //Si no es administrador...
             return redirect()->route('home');
         }
 

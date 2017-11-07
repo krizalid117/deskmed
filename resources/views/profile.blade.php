@@ -116,10 +116,10 @@ use \App\Http\Controllers\UsuarioController;
             <label for="txt-profile-id" class="col-sm-3 control-label">Identificador ({{ $tipoIdentificador }})</label>
             <div class="col-sm-9">
                 <div class="input-group">
-                    <input type="text" id="txt-profile-id" class="form-control" value="{{ ($usuario["id_tipo_identificador"] === 1 ? UsuarioController::upRut($usuario["identificador"]) : $usuario["identificador"]) }}" disabled autocomplete="off">
+                    <input type="text" id="txt-profile-id" class="form-control" value="{{ ($usuario->id_tipo_identificador === 1 ? UsuarioController::upRut($usuario->identificador) : $usuario->identificador) }}" disabled autocomplete="off">
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-default dropdown-toggle btn-id-priv" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Opciones de privacidad de tu identificador" disabled>
-                            <span class="{{ UsuarioController::getPrivacyIconClass($usuario["id_privacidad_identificador"]) }}"></span>
+                            <span class="{{ UsuarioController::getPrivacyIconClass($usuario->id_privacidad_identificador) }}"></span>
                             <span class="caret hidden"></span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-right">
@@ -128,7 +128,7 @@ use \App\Http\Controllers\UsuarioController;
                                     <a href="#" class="privacy-op" data-id-privacy="{{ $op->id }}" data-glyph="{{ UsuarioController::getPrivacyIconClass($op->id) }}">
                                         <span class="{{ UsuarioController::getPrivacyIconClass($op->id) }}"></span>
                                         <span class="priv-nombre">{{ $op->nombre }}</span>
-                                        {!! ($op->id === $usuario["id_privacidad_identificador"] ? '<span class="ui-icon ui-icon-check"></span>' : "") !!}
+                                        {!! ($op->id === $usuario->id_privacidad_identificador ? '<span class="ui-icon ui-icon-check"></span>' : "") !!}
                                     </a>
                                 </li>
                             @endforeach
@@ -140,25 +140,25 @@ use \App\Http\Controllers\UsuarioController;
         <div class="form-group" inp-name="nombres">
             <label for="txt-profile-nombres" class="col-sm-3 control-label">Nombres</label>
             <div class="col-sm-9">
-                <input type="text" id="txt-profile-nombres" class="form-control" value="{{ $usuario["nombres"] }}" disabled autocomplete="off">
+                <input type="text" id="txt-profile-nombres" class="form-control" value="{{ $usuario->nombres }}" disabled autocomplete="off">
             </div>
         </div>
         <div class="form-group" inp-name="apellidos">
             <label for="txt-profile-apellidos" class="col-sm-3 control-label">Apellidos</label>
             <div class="col-sm-9">
-                <input type="text" id="txt-profile-apellidos" class="form-control" value="{{ $usuario["apellidos"] }}" disabled autocomplete="off">
+                <input type="text" id="txt-profile-apellidos" class="form-control" value="{{ $usuario->apellidos }}" disabled autocomplete="off">
             </div>
         </div>
         <div class="form-group" inp-name="email">
             <label for="txt-profile-email" class="col-sm-3 control-label">Correo electrónico</label>
             <div class="col-sm-9">
-                <input type="email" id="txt-profile-email" class="form-control" value="{{ $usuario["email"] }}" disabled autocomplete="off">
+                <input type="email" id="txt-profile-email" class="form-control" value="{{ $usuario->email }}" disabled autocomplete="off">
             </div>
         </div>
         <div class="form-group" inp-name="fecha_nacimiento">
             <label for="txt-profile-fnac" class="col-sm-3 control-label">Fecha de nacimiento</label>
             <div class="col-sm-9 date-container">
-                <input type="text" id="txt-profile-fnac" class="form-control" value="{{ date('d-m-Y', strtotime($usuario["fecha_nacimiento"])) }}" disabled readonly autocomplete="off">
+                <input type="text" id="txt-profile-fnac" class="form-control" value="{{ date('d-m-Y', strtotime($usuario->fecha_nacimiento)) }}" disabled readonly autocomplete="off">
                 <span class="glyphicon glyphicon-calendar"></span>
             </div>
         </div>
@@ -167,7 +167,7 @@ use \App\Http\Controllers\UsuarioController;
             <div class="col-sm-9">
                 <select id="txt-profile-sexo" class="form-control" disabled autocomplete="off">
                     @foreach($sexos as $id => $sexo)
-                        <option value="{{ $id }}" {{ ($id === $usuario["id_sexo"] ? "selected" : "") }}>{{ $sexo }}</option>
+                        <option value="{{ $id }}" {{ ($id === $usuario->id_sexo ? "selected" : "") }}>{{ $sexo }}</option>
                     @endforeach
                 </select>
             </div>
@@ -207,7 +207,7 @@ use \App\Http\Controllers\UsuarioController;
         var changingPass = false;
 
         btnAllowEdit.data('active', false);
-        btnIdPriv.data('selected', '{{ $usuario["id_privacidad_identificador"] }}');
+        btnIdPriv.data('selected', '{{ $usuario->id_privacidad_identificador }}');
 
         $(function () {
             $('#txt-profile-fnac').datepicker({
@@ -328,7 +328,7 @@ use \App\Http\Controllers\UsuarioController;
                 _token: '{{ csrf_token() }}'
             };
 
-            sendPost('{{ route('usuario.edit', [$usuario["id"]]) }}', datos, function (respuesta) {
+            sendPost('{{ route('usuario.edit', [$usuario->id]) }}', datos, function (respuesta) {
                 mensajes.alerta("Datos personales guardados correctamente.", "Guardado exitoso", function () {
                     location.reload();
                 });
@@ -339,7 +339,7 @@ use \App\Http\Controllers\UsuarioController;
             var input = $('.profile-pic-upload')[0];
 
             if (input.value !== "") {
-                var url = '{{ route('usuario.uploadpic', [$usuario["id"]]) }}',
+                var url = '{{ route('usuario.uploadpic', [$usuario->id]) }}',
                     datos = {
                         input_img: input.files[0],
                         _token: '{{ csrf_token() }}'
@@ -358,7 +358,7 @@ use \App\Http\Controllers\UsuarioController;
 
         function eliminarImagenPerfil() {
             mensajes.confirmacion_sino("¿Está seguro de eliminar la imagen de perfil?", function () {
-                sendPost('{{ route('usuario.deletepic', [$usuario["id"]]) }}', {
+                sendPost('{{ route('usuario.deletepic', [$usuario->id]) }}', {
                     _token: '{{ csrf_token() }}'
                 }, function () {
                     mensajes.alerta('Imagen de perfil eliminada correctamente.', 'Aviso', function () {

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class TestController extends Controller
 {
     public function createUsers(Request $request, $amaunt) {
-        $usuario = Auth::user()["attributes"];
+        $usuario = Auth::user();
 
         $users = factory(Usuario::class, intval($amaunt))->create();
 

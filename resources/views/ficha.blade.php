@@ -127,7 +127,7 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
         </div>
     </div>
 
-    @if($isOwnUser || !is_null($usuarioDB->doctors()->where('id_usuario_doctor', $usuario["id"])->first()))
+    @if($isOwnUser || !is_null($usuarioDB->doctors()->where('id_usuario_doctor', $usuario->id)->first()))
 
         <div class="basic-form-container">
             <p class="pp-title-sub">{{ $titulo }}</p>
@@ -267,7 +267,7 @@ $titulo = ($anios > 17 ? $sexo->alias_adulto : $sexo->alias_infantil . ". " . Gl
 
             $resultado = DB::select($consulta, [
                 "notifiable_id" => $usuarioDB->id,
-                "doctor_id" => $usuario["id"],
+                "doctor_id" => $usuario->id,
             ]);
 
             $solicitud = count($resultado) === 0;

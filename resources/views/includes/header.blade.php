@@ -3,7 +3,7 @@
     use \Illuminate\Support\Facades\Auth;
 
     $currentView = Route::current()->getName();
-    $profilePic = UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]);
+    $profilePic = UsuarioController::getProfilePic($usuario->profile_pic_path, $usuario->id_sexo);
 ?>
 
 <div class="header-container">
@@ -39,19 +39,19 @@
                 <div class="profile-row profile-row-p profile-menu profile-menu-p"></div>
                 <div class="profile-window profile-window-p profile-menu profile-menu-p">
                     <ul>
-                        @if ($usuario["id_tipo_usuario"] === 1)
+                        @if ($usuario->id_tipo_usuario === 1)
                         <li class="profile-setting per profile-setting-validations">
                             <img src="{{ URL::to('img/validations.png') }}" style="filter: invert(100%);" alt="Solicitudes de valiación">
                             <span>Solicitudes de validación</span>
                         </li>
                         @endif
-                        @if ($usuario["id_tipo_usuario"] === 2)
+                        @if ($usuario->id_tipo_usuario === 2)
                         <li class="profile-setting per profile-setting-career">
                             <img src="{{ URL::to('img/doc.png') }}" alt="Perfil profesional">
                             <span>Perfil profesional</span>
                         </li>
                         @endif
-                        @if ($usuario["id_tipo_usuario"] === 3)
+                        @if ($usuario->id_tipo_usuario === 3)
                         <li class="profile-setting per profile-setting-ficha">
                             <img src="{{ URL::to('img/ficha.png') }}" alt="Ficha de salud">
                             <span>Ficha de salud</span>

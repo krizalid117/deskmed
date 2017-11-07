@@ -3,8 +3,8 @@
 use \App\Http\Controllers\UsuarioController;
 use \App\Http\Controllers\GlobalController;
 
-$verDoctores = $usuario["id_tipo_usuario"] === 3 || $usuario["id_tipo_usuario"] === 1;
-$verPacientes = false; //$usuario["id_tipo_usuario"] === 2 || $usuario["id_tipo_usuario"] === 1;
+$verDoctores = $usuario->id_tipo_usuario === 3 || $usuario->id_tipo_usuario === 1;
+$verPacientes = false; //$usuario->id_tipo_usuario === 2 || $usuario->id_tipo_usuario === 1;
 
 ?>
 

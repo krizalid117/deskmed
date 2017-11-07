@@ -35,30 +35,30 @@ class UsuarioController extends Controller
     }
 
     public function profile() {
-        $usuario = Auth::user()["attributes"];
+        $usuario = Auth::user();
 
         return view('profile', [
             "usuario" => $usuario,
             "sexos" => Sexos::pluck('nombre', 'id'),
-            "tipoIdentificador" => DB::table('tipos_identificador')->where('id', $usuario["id_tipo_identificador"])->value('nombre'),
-            "profilePic" => UsuarioController::getProfilePic($usuario["profile_pic_path"], $usuario["id_sexo"]),
+            "tipoIdentificador" => DB::table('tipos_identificador')->where('id', $usuario->id_tipo_identificador)->value('nombre'),
+            "profilePic" => UsuarioController::getProfilePic($usuario->profile_pic_path, $usuario->id_sexo),
             "opcionesPrivacidad" => DB::table('privacidad_opciones')->get()
         ]);
     }
 
     public function profesion() {
-        $usuario = Auth::user()["attributes"];
+        $usuario = Auth::user();
 
         return view('career', [
             "usuario" => $usuario,
-            "id" => $usuario["id"],
+            "id" => $usuario->id,
             "isOwnUser" => true,
         ]);
     }
 
     public function doctorProfile(Request $request, $id) {
         return view('career', [
-            "usuario" => Auth::user()["attributes"],
+            "usuario" => Auth::user(),
             "id" => $id,
             "isOwnUser" => false,
         ]);
@@ -66,7 +66,7 @@ class UsuarioController extends Controller
 
     //un usuario paciente ve su pripia ficha...
     public function ficha() {
-        return view('ficha', $this->getDatosFicha(Auth::user()["attributes"]["id"], true));
+        return view('ficha', $this->getDatosFicha(Auth::user()->id, true));
     }
 
     //Un usuario ve la ficha de otro usuario paciente
@@ -209,7 +209,7 @@ class UsuarioController extends Controller
         ];
 
         //Se agrega email en caso de que haya sido cambiado
-        if (Auth::user()["attributes"]["email"] !== mb_strtolower($request["email"], 'utf8')) {
+        if (Auth::user()->email !== mb_strtolower($request["email"], 'utf8')) {
             $validar['email'] = 'required|email|max:100|unique:usuarios,email';
             $nombres['email'] = 'Correo eléctronico';
             $update['email'] = mb_strtolower($request["email"], 'utf8');
@@ -236,7 +236,7 @@ class UsuarioController extends Controller
 
         $continuar = true;
 
-        if (intval($request["chaging_pass"]) === 1 && !Hash::check($request["pw"], Auth::user()["attributes"]["password"])) {
+        if (intval($request["chaging_pass"]) === 1 && !Hash::check($request["pw"], Auth::user()->password)) {
             $continuar = false;
         }
 
@@ -283,7 +283,7 @@ class UsuarioController extends Controller
             $image->move($destinationPath, $name);
 
             //Imagen antigua...
-            $oldImage = Auth::user()["attributes"]["profile_pic_path"];
+            $oldImage = Auth::user()->profile_pic_path;
 
             $update = DB::table('usuarios')
                 ->where('id', $idUsuario)
@@ -309,7 +309,7 @@ class UsuarioController extends Controller
 
     public function deletePic(Request $request, $idUsuario) {
 
-        $oldImage = Auth::user()["attributes"]["profile_pic_path"];
+        $oldImage = Auth::user()->profile_pic_path;
 
         $datos = [
             'error' => false
@@ -407,7 +407,7 @@ class UsuarioController extends Controller
 
     //Perfil profesional
     public function guardarPPTemporal( Request $request) {
-        $idUsuario = Auth::user()["attributes"]["id"];
+        $idUsuario = Auth::user()->id;
 
         $this->validate($request, [
             'titulo' => 'max:255',
@@ -455,7 +455,7 @@ class UsuarioController extends Controller
             "id" => 'exists:antecedentes_familiares_opciones,id'
         ]);
 
-        $idUsuario = Auth::user()["attributes"]["id"];
+        $idUsuario = Auth::user()->id;
 
         $datos = [
             "error" => false,
@@ -522,7 +522,7 @@ class UsuarioController extends Controller
     }
 
     public function addEditIntegrante (Request $request) {
-        $idUsuario = Auth::user()["attributes"]["id"];
+        $idUsuario = Auth::user()->id;
 
         $validations = [
             "parentesco" => "required|exists:parentescos,id",
@@ -618,7 +618,7 @@ class UsuarioController extends Controller
     }
 
     public function cambioCondicion(Request $request) {
-        $idUsuario = Auth::user()["attributes"]["id"];
+        $idUsuario = Auth::user()->id;
 
         $datos = [
             "error" => false,
@@ -691,7 +691,7 @@ class UsuarioController extends Controller
         }
 
         $update = DB::table('usuarios')
-            ->where('id', Auth::user()["attributes"]["id"])
+            ->where('id', Auth::user()->id)
             ->update([
                 $campo => $request["texto"],
             ]);
@@ -704,7 +704,7 @@ class UsuarioController extends Controller
     }
 
     public function addDoctorToList(Request $request, $id) {
-        $userId = Auth::user()["attributes"]["id"];
+        $userId = Auth::user()->id;
 
         $datos = [
             "error" => false,
@@ -838,7 +838,7 @@ class UsuarioController extends Controller
 
         return [
             "id" => $id,
-            "usuario" => Auth::user()["attributes"],
+            "usuario" => Auth::user(),
             "ant_fam_op" => DB::table('antecedentes_familiares_opciones')->orderBy('nombre', 'asc')->get(), //Opciones de antecedentes familiares
             "parentescos" => DB::table('parentescos')->orderBy('nombre', 'asc')->get(), //Opciones de parentesco
             "estadosSalud" => DB::table('estados_salud')->orderBy('id', 'asc')->get(), //Opciones de estado de salud

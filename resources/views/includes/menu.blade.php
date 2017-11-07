@@ -1,7 +1,7 @@
 <?php
     $currentView = Route::current()->getName();
 
-    $labelTratamientos = ($usuario["id_tipo_usuario"] === 2 ? "Tratamientos" : ($usuario["id_tipo_usuario"] === 3 ? "Mis tratamientos" : "Tratamientos de pacientes"));
+    $labelTratamientos = ($usuario->id_tipo_usuario === 2 ? "Tratamientos" : ($usuario->id_tipo_usuario === 3 ? "Mis tratamientos" : "Tratamientos de pacientes"));
 ?>
 
 <div class="side-menu-container">
@@ -16,12 +16,12 @@
                 <img class="img-menu" src="{{ URL::to('img/home.png') }}" alt="home" data-title="Inicio">
                 <div class="content-menu">Inicio</div>
             </li>
-            @if ($usuario["id_tipo_usuario"] === 2) <!-- Doctor -->
+            @if ($usuario->id_tipo_usuario === 2) <!-- Doctor -->
                 <li class="side-menu-item menu-pacientes {{ ($currentView === "pacientes" ? "side-menu-selected" : "") }}" title="Mis pacientes">
                     <img class="img-menu" src="{{ URL::to('img/patient.png') }}" alt="pacientes" data-title="Mis pacientes">
                     <div class="content-menu">Mis pacientes</div>
                 </li>
-            @elseif ($usuario["id_tipo_usuario"] === 3) <!-- Paciente -->
+            @elseif ($usuario->id_tipo_usuario === 3) <!-- Paciente -->
                 <li class="side-menu-item menu-doctores {{ ($currentView === "paciente.doctores" ? "side-menu-selected" : "") }}" title="Mis doctores">
                     <img class="img-menu" src="{{ URL::to('img/doc.png') }}" alt="doctores" data-title="Mis doctores">
                     <div class="content-menu">Mis profesionales de la salud</div>

@@ -100,7 +100,7 @@ class GlobalController
             GlobalController::log($sql->sql);
         });
 
-        $usuario = Auth::user()["attributes"];
+        $usuario = Auth::user();
 
         $consulta = "
             select u.*
@@ -148,8 +148,8 @@ class GlobalController
             order by translate(u.nombres, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn'), translate(u.apellidos, 'áéíóúÁÉÍÓÚñÑ', 'aeiouAEIOUNn')
         ";
 
-        $resultsDocs = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario["id"] . "", "tipo" => 2 ]); //doctores
-        $resultsPat = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario["id"] . "", "tipo" => 3 ]); //pacientes
+        $resultsDocs = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario->id . "", "tipo" => 2 ]); //doctores
+        $resultsPat = DB::select($consulta, [ "keyword" => $keyword, "id" => $usuario->id . "", "tipo" => 3 ]); //pacientes
 
         $results = [
             "d" => [

@@ -16,7 +16,7 @@ class DoctorsOnly
      */
     public function handle($request, Closure $next)
     {
-        if (in_array(Auth::user()["attributes"]["id_tipo_usuario"], [1, 2]) === false) { //Si no es doctor ni administrador...
+        if (in_array(Auth::user()->id_tipo_usuario, [1, 2]) === false) { //Si no es doctor ni administrador...
             return redirect()->route('home');
         }
 
