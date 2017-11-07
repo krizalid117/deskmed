@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use \App\Verificaciones;
 
 class GlobalController
 {
@@ -173,6 +174,32 @@ class GlobalController
     public function getNotifications() {
         return view('layouts.partials.all_notifications', [
             "unreadNotifCount" => count(Auth::user()->unreadNotifications),
+        ]);
+    }
+
+    public function validations() {
+
+        $consulta = "
+            select sv.id
+            , sv.id_usuario
+            , sv.estado
+            , sv.comentario
+            , to_char(sv.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+            , cast(extract(epoch from sv.updated_at::timestamp without time zone) as integer) as tstamp
+            , concat_ws(' ', u.nombres, u.apellidos) as nombre_completo
+            from solicitud_verificacion sv
+            join usuarios u
+              on u.id = sv.id_usuario
+            order by sv.updated_at desc
+        ";
+
+        $validations = json_encode(DB::select($consulta));
+
+//        dd($validations);
+
+        return view('admin.validations', [
+            "usuario" => Auth::user(),
+            "validations" => $validations,
         ]);
     }
 }

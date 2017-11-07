@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ URL::to('js/select2-4.0.3/dist/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('css/wfmi-style.css') }}">
     <link rel="stylesheet" href="{{ URL::to('css/pretty.css') }}">
+    <link rel="stylesheet" href="{{ URL::to('js/DataTables/datatables.min.css') }}">
 
     @yield('stylesheets')
 </head>
@@ -68,6 +69,7 @@
     $.datepicker.setDefaults($.datepicker.regional["es"]);
 </script>
 <script src="{{ URL::to('js/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>
+<script src="{{ URL::to('js/DataTables/datatables.min.js') }}"></script>
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
 
 <script> {{-- Scripts para el menu --}}
