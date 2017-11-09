@@ -35,7 +35,9 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get('/test/users/create/{amaunt}', 'TestController@createUsers')->name('test.users.create');
 
-        Route::get('/admin/validations/', 'GlobalController@validations')->name('admin.validations');
+        Route::get('/admin/validations', 'GlobalController@validations')->name('admin.validations');
+
+        Route::post('/admin/doc', 'GlobalController@getDoctorInfo')->name('admin.getdoctorinfo');
     });
 
     //Rutas sólo para doctores...

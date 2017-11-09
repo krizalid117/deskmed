@@ -202,4 +202,44 @@ class GlobalController
             "validations" => $validations,
         ]);
     }
+
+    public function getDoctorInfo(Request $request) {
+        $datos = [
+            "error" => false,
+            "doctor" => [],
+        ];
+
+        $consulta = "
+            select u.nombres
+            , u.apellidos
+            , to_char(u.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_registro
+            , to_char(u.updated_at, 'dd-mm-yyyy HH24:mi:ss') as ultima_actualizacion
+            , u.email
+            , to_char(u.fecha_nacimiento, 'dd-mm-yyyy') as fecha_nacimiento
+            , s.nombre as sexo
+            , ti.nombre as tipo_identificador
+            , u.identificador
+            , coalesce(u.antecedente_titulo_segun_usuario, 'Sin especificar') as antecedente_titulo_segun_usuario
+            , coalesce(u.especialidad_segun_usuario, 'Sin especificar') as especialidad_segun_usuario
+            , coalesce(u.fecha_registro_segun_usuario, 'Sin especificar') as fecha_registro_segun_usuario
+            , coalesce(u.institucion_habilitante_segun_usuario, 'Sin especificar') as institucion_habilitante_segun_usuario
+            , coalesce(u.nregistro_segun_usuario, 'Sin especificar') as nregistro_segun_usuario
+            , coalesce(u.titulo_segun_usuario, 'Sin especificar') as titulo_segun_usuario
+            from usuarios u
+            join sexos s
+              on s.id = u.id_sexo
+            join tipos_identificador ti
+              on ti.id = u.id_tipo_identificador
+            where u.id = {$request["id"]}
+        ";
+
+        if ($r = DB::select($consulta)) {
+            $datos["doctor"] = $r[0];
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
 }

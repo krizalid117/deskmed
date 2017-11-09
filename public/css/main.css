@@ -1106,9 +1106,24 @@ div.dataTables_wrapper div.dataTables_paginate {
     padding-top: 15px;
 }
 
-.d-dtable > thead > tr > th[class^="sorting"]:after {
+.d-dtable > thead > tr > th[class*="sorting"]:after {
     bottom: 3px !important;
 
+}
+
+td.d-dtable-center {
+    text-align: center;
+    padding-left: 0 !important;
+}
+
+.pagination>.active>a
+, .pagination>.active>a:focus
+, .pagination>.active>a:hover
+, .pagination>.active>span
+, .pagination>.active>span:focus
+, .pagination>.active>span:hover {
+    background-color: #EDB97C !important;
+    border-color: #EDB97C !important;
 }
 
 /*** XS ***/

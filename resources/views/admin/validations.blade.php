@@ -15,6 +15,14 @@
             text-align: center;
             cursor: pointer;
         }
+
+        .dialog-doctor-info > div {
+            margin-bottom: 10px;
+        }
+
+        .dialog-doctor-info > div:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
     </style>
 @endsection
 
@@ -84,6 +92,7 @@
                 "columns": [
                     {
                         "data": "id",
+                        "className": "d-dtable-center",
                         "searchable": false
                     },
                     {
@@ -97,11 +106,13 @@
                     },
                     {
                         "data": "updated_at",
+                        "className": "d-dtable-center",
                         "orderable": true,
                         "orderData": [2]
                     },
                     {
                         "data": "estado",
+                        "className": "d-dtable-center",
                         "render": function (data) {
                             var txt = "Pendiente";
 
@@ -130,6 +141,86 @@
                 rowCallback: function (row, data) {
                     $(row).data('datos', data);
                 }
+            }).on('click', '.val-info', function () {
+                var idUsuario = $(this).closest('tr').data('datos').id_usuario;
+
+                sendPost('{{ route('admin.getdoctorinfo') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id: idUsuario
+                }, function (response) {
+                    var doctor = response.doctor;
+
+                    $('<div class="dialog-doctor-info">' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Nombres:</span><br>' + doctor.nombres +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Apellidos:</span><br>' + doctor.apellidos +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Fecha creación cta.:</span><br>' + doctor.fecha_registro +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">e-mail:</span><br>' + doctor.email +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Fecha nacimiento:</span><br>' + doctor.fecha_nacimiento +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Sexo:</span><br>' + doctor.sexo +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Tipo identificador:</span><br>' + doctor.tipo_identificador +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Identificador:</span><br>' + (doctor.tipo_identificador !== 1 ? doctor.identificador : formatearRut(doctor.identificador)) +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="Título (según usuario)">Título (S.U.):</span><br>' + doctor.titulo_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="Especialidad (según usuario)">Especialidad (S.U.):</span><br>' + doctor.especialidad_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="Institución habilitante (según usuario)">Instit. habil. (S.U.):</span><br>' + doctor.institucion_habilitante_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="N° registro (según usuario)">N° registro (S.U.):</span><br>' + doctor.nregistro_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="Fecha registro (según usuario)">Fecha registro (S.U.):</span><br>' + doctor.fecha_registro_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold" title="Antecedente del título (según usuario)">Antecedente título (S.U.):</span><br>' + doctor.antecedente_titulo_segun_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                            '<span class="bold">Última Actualización:</span><br>' + doctor.ultima_actualizacion +
+                        '</div>' +
+                    '</div>').dialog({
+                        title: "Doctor ID: " + idUsuario,
+                        classes: {'ui-dialog': 'dialog-responsive'},
+                        width: 1000,
+                        resizable: true,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        close: function () {
+                            $('.dialog-doctor-info').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Cerrar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.dialog-doctor-info').dialog("close");
+                                }
+                            }
+                        ]
+                    });
+                });
+            }).on('click', '.val-validate', function () {
+
             });
 
             $('#filter-validations-search').keyup(function () {
