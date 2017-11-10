@@ -242,4 +242,56 @@ class GlobalController
 
         return response()->json($datos);
     }
+
+    public function getVerificacionesSolicitud(Request $request) {
+        $datos = [
+            "error" => false,
+            "solicitud" => [],
+        ];
+
+        $consulta = "
+            select 
+            s.id_usuario
+            , s.estado
+            , coalesce(s.comentario, '') as comentario
+            , to_char(s.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_creacion
+            , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as ultima_actualizacion
+            , case
+                when count(v) > 0 then
+                    json_agg((
+                        select to_json(a)
+                        from (
+                            select v.id,
+                            v.habilitado,
+                            coalesce(v.titulo_habilitante_legal, '') as titulo_habilitante_legal,
+                            coalesce(v.institucion_habilitante, '') as institucion_habilitante,
+                            coalesce(v.especialidad, '') as especialidad,
+                            v.id_usuario,
+                            to_char(v.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_creacion,
+                            to_char(v.updated_at, 'dd-mm-yyyy HH24:mi:ss') as ultima_actualizacion,
+                            coalesce(v.nregistro, '') as nregistro,
+                            coalesce(v.fecha_registro, '') as fecha_registro,
+                            coalesce(v.antecedente_titulo, '') as antecedente_titulo,
+                            v.id_solicitud,
+                            v.id_usuario_verificante
+                        ) a
+                    ) order by v.updated_at desc)
+                else '[]'
+            end as verificaciones
+            from solicitud_Verificacion s
+            left join verificaciones v
+              on s.id = v.id_solicitud
+            where s.id = {$request["id"]}
+            group by s.id
+        ";
+
+        if ($r = DB::select($consulta)) {
+            $datos["solicitud"] = $r[0];
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
 }

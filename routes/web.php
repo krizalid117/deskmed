@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/admin/validations', 'GlobalController@validations')->name('admin.validations');
 
         Route::post('/admin/doc', 'GlobalController@getDoctorInfo')->name('admin.getdoctorinfo');
+        Route::post('/admin/get_verifications', 'GlobalController@getVerificacionesSolicitud')->name('admin.getverificaciones');
     });
 
     //Rutas sólo para doctores...

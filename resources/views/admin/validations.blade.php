@@ -144,83 +144,85 @@
             }).on('click', '.val-info', function () {
                 var idUsuario = $(this).closest('tr').data('datos').id_usuario;
 
-                sendPost('{{ route('admin.getdoctorinfo') }}', {
-                    _token: '{{ csrf_token() }}',
-                    id: idUsuario
-                }, function (response) {
-                    var doctor = response.doctor;
-
-                    $('<div class="dialog-doctor-info">' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Nombres:</span><br>' + doctor.nombres +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Apellidos:</span><br>' + doctor.apellidos +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Fecha creación cta.:</span><br>' + doctor.fecha_registro +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">e-mail:</span><br>' + doctor.email +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Fecha nacimiento:</span><br>' + doctor.fecha_nacimiento +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Sexo:</span><br>' + doctor.sexo +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Tipo identificador:</span><br>' + doctor.tipo_identificador +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Identificador:</span><br>' + (doctor.tipo_identificador !== 1 ? doctor.identificador : formatearRut(doctor.identificador)) +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="Título (según usuario)">Título (S.U.):</span><br>' + doctor.titulo_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="Especialidad (según usuario)">Especialidad (S.U.):</span><br>' + doctor.especialidad_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="Institución habilitante (según usuario)">Instit. habil. (S.U.):</span><br>' + doctor.institucion_habilitante_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="N° registro (según usuario)">N° registro (S.U.):</span><br>' + doctor.nregistro_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="Fecha registro (según usuario)">Fecha registro (S.U.):</span><br>' + doctor.fecha_registro_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold" title="Antecedente del título (según usuario)">Antecedente título (S.U.):</span><br>' + doctor.antecedente_titulo_segun_usuario +
-                        '</div>' +
-                        '<div class="col-sm-4">' +
-                            '<span class="bold">Última Actualización:</span><br>' + doctor.ultima_actualizacion +
-                        '</div>' +
-                    '</div>').dialog({
-                        title: "Doctor ID: " + idUsuario,
-                        classes: {'ui-dialog': 'dialog-responsive'},
-                        width: 1000,
-                        resizable: true,
-                        draggable: true,
-                        autoOpen: true,
-                        modal: true,
-                        escapeOnClose: true,
-                        close: function () {
-                            $('.dialog-doctor-info').dialog('destroy').remove();
-                        },
-                        buttons: [
-                            {
-                                text: "Cerrar",
-                                'class': 'btn',
-                                click: function () {
-                                    $('.dialog-doctor-info').dialog("close");
-                                }
-                            }
-                        ]
-                    });
-                });
+                openUserInfo(idUsuario);
             }).on('click', '.val-validate', function () {
+                var datos = $(this).closest('tr').data('datos');
+                var idVerificacion = datos.id;
 
+                sendPost('{{ route('admin.getverificaciones') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id: idVerificacion
+                }, function (response) {
+                    var solicitud = response.solicitud;
+                    var verificaciones = eval(solicitud.verificaciones);
+
+//                    if (verificaciones.length > 0) {
+                        $('<div class="dialog-doctor-solicitud">' +
+                            '<fieldset class="solicitud-user-info">' +
+                                '<legend><span class="bold">Médico</span></legend>' +
+                                '<div class="col-sm-4">' +
+                                    '<span class="bold">Nombres:</span><br>' + datos.nombres +
+                                '</div>' +
+                                '<div class="col-sm-4">' +
+                                    '<span class="bold">ID:</span><br>' + datos.id_usuario +
+                                '</div>' +
+                                '<div class="col-sm-4">' +
+                                    '<span class="bold">Datos:</span><br><span class="glyphicon glyphicon-eye-open" onclick="openUserInfo(' + datos.id_usuario + ');" style="cursor: pointer;"></span>' +
+                                '</div>' +
+                            '</fieldset>' +
+                            '<fieldset>' +
+                                '<legend><span class="bold">Datos solicitud</span></legend>' +
+                                '<div class="form-group col-sm-3">' +
+                                    '<label for="solicitud-estoad" class="form-label">Estado:</label>' +
+                                    '<select class="form-control" id="solicitud-estoad">' +
+                                        '<option value="0" ' + (parseInt(solicitud.estado) === 0 ? "selected" : "") + '>Pendiente</option>' +
+                                        '<option value="1" ' + (parseInt(solicitud.estado) === 1 ? "selected" : "") + '>Cursado</option>' +
+                                        '<option value="2" ' + (parseInt(solicitud.estado) === 2 ? "selected" : "") + '>Cursado (No registra)</option>' +
+                                        '<option value="3" ' + (parseInt(solicitud.estado) === 3 ? "selected" : "") + '>Cursado (Faltan datos)</option>' +
+                                    '</select>' +
+                                '</div>' +
+                                '<div class="form-group col-sm-3">' +
+                                    '<label for="solicitud-comentario" class="form-label">Comentario:</label>' +
+                                    '<input type="text" id="solicitud-comentario" class="form-control" value="' + solicitud.comentario + '">' +
+                                '</div>' +
+                                '<div class="form-group col-sm-3">' +
+                                    '<label for="solicitud-createdat" class="form-label">Creado el</label>' +
+                                    '<input type="text" id="solicitud-createdat" class="form-control" value="' + solicitud.fecha_creacion + '">' +
+                                '</div>' +
+                                '<div class="form-group col-sm-3">' +
+                                    '<label for="solicitud-updatedat" class="form-label">Último cambio</label>' +
+                                    '<input type="text" id="solicitud-updatedat" class="form-control" value="' + solicitud.ultima_actualizacion + '">' +
+                                '</div>' +
+                            '</fieldset>' +
+                        '</div>').dialog({
+                            title: "Solicitud ID: " + idVerificacion,
+                            classes: { 'ui-dialog': 'dialog-responsive' },
+                            width: 1000,
+                            resizable: false,
+                            draggable: true,
+                            autoOpen: true,
+                            modal: true,
+                            escapeOnClose: true,
+                            close: function () {
+                                $('.dialog-doctor-solicitud').dialog('destroy').remove();
+                            },
+                            buttons: [
+                                {
+                                    text: "Cerrar",
+                                    'class': 'btn',
+                                    click: function () {
+                                        $('.dialog-doctor-solicitud').dialog("close");
+                                    }
+                                }
+                            ]
+                        });
+//                    }
+//                    else {
+//                        mensajes.alerta("Ya no existe esta solicitud. Presione \"Aceptar\" para recargar la página.", "Solicitud inexistente", function () {
+//                            location.reload();
+//                        });
+//                    }
+                });
             });
 
             $('#filter-validations-search').keyup(function () {
@@ -260,6 +262,84 @@
                 mensajes.loading_close();
             });
         });
+
+        function openUserInfo(idUsuario) {
+            sendPost('{{ route('admin.getdoctorinfo') }}', {
+                _token: '{{ csrf_token() }}',
+                id: idUsuario
+            }, function (response) {
+                var doctor = response.doctor;
+
+                $('<div class="dialog-doctor-info">' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Nombres:</span><br>' + doctor.nombres +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Apellidos:</span><br>' + doctor.apellidos +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Fecha creación cta.:</span><br>' + doctor.fecha_registro +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">e-mail:</span><br>' + doctor.email +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Fecha nacimiento:</span><br>' + doctor.fecha_nacimiento +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Sexo:</span><br>' + doctor.sexo +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Tipo identificador:</span><br>' + doctor.tipo_identificador +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Identificador:</span><br>' + (doctor.tipo_identificador !== 1 ? doctor.identificador : formatearRut(doctor.identificador)) +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="Título (según usuario)">Título (S.U.):</span><br>' + doctor.titulo_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="Especialidad (según usuario)">Especialidad (S.U.):</span><br>' + doctor.especialidad_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="Institución habilitante (según usuario)">Instit. habil. (S.U.):</span><br>' + doctor.institucion_habilitante_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="N° registro (según usuario)">N° registro (S.U.):</span><br>' + doctor.nregistro_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="Fecha registro (según usuario)">Fecha registro (S.U.):</span><br>' + doctor.fecha_registro_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold" title="Antecedente del título (según usuario)">Antecedente título (S.U.):</span><br>' + doctor.antecedente_titulo_segun_usuario +
+                    '</div>' +
+                    '<div class="col-sm-4">' +
+                    '<span class="bold">Última Actualización:</span><br>' + doctor.ultima_actualizacion +
+                    '</div>' +
+                '</div>').dialog({
+                    title: "Doctor ID: " + idUsuario,
+                    classes: {'ui-dialog': 'dialog-responsive'},
+                    width: 1000,
+                    resizable: false,
+                    draggable: true,
+                    autoOpen: true,
+                    modal: true,
+                    escapeOnClose: true,
+                    close: function () {
+                        $('.dialog-doctor-info').dialog('destroy').remove();
+                    },
+                    buttons: [
+                        {
+                            text: "Cerrar",
+                            'class': 'btn',
+                            click: function () {
+                                $('.dialog-doctor-info').dialog("close");
+                            }
+                        }
+                    ]
+                });
+            });
+        }
 
     </script>
 @endsection
