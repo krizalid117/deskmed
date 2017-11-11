@@ -14,6 +14,7 @@ use App\UsuarioDoctores;
 use App\UsuarioEnfermedadesHistoricas;
 use App\UsuarioEnfermedadesActuales;
 use App\Http\Controllers\GlobalController;
+use App\Verificaciones;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -750,6 +751,49 @@ class UsuarioController extends Controller
             "usuario" => $usuario,
             "doctores" => $usuario->doctors()->get(),
         ]);
+    }
+
+    public function getVerificationResponse(Request $request) {
+        $id = $request["id"];
+
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $verificacion = SolicitudesVerificacion::find($id);
+
+        if (!is_null($verificacion)) {
+            $mensaje = "";
+
+            if ($verificacion->estado === 0) {
+                $mensaje = "Tu solicitud está pendiente. Por favor, consulta nuevamente en unas horas.";
+            }
+            else if ($verificacion->estado === 1) {
+                $mensaje = "Tu solicitud ha sido cursada, mira tu perfil profesional para ver los resultados.";
+            }
+            else if ($verificacion->estado === 2) {
+                $mensaje = "Tu solicitud ha sido cursada, pero faltaron datos para verificar correctamente tu situación profesional. Por favor, comunícate con soporte para más información. Comentarios adicionales: <br><br><span class=\"bold\">{$verificacion->comentario}</span>";
+            }
+            else {
+                $mensaje = "Tu solicitud ha sido cursada, pero no fuiste encontrado como profesional de la salud según el Registro Nacional de Prestadores Individuales de Salud. Por favor, comunícate con soporte para más información. Comentarios adicionales: <br><br><span class=\"bold\">{$verificacion->comentario}</span>";
+            }
+
+            $datos["mensaje"] = $mensaje;
+
+            if ($request->exists("n")) {
+                $n = Usuario::find($verificacion->id_usuario)->unreadNotifications()->where('id', $request["n"])->first();
+
+                if ($n) {
+                    $n->update(['read_at' => Carbon::now()]);
+                }
+            }
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
     }
 
     /* funciones estáticas */

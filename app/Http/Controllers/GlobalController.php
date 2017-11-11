@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use \Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use \App\Verificaciones;
+use App\Notifications\VerificationRequestResponded;
+use App\Usuario;
+use App\Verificaciones;
+use App\SolicitudesVerificacion;
 
 class GlobalController
 {
@@ -250,8 +255,9 @@ class GlobalController
         ];
 
         $consulta = "
-            select 
-            s.id_usuario
+            select s.id_usuario
+            , u.identificador
+            , u.id_tipo_identificador
             , s.estado
             , coalesce(s.comentario, '') as comentario
             , to_char(s.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_creacion
@@ -263,26 +269,30 @@ class GlobalController
                         from (
                             select v.id,
                             v.habilitado,
-                            coalesce(v.titulo_habilitante_legal, '') as titulo_habilitante_legal,
-                            coalesce(v.institucion_habilitante, '') as institucion_habilitante,
+                            coalesce(v.titulo_habilitante_legal, '') as titulo,
+                            coalesce(v.institucion_habilitante, '') as institucion,
                             coalesce(v.especialidad, '') as especialidad,
-                            v.id_usuario,
+                            coalesce(v.nregistro, '') as nregistro,
+                            coalesce(v.fecha_registro, '') as fregistro,
+                            coalesce(v.antecedente_titulo, '') as antecedente,
                             to_char(v.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_creacion,
                             to_char(v.updated_at, 'dd-mm-yyyy HH24:mi:ss') as ultima_actualizacion,
-                            coalesce(v.nregistro, '') as nregistro,
-                            coalesce(v.fecha_registro, '') as fecha_registro,
-                            coalesce(v.antecedente_titulo, '') as antecedente_titulo,
-                            v.id_solicitud,
-                            v.id_usuario_verificante
+                            concat_ws(' ', uv.nombres, uv.apellidos) as nombre_verificante,
+                            uv.id as id_verificante,
+                            0 as estado
                         ) a
                     ) order by v.updated_at desc)
                 else '[]'
             end as verificaciones
-            from solicitud_Verificacion s
+            from solicitud_verificacion s
+            join usuarios u
+              on u.id = s.id_usuario
             left join verificaciones v
               on s.id = v.id_solicitud
+            left join usuarios uv
+              on uv.id = v.id_usuario_verificante
             where s.id = {$request["id"]}
-            group by s.id
+            group by s.id, u.id
         ";
 
         if ($r = DB::select($consulta)) {
@@ -290,6 +300,87 @@ class GlobalController
         }
         else {
             $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function verifyExternal(Request $request) {
+        $datos = [
+            "error" => false,
+            "content" => "",
+        ];
+//
+//        $client = new Client();
+        $baseUrl = "http://webhosting.superdesalud.gob.cl";
+//
+//        $res = $client->request('GET', "$baseUrl/prestadoresindividuales.nsf/(searchAll2)/Search?SearchView&Query=(FIELD%20rut_pres={$request["rut"]})&Start=1&count=10");
+//
+//        var_dump($res->getBody());
+//
+//        $datos["verificacion"] = $res;
+
+//        return response()->json($datos);
+
+        $step = intval($request["step"]);
+
+        switch ($step) {
+            case 1:
+                $datos["content"] = (file_get_contents("$baseUrl/bases/prestadoresindividuales.nsf/(searchAll2)/Search?SearchView&Query=(FIELD%20rut_pres={$request["data"]})&Start=1&count=10"));
+                break;
+            case 2:
+                $datos["content"] = utf8_encode(file_get_contents("$baseUrl{$request["data"]}"));
+                break;
+            case 3:
+                $datos["content"] = utf8_encode(file_get_contents("$baseUrl/bases/prestadoresindividuales.nsf/(AntecRegxRut2)/{$request["data"]}?open"));
+                break;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function saveVerification(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $solicitud = SolicitudesVerificacion::find($request["id_solicitud"]);
+
+        $update = $solicitud->update([
+            "estado" => intval($request["estado"]),
+            "comentario" => $request["comentario"],
+        ]);
+
+        if ($update && $request->exists("verificaciones")) {
+
+            foreach ($request["verificaciones"] as $ver) {
+                if (intval($ver["estado"]) === 1) {
+
+                    $verificacion = new Verificaciones();
+
+                    $verificacion->habilitado = $ver["habilitado"] === "true";
+                    $verificacion->titulo_habilitante_legal = $ver["titulo"];
+                    $verificacion->institucion_habilitante = $ver["institucion"];
+                    $verificacion->especialidad = $ver["especialidad"];
+                    $verificacion->id_usuario = $solicitud->id_usuario;
+                    $verificacion->nregistro = $ver["nregistro"];
+                    $verificacion->fecha_registro = $ver["fregistro"];
+                    $verificacion->antecedente_titulo = $ver["antecedente"];
+                    $verificacion->id_solicitud = $solicitud->id;
+                    $verificacion->id_usuario_verificante = Auth::user()->id;
+
+                    $verificacion->save();
+
+                    Usuario::find($solicitud->id_usuario)->notify(new VerificationRequestResponded($solicitud));
+                }
+                else if (intval($ver["estado"]) === 2) {
+                    DB::table('verificaciones')->where('id', $ver["id"])->delete();
+                }
+            }
+        }
+        else {
+            $datos["error"] = false;
         }
 
         return response()->json($datos);

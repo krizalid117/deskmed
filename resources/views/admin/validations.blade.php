@@ -28,6 +28,10 @@
 
 @section('content')
 
+    <div id="verification-container" class="hidden">
+
+    </div>
+
     <div class="basic-form-container">
 
         <input type="text" id="filter-validations-search" placeholder="Filtrar..." style="width: 200px; height: 30px; padding-left: 5px;">
@@ -60,7 +64,7 @@
 
 @section('scripts')
     <script type="text/javascript">
-        var validations = JSON.parse('{!! $validations !!}');
+        var validations = eval({!! $validations !!});
 
         $(function () {
             var dtable = $('.d-dtable').DataTable({
@@ -156,72 +160,254 @@
                     var solicitud = response.solicitud;
                     var verificaciones = eval(solicitud.verificaciones);
 
-//                    if (verificaciones.length > 0) {
-                        $('<div class="dialog-doctor-solicitud">' +
-                            '<fieldset class="solicitud-user-info">' +
-                                '<legend><span class="bold">Médico</span></legend>' +
-                                '<div class="col-sm-4">' +
-                                    '<span class="bold">Nombres:</span><br>' + datos.nombres +
-                                '</div>' +
-                                '<div class="col-sm-4">' +
-                                    '<span class="bold">ID:</span><br>' + datos.id_usuario +
-                                '</div>' +
-                                '<div class="col-sm-4">' +
-                                    '<span class="bold">Datos:</span><br><span class="glyphicon glyphicon-eye-open" onclick="openUserInfo(' + datos.id_usuario + ');" style="cursor: pointer;"></span>' +
-                                '</div>' +
-                            '</fieldset>' +
-                            '<fieldset>' +
-                                '<legend><span class="bold">Datos solicitud</span></legend>' +
-                                '<div class="form-group col-sm-3">' +
-                                    '<label for="solicitud-estoad" class="form-label">Estado:</label>' +
-                                    '<select class="form-control" id="solicitud-estoad">' +
-                                        '<option value="0" ' + (parseInt(solicitud.estado) === 0 ? "selected" : "") + '>Pendiente</option>' +
-                                        '<option value="1" ' + (parseInt(solicitud.estado) === 1 ? "selected" : "") + '>Cursado</option>' +
-                                        '<option value="2" ' + (parseInt(solicitud.estado) === 2 ? "selected" : "") + '>Cursado (No registra)</option>' +
-                                        '<option value="3" ' + (parseInt(solicitud.estado) === 3 ? "selected" : "") + '>Cursado (Faltan datos)</option>' +
-                                    '</select>' +
-                                '</div>' +
-                                '<div class="form-group col-sm-3">' +
-                                    '<label for="solicitud-comentario" class="form-label">Comentario:</label>' +
-                                    '<input type="text" id="solicitud-comentario" class="form-control" value="' + solicitud.comentario + '">' +
-                                '</div>' +
-                                '<div class="form-group col-sm-3">' +
-                                    '<label for="solicitud-createdat" class="form-label">Creado el</label>' +
-                                    '<input type="text" id="solicitud-createdat" class="form-control" value="' + solicitud.fecha_creacion + '">' +
-                                '</div>' +
-                                '<div class="form-group col-sm-3">' +
-                                    '<label for="solicitud-updatedat" class="form-label">Último cambio</label>' +
-                                    '<input type="text" id="solicitud-updatedat" class="form-control" value="' + solicitud.ultima_actualizacion + '">' +
-                                '</div>' +
-                            '</fieldset>' +
-                        '</div>').dialog({
-                            title: "Solicitud ID: " + idVerificacion,
-                            classes: { 'ui-dialog': 'dialog-responsive' },
-                            width: 1000,
-                            resizable: false,
-                            draggable: true,
-                            autoOpen: true,
-                            modal: true,
-                            escapeOnClose: true,
-                            close: function () {
-                                $('.dialog-doctor-solicitud').dialog('destroy').remove();
-                            },
-                            buttons: [
-                                {
-                                    text: "Cerrar",
-                                    'class': 'btn',
-                                    click: function () {
-                                        $('.dialog-doctor-solicitud').dialog("close");
-                                    }
+                    $('<div class="dialog-doctor-solicitud">' +
+                        '<fieldset class="solicitud-user-info">' +
+                        '<legend><span class="bold">Médico</span></legend>' +
+                        '<div class="col-sm-4">' +
+                        '<span class="bold">Nombres:</span><br>' + datos.nombre_completo +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                        '<span class="bold">ID:</span><br>' + datos.id_usuario +
+                        '</div>' +
+                        '<div class="col-sm-4">' +
+                        '<span class="bold">Datos:</span><br><span class="glyphicon glyphicon-eye-open" onclick="openUserInfo(' + datos.id_usuario + ');" style="cursor: pointer;"></span>' +
+                        '</div>' +
+                        '</fieldset>' +
+                        '<fieldset>' +
+                        '<legend><span class="bold">Datos solicitud</span></legend>' +
+                        '<div class="form-group col-sm-3">' +
+                        '<label for="solicitud-estado" class="form-label">Estado:</label>' +
+                        '<select class="form-control" id="solicitud-estado">' +
+                        '<option value="0" ' + (parseInt(solicitud.estado) === 0 ? "selected" : "") + '>Pendiente</option>' +
+                        '<option value="1" ' + (parseInt(solicitud.estado) === 1 ? "selected" : "") + '>Cursado</option>' +
+                        '<option value="2" ' + (parseInt(solicitud.estado) === 2 ? "selected" : "") + '>Cursado (No registra)</option>' +
+                        '<option value="3" ' + (parseInt(solicitud.estado) === 3 ? "selected" : "") + '>Cursado (Faltan datos)</option>' +
+                        '</select>' +
+                        '</div>' +
+                        '<div class="form-group col-sm-3">' +
+                        '<label for="solicitud-comentario" class="form-label">Comentario:</label>' +
+                        '<input type="text" id="solicitud-comentario" class="form-control" value="' + solicitud.comentario + '">' +
+                        '</div>' +
+                        '<div class="form-group col-sm-3">' +
+                        '<label for="solicitud-createdat" class="form-label">Creado el</label>' +
+                        '<input type="text" id="solicitud-createdat" class="form-control" value="' + solicitud.fecha_creacion + '" readonly>' +
+                        '</div>' +
+                        '<div class="form-group col-sm-3">' +
+                        '<label for="solicitud-updatedat" class="form-label">Último cambio</label>' +
+                        '<input type="text" id="solicitud-updatedat" class="form-control" value="' + solicitud.ultima_actualizacion + '" readonly>' +
+                        '</div>' +
+                        '</fieldset>' +
+                        '<fieldset>' +
+                        '<legend class="bold">Verificaciones</legend>' +
+                        '<div class="table-responsive">' +
+                        '<table class="table table-striped table-bordered table-hover table-condensed" style="margin-bottom: 5px; font-size: .65em;">' +
+                        '<thead>' +
+                        '<tr>' +
+                        '<th style="width: 25px;">ID</th>' +
+                        '<th style="width: 50px;">¿Habilitado?</th>' +
+                        '<th style="width: 100px;">Título</th>' +
+                        '<th style="width: 100px;">Institución</th>' +
+                        '<th style="width: 100px;">Especialidad</th>' +
+                        '<th style="width: 60px;">N° registro</th>' +
+                        '<th style="width: 80px;">Fecha registro</th>' +
+                        '<th>Antecendete</th>' +
+                        '<th style="width: 120px;">Verificado por</th>' +
+                        '<th style="width: 120px;">Fecha creación</th>' +
+                        '<th style="width: 50px;">Acciones</th>' +
+                        '</tr>' +
+                        '</thead>' +
+                        '<tbody id="tbody-verificaciones">' +
+                        reloadVerifications() +
+                        '</tbody>' +
+                        '</table>' +
+                        '</div>' +
+                        '<div style="text-align: right;">' +
+                        '<button class="btn btn-primary btn-xs" id="btn-add-verificacion">Agregar verificación</button>' +
+                        '</div>' +
+                        '</fieldset>' +
+                    '</div>').dialog({
+                        title: "Solicitud ID: " + idVerificacion,
+                        classes: {'ui-dialog': 'dialog-responsive'},
+                        width: 1000,
+                        resizable: false,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        position: {my: "center top", at: "center top+70", of: window},
+                        close: function () {
+                            $('.dialog-doctor-solicitud').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Cerrar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.dialog-doctor-solicitud').dialog("close");
                                 }
-                            ]
-                        });
-//                    }
-//                    else {
-//                        mensajes.alerta("Ya no existe esta solicitud. Presione \"Aceptar\" para recargar la página.", "Solicitud inexistente", function () {
-//                            location.reload();
-//                        });
-//                    }
+                            },
+                            {
+                                text: "Guardar",
+                                'class': 'btn btn-primary',
+                                click: function () {
+                                    sendPost('{{ route('admin.saveverification') }}', {
+                                        _token: '{{ csrf_token() }}',
+                                        id_solicitud: idVerificacion,
+                                        estado: $('#solicitud-estado').val(),
+                                        comentario: $.trim($('#solicitud-comentario').val()),
+                                        verificaciones: verificaciones
+                                    }, function() {
+                                        mensajes.alerta("Datos de solicitud guardados correctamente.", "Aviso", function () {
+                                            $('.dialog-doctor-solicitud').dialog("close");
+                                            location.reload();
+                                        });
+                                    });
+                                }
+                            }
+                        ]
+                    });
+
+                    $('#btn-add-verificacion').click(function () {
+                        if (solicitud.id_tipo_identificador === 1) {
+
+                            var verif = {
+                                id: 0,
+                                habilitado: false,
+                                titulo: "",
+                                institucion: "",
+                                especialidad: "",
+                                nregistro: "",
+                                fregistro: "",
+                                antecedente: "",
+                                fecha_creacion: "Recién",
+                                ultima_actualizacion: "Recién",
+                                nombre_verificante: '{{ $usuario->nombres . " " . $usuario->apellidos }}',
+                                id_verificante: '{{ $usuario->id }}',
+                                estado: 1
+                            };
+
+                            sendPost('{{ route('admin.sendverification') }}', {
+                                _token: '{{ csrf_token() }}',
+                                data: solicitud.identificador.slice(0, -1),
+                                step: 1
+                            }, function (verifyResponse) {
+                                var container = $('#verification-container');
+
+                                container.html(verifyResponse.content);
+
+                                var found = container.find('maxview').text();
+
+                                if (parseInt(found) === 1 && container.find('.showDoc').length) {
+
+                                    var row = $('.showRow');
+
+                                    verif.habilitado = true;
+                                    verif.titulo = $.trim(row.children('td').eq(2).text());
+                                    verif.institucion = $.trim(row.children('td').eq(3).text());
+                                    verif.especialidad = $.trim(row.children('td').eq(4).text());
+
+                                    var href = container.find('.showDoc').attr('href');
+
+                                    sendPost('{{ route('admin.sendverification') }}', {
+                                        _token: '{{ csrf_token() }}',
+                                        data: href,
+                                        step: 2
+                                    }, function (verifyResponse2) {
+                                        container.html(verifyResponse2.content);
+
+                                        var row = $('.reporte').children('table').children('tbody').children('tr').eq(4);
+
+                                        verif.nregistro = $.trim(row.children('td').eq(1).text());
+                                        verif.fregistro = $.trim(row.children('td').eq(3).text());
+
+                                        var dato = container.find('.details').attr('ref');
+
+                                        sendPost('{{ route('admin.sendverification') }}', {
+                                            _token: '{{ csrf_token() }}',
+                                            data: dato,
+                                            step: 3
+                                        }, function (verifyResponse3) {
+                                            container.html(verifyResponse3.content);
+
+                                            verif.antecedente = $.trim(container.children('form').children('table').children('tbody').children('tr').eq(1).children('td').text());
+
+                                            container.empty();
+
+                                            verificaciones.push(verif);
+
+                                            $('#tbody-verificaciones').html(reloadVerifications());
+
+                                            $('#solicitud-estado').val(1);
+                                            $('#btn-add-verificacion').prop('disabled', true).attr('title', 'Para verificar nuevamente, guarde datos o cancele y vuelva a intentarlo.');
+                                        });
+                                    });
+                                }
+                                else {
+                                    mensajes.alerta("No se encontraron datos vinculados al RUT.", "Alerta", function () {
+                                        $('#solicitud-estado').val(2);
+                                        $('#solicitud-comentario').focus();
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            mensajes.alerta("No se puede verificar un usuario con tipo de identificador que no sea RUT.", "Alerta", function () {
+                                $('#solicitud-estado').val(3);
+                                $('#solicitud-comentario').focus();
+                            });
+                        }
+                    });
+
+                    $('#tbody-verificaciones').on('click', '.eliminar-verificacion', function () {
+                        var index = parseInt($(this).closest('tr').attr('index'));
+
+                        mensajes.confirmacion_sino("¿Está seguro de eliminar esta verificación?", function () {
+
+                            if (parseInt(verificaciones[index].estado) === 0) { //Si existía de antes se deja en estado 2 para elimianrlo desde la base de datos
+                                verificaciones[index].estado = 2;
+                            }
+                            else { //Si no, se elimina desde el array
+                                verificaciones.splice(index, 1);
+                            }
+
+                            $('#tbody-verificaciones').html(reloadVerifications());
+                        })
+                    });
+
+                    function reloadVerifications() {
+                        var bodyVerificaciones = '';
+                        var conteo = 0;
+
+                        for (var i = 0; i < verificaciones.length; i++) {
+                            var v = verificaciones[i];
+                            var estado = parseInt(v.estado);
+
+                            if (estado !== 2) {
+
+                                conteo++;
+
+                                bodyVerificaciones += '<tr data-datos="' + htmlEntities(JSON.stringify(v)) + '" index="' + i + '">' +
+                                    '<td>' + v.id + '</td>' +
+                                    '<td style="text-align: center;">' + (v.habilitado ? "Sí" : "No") + '</td>' +
+                                    '<td>' + v.titulo + '</td>' +
+                                    '<td>' + v.institucion + '</td>' +
+                                    '<td>' + v.especialidad + '</td>' +
+                                    '<td>' + v.nregistro + '</td>' +
+                                    '<td>' + v.fregistro + '</td>' +
+                                    '<td>' + v.antecedente + '</td>' +
+                                    '<td title="ID: ' + v.id_verificante + '">' + v.nombre_verificante + '</td>' +
+                                    '<td>' + v.fecha_creacion + '</td>' +
+                                    '<td style="text-align: center;"><span class="ui-icon ui-icon-trash eliminar-verificacion" style="display: inline-block; cursor: pointer;" title="Eliminar verificación"></span></td>' +
+                                '</tr>';
+                            }
+                        }
+
+                        if (conteo === 0) {
+                            return '<tr><td colspan="11" style="text-align: center;">No hay verificaciones para esta solicitud</td></tr>';
+                        }
+
+                        return bodyVerificaciones;
+                    }
                 });
             });
 
@@ -234,6 +420,9 @@
 
                 var getCondition = function (dato, value) {
                     switch (value) {
+                        case "0":
+                            return parseInt(dato) === 0;
+                            break;
                         case "1":
                             return parseInt(dato) === 1;
                             break;

@@ -34,7 +34,7 @@ function sendPost(__url, __opt, __func, __errorcb) {
             }
 
             mensajes.loading_close();
-            mensajes.alerta("Error al ejecutar la acción.");
+            mensajes.alerta("Error al ejecutar la acción: " + ex);
         }
     }, 'json')
         .fail(function (res) {
@@ -271,6 +271,10 @@ function validarRut(rutCompleto) { //debe estar en formato: xx.xxx.xxx-x
     }
 
     return dv(rut) == digv;
+}
+
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 /********************* Funciones JQuery *********************/

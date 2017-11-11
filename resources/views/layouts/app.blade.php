@@ -412,6 +412,18 @@
             $('.header-notifications-count').text(text);
         });
     }
+
+    function checkVerificationRequest(id, n) {
+        sendPost('{{ route('usuario.getverificationresponse') }}', {
+            _token: '{{ csrf_token() }}',
+            id: id,
+            n: n
+        }, function (response) {
+            mensajes.alerta(response.mensaje, "Solicitud de verificación", function () {
+                reloadNotifications();
+            });
+        });
+    }
 </script>
 
 @yield('scripts')

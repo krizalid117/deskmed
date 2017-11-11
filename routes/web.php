@@ -39,6 +39,10 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/admin/doc', 'GlobalController@getDoctorInfo')->name('admin.getdoctorinfo');
         Route::post('/admin/get_verifications', 'GlobalController@getVerificacionesSolicitud')->name('admin.getverificaciones');
+
+        Route::post('/admin/send_verification', 'GlobalController@verifyExternal')->name('admin.sendverification');
+
+        Route::post('/admin/save_verification', 'GlobalController@saveVerification')->name('admin.saveverification');
     });
 
     //Rutas sólo para doctores...
@@ -50,6 +54,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/career/savetemp', 'UsuarioController@guardarPPTemporal')->name('usuario.profesion.savetemp');
 
         Route::post('/sendaddlistrequest', 'UsuarioController@sendAddListRequest')->name('usuario.sendaddlistrequest');
+
+        Route::post('/user/getverificationresponse', 'UsuarioController@getVerificationResponse')->name('usuario.getverificationresponse');
     });
 
     //Rutas sólo para pacientes...
