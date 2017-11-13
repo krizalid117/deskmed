@@ -245,9 +245,9 @@ input, textarea {
     color: var(--secondary-text-color);
     border-bottom: 1px solid var(--secondary-border-color);
 
-    -webkit-box-shadow: 0 0 10px 1px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0 0 10px 1px rgba(0,0,0,0.75);
-    box-shadow: 0 0 10px 1px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.75);
+    box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.75);
 }
 
 .header-content-wrapper {
@@ -326,10 +326,6 @@ input, textarea {
     position: relative;
 }
 
-.profile-row {
-
-}
-
 .header-a-notif {
     width: 25px;
     height: 25px;
@@ -379,16 +375,17 @@ input, textarea {
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    bottom: -1px;
-    right: 18px;
+    bottom: -2px;
+    right: 19px;
+    z-index: 2;
 }
 
 .profile-row-p {
-    border-bottom: 5px solid var(--menu-bg-color);
+    border-bottom: 6px solid var(--menu-bg-color);
 }
 
 .profile-row-n {
-    border-bottom: 5px solid #f1f1f1;
+    border-bottom: 6px solid #f1f1f1;
 }
 
 .profile-window {

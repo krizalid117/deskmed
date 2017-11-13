@@ -164,6 +164,9 @@
                 else if ($(this).hasClass('menu-doctores')) {
                     window.location = '{{ route('paciente.doctores') }}';
                 }
+                else if ($(this).hasClass('menu-agenda')) {
+                    window.location = '{{ $usuario->id_tipo_usuario === 2 ? route('doctor.agenda') : ($usuario->id_tipo_usuario === 3 ? route('patient.agenda') : route("home")) }}';
+                }
             }
         });
 

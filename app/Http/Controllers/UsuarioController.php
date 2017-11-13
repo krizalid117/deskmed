@@ -15,6 +15,7 @@ use App\UsuarioEnfermedadesHistoricas;
 use App\UsuarioEnfermedadesActuales;
 use App\Http\Controllers\GlobalController;
 use App\Verificaciones;
+use Illuminate\Foundation\Testing\HttpException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -794,6 +795,26 @@ class UsuarioController extends Controller
         }
 
         return response()->json($datos);
+    }
+
+    public function agenda() {
+        $usuario = Auth::user();
+
+        $view = "";
+
+        if ($usuario->id_tipo_usuario === 2) {
+            $view = "doctor";
+        }
+        else if ($usuario->id_tipo_usuario === 3) {
+            $view = "patient";
+        }
+        else {
+            throw new HttpException(404);
+        }
+
+        return view("agenda.{$view}", [
+            "usuario" => $usuario,
+        ]);
     }
 
     /* funciones estáticas */
