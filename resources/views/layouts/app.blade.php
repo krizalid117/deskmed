@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ URL::to('css/wfmi-style.css') }}">
     <link rel="stylesheet" href="{{ URL::to('css/pretty.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/DataTables/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{ URL::to('js/timepicker/jquery.timepicker.min.css') }}">
 
     @yield('stylesheets')
 </head>
@@ -70,7 +71,13 @@
 </script>
 <script src="{{ URL::to('js/bootstrap-3.3.7/js/bootstrap.min.js') }}"></script>
 <script src="{{ URL::to('js/DataTables/datatables.min.js') }}"></script>
+<script src="{{ URL::to('js/floatThead/jquery.floatThead.js') }}"></script>
+<script src="{{ URL::to('js/floatThead/jquery.floatThead._.js') }}"></script>
+<script src="{{ URL::to('js/timepicker/jquery.timepicker.min.js') }}"></script>
+{{--<script src="{{ URL::to('js/datepair/src/Datepair.js') }}"></script>--}}
+{{--<script src="{{ URL::to('js/datepair/src/jquery.datepair.js') }}"></script>--}}
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
+
 
 <script> {{-- Scripts para el menu --}}
 

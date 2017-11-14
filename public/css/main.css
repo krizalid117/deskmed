@@ -127,6 +127,10 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     z-index: 1 !important;
 }
 
+.floatThead-container {
+    z-index: 1 !important;
+}
+
 
 /* OTHER CSS RULES */
 

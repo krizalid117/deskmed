@@ -57,7 +57,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/user/getverificationresponse', 'UsuarioController@getVerificationResponse')->name('usuario.getverificationresponse');
 
-        Route::get('/professional/agenda', 'UsuarioController@agenda')->name('doctor.agenda');
+        Route::get('/professional/agenda/{mode?}', 'UsuarioController@agenda')->name('doctor.agenda');
     });
 
     //Rutas sólo para pacientes...
@@ -74,7 +74,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/user/add_doctor/{id}', 'UsuarioController@addDoctorToList')->name('patients.addDoctor');
 
-        Route::get('/patient/agenda', 'UsuarioController@agenda')->name('patient.agenda');
+        Route::get('/patient/agenda/{mode?}', 'UsuarioController@agenda')->name('patient.agenda');
     });
 
     Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');

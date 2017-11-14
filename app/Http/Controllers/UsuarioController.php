@@ -797,8 +797,10 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
-    public function agenda() {
+    public function agenda(Request $request, $mode = NULL) {
         $usuario = Auth::user();
+
+        $mode = !is_null($mode) ? $mode : "weekly";
 
         $view = "";
 
@@ -814,6 +816,7 @@ class UsuarioController extends Controller
 
         return view("agenda.{$view}", [
             "usuario" => $usuario,
+            "mode" => $mode,
         ]);
     }
 
