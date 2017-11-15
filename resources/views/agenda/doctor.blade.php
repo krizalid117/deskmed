@@ -36,6 +36,10 @@
             width: 100%;
         }
 
+        .tbl-agenda-weekly {
+            min-width: 800px;
+        }
+
         .tbl-agenda-weekly > thead > tr > th {
             background-color: var(--normal-background-color);
             height: 40px;
@@ -45,13 +49,6 @@
             padding: 0 !important;
             text-align: center;
             border-left: 1px solid #ddd;
-        }
-
-        .tbl-agenda-weekly > tbody > tr > td:not(:first-child) {
-            border-left: 1px solid #ddd;
-            text-align: center;
-            height: 50px;
-            padding: 0 !important;
         }
 
         .tbl-agenda-weekly > tbody > tr > td:first-child {
@@ -69,7 +66,7 @@
         .agenda-horario-fila {
             text-align: right;
             vertical-align: top;
-            padding: 2px 2px 0 0 !important;
+            padding: 2px 4px 0 0 !important;
         }
 
         .agenda-daterange {
@@ -90,14 +87,28 @@
             -webkit-border-radius: 3px;
             -moz-border-radius: 3px;
             border-radius: 3px;
+
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .weekly-labels .weekly-labels-button:hover {
             border: 1px solid #ddd;
 
-            -webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.55);
-            -moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.55);
-            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.55);
+            -webkit-box-shadow: 0 0 10px -1px rgba(0, 0, 0, 0.55);
+            -moz-box-shadow: 0 0 10px -1px rgba(0, 0, 0, 0.55);
+            box-shadow: 0 0 10px -1px rgba(0, 0, 0, 0.55);
+        }
+
+        .weekly-agenda-day {
+            position: relative;
+
+            border-left: 1px solid #ddd;
+            text-align: center;
+            height: 50px;
+            padding: 0 !important;
         }
     </style>
 @endsection
@@ -152,7 +163,248 @@
                             <th data-day="0" style="width: 13.5%;">Domingo</th>
                         </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <tr class="weekly-agenda-row" data-hora="00:00">
+                                <td class="agenda-horario-fila">00:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="01:00">
+                                <td class="agenda-horario-fila">01:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="02:00">
+                                <td class="agenda-horario-fila">02:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="03:00">
+                                <td class="agenda-horario-fila">03:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="04:00">
+                                <td class="agenda-horario-fila">04:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="05:00">
+                                <td class="agenda-horario-fila">05:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="06:00">
+                                <td class="agenda-horario-fila">06:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="07:00">
+                                <td class="agenda-horario-fila">07:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="08:00">
+                                <td class="agenda-horario-fila">08:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="09:00">
+                                <td class="agenda-horario-fila">09:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="10:00">
+                                <td class="agenda-horario-fila">10:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="11:00">
+                                <td class="agenda-horario-fila">11:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="12:00">
+                                <td class="agenda-horario-fila">12:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="13:00">
+                                <td class="agenda-horario-fila">13:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="14:00">
+                                <td class="agenda-horario-fila">14:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="15:00">
+                                <td class="agenda-horario-fila">15:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="16:00">
+                                <td class="agenda-horario-fila">16:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="17:00">
+                                <td class="agenda-horario-fila">17:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="18:00">
+                                <td class="agenda-horario-fila">18:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="19:00">
+                                <td class="agenda-horario-fila">19:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="20:00">
+                                <td class="agenda-horario-fila">20:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="21:00">
+                                <td class="agenda-horario-fila">21:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="22:00">
+                                <td class="agenda-horario-fila">22:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                            <tr class="weekly-agenda-row" data-hora="23:00">
+                                <td class="agenda-horario-fila">23:00</td>
+                                <td class="weekly-agenda-day" data-dia="1"></td>
+                                <td class="weekly-agenda-day" data-dia="2"></td>
+                                <td class="weekly-agenda-day" data-dia="3"></td>
+                                <td class="weekly-agenda-day" data-dia="4"></td>
+                                <td class="weekly-agenda-day" data-dia="5"></td>
+                                <td class="weekly-agenda-day" data-dia="6"></td>
+                                <td class="weekly-agenda-day" data-dia="0"></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -175,61 +427,92 @@
             var tblAgenda = $('.tbl-agenda');
             var agendaContainer = $('.agenda-container');
 
-            $('.agenda-wrapper').css('max-height', agendaContainer.height() + 'px');
-
             @if($mode === "weekly")
 
-            var weekpicker = $('.week-picker');
-            var startDate;
-            var endDate;
+                var weekpicker = $('.week-picker');
 
-            var selectCurrentWeek = function() {
-                setTimeout(function () {
-                    $('.week-picker').find('.ui-datepicker-current-day a').addClass('ui-state-active');
+                var selectCurrentWeek = function (monthChange) {
+                    setTimeout(function () {
+                        weekpicker.find('.ui-datepicker-current-day a').addClass('ui-state-active');
 
-                    if (!weekpicker.hasClass('hidden')) {
-                        weekpicker.addClass('hidden');
+                        if (!weekpicker.hasClass('hidden') && !monthChange) {
+                            weekpicker.addClass('hidden');
+
+                            var icon = $('.weekly-labels-button').find('.ui-icon');
+
+                            icon.toggleClass('ui-icon-triangle-1-s');
+                            icon.toggleClass('ui-icon-triangle-1-n');
+                        }
+                    }, 1);
+                };
+
+                var selectWeek = function () {
+
+                    updateWeekDates(function () {
+                        loadAgenda();
+                    });
+                };
+
+                weekpicker.datepicker({
+                    showOtherMonths: true,
+                    selectOtherMonths: true,
+                    onSelect: selectWeek,
+                    beforeShowDay: function (date) {
+                        var cssClass = '';
+
+                        var today = new Date();
+
+                        var start = ($('#startDate').data('date') ? $.datepicker.parseDate($.datepicker._defaults.dateFormat, $('#startDate').data('date')) : null) || new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 1);
+                        var end = ($('#endDate').data('date') ? $.datepicker.parseDate($.datepicker._defaults.dateFormat, $('#endDate').data('date')) : null) || new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 7);
+
+                        if (date >= start && date <= end) {
+                            cssClass = 'ui-datepicker-current-day';
+                        }
+
+                        return [true, cssClass];
+                    },
+                    onChangeMonthYear: function (year, month, inst) {
+                        selectCurrentWeek(true);
                     }
-                }, 1);
-            };
+                });
 
-            weekpicker.datepicker({
-                showOtherMonths: true,
-                selectOtherMonths: true,
-                onSelect: function(dateText, inst) {
-                    var date = $(this).datepicker('getDate');
-                    startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() +1);
-                    endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 7);
-                    var dateFormat = inst.settings.dateFormat || $.datepicker._defaults.dateFormat;
+                $(document).on('mousemove', '.week-picker .ui-datepicker-calendar tr', function () {
+                    $(this).find('td a').addClass('ui-state-hover');
+                });
+                $(document).on('mouseleave', '.week-picker .ui-datepicker-calendar tr', function () {
+                    $(this).find('td a').removeClass('ui-state-hover');
+                });
 
-                    $('#startDate').text($.datepicker.formatDate(dateFormat, startDate, inst.settings));
-                    $('#endDate').text($.datepicker.formatDate(dateFormat, endDate, inst.settings));
+                weekpicker.datepicker("setDate", "{{ date('d-m-Y') }}");
 
-                    selectCurrentWeek();
-                },
-                beforeShowDay: function(date) {
-                    var cssClass = '';
+                $('.weekly-labels-button').click(function () {
+                    weekpicker.toggleClass('hidden');
+                    $(this).find('.ui-icon').toggleClass('ui-icon-triangle-1-s');
+                    $(this).find('.ui-icon').toggleClass('ui-icon-triangle-1-n');
+                });
 
-                    if(date >= startDate && date <= endDate) {
-                        cssClass = 'ui-datepicker-current-day';
+                updateWeekDates(function () {
+                    loadAgenda();
+                });
+
+                function updateWeekDates(callback) {
+                    var date = weekpicker.datepicker('getDate');
+                    var startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);
+                    var endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 7);
+                    var dateFormat = $.datepicker._defaults.dateFormat;
+
+                    var s = $.datepicker.formatDate(dateFormat, startDate);
+                    var e = $.datepicker.formatDate(dateFormat, endDate);
+
+                    $('#startDate').text(s).data('date', s);
+                    $('#endDate').text(e).data('date', e);
+
+                    selectCurrentWeek(false);
+
+                    if (callback) {
+                        callback();
                     }
-
-                    return [true, cssClass];
-                },
-                onChangeMonthYear: function(year, month, inst) {
-                    selectCurrentWeek();
                 }
-            }).datepicker('hide');
-
-            $(document).on('mousemove', '.week-picker .ui-datepicker-calendar tr', function() { $(this).find('td a').addClass('ui-state-hover'); });
-            $(document).on('mouseleave', '.week-picker .ui-datepicker-calendar tr', function() { $(this).find('td a').removeClass('ui-state-hover'); });
-
-
-            $('.ui-datepicker-today').click();
-
-            $('.weekly-labels-button').click(function () {
-               weekpicker.toggleClass('hidden');
-            });
 
             @endif
 
@@ -247,56 +530,86 @@
                 'forceRoundTime': true,
                 useSelect: true
             }).on('changeTime', function () {
-                var $this = $(this);
-
-                if ($this.hasClass('start')) {
-                    var $end = $('.agenda-rango-hora.end');
-
-                    if ($end.timepicker('getTime') < $this.timepicker('getTime')) {
-                        $end.timepicker('setTime', $this.timepicker('getTime'));
-                    }
-
-                    $end.timepicker('option', { 'minTime': $this.val() });
-                }
-
-                loadAgenda();
-            }).trigger('changeTime');
+                updateEndTime($(this), function () {
+                    ocultarFilasHorario();
+                });
+            });
 
             $(window).resize(function () {
-                $('.agenda-wrapper').css('max-height', agendaContainer.height() + 'px');
+                var extra = (document.documentElement.clientWidth <= 767) ? 15 : 0;
+
+                $('.agenda-wrapper').css('max-height', (agendaContainer.outerHeight() - extra) + 'px');
             }).resize();
+
+            updateEndTime($('.agenda-rango-hora.start'), function () {
+                ocultarFilasHorario();
+            });
+
+            $('.weekly-agenda-row[data-hora="11:00"]').children('.weekly-agenda-day[data-dia="4"]').append('<div style="width: calc(100% - 4px); position: absolute; left: 2px; top: 25%; height: 200%; cursor: pointer; z-index: 1;">' +
+                '<div style="background-color: green; height: 100%; width: 100%; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;">' +
+                    'ASDASD' +
+                '</div>' +
+            '</div>');
         });
 
         function loadAgenda() {
             mensajes.loading_open();
 
-            var tbody = $('.tbl-agenda').children('tbody').empty();
+            var tbody = $('.tbl-agenda').children('tbody');
 
             @if ($mode === "daily")
 
             @elseif ($mode === "weekly")
 
-            var horaStart = parseInt($('.agenda-rango-hora.start').val().split(':')[0]);
-            var horaEnd = parseInt($('.agenda-rango-hora.end').val().split(':')[0]);
 
-            for (var i = horaStart; i <= horaEnd; i++) {
-                tbody.append('<tr>' +
-                    '<td class="agenda-horario-fila">' + i + ':00</td>' +
-                    '<td>l</td>' +
-                    '<td>m</td>' +
-                    '<td>m</td>' +
-                    '<td>j</td>' +
-                    '<td>v</td>' +
-                    '<td>s</td>' +
-                    '<td>d</td>' +
-                '</tr>');
-            }
 
             @elseif ($mode === "monthly")
 
             @endif
 
             mensajes.loading_close();
+        }
+
+        function ocultarFilasHorario() {
+            var horaStart = parseInt($('.agenda-rango-hora.start').val().split(':')[0]);
+            var horaEnd = parseInt($('.agenda-rango-hora.end').val().split(':')[0]);
+
+            console.log(horaStart, horaEnd);
+
+            $('.weekly-agenda-row').each(function () {
+                var $this = $(this);
+                var hora = parseInt($this.data('hora').split(':')[0]);
+
+                console.log(hora);
+
+                if (hora >= horaStart && hora <= horaEnd) {
+                    if ($this.hasClass('hidden')) {
+                        $this.removeClass('hidden');
+                    }
+                }
+                else {
+                    if (!$this.hasClass('hidden')) {
+                        $this.addClass('hidden');
+                    }
+                }
+            });
+        }
+
+        function updateEndTime($this, callback) {
+
+            if ($this.hasClass('start')) {
+                var $end = $('.agenda-rango-hora.end');
+
+                if ($end.timepicker('getTime') < $this.timepicker('getTime')) {
+                    $end.timepicker('setTime', $this.timepicker('getTime'));
+                }
+
+                $end.timepicker('option', { 'minTime': $this.val() });
+            }
+
+            if (callback) {
+                callback();
+            }
         }
     </script>
 @endsection
