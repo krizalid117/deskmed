@@ -303,3 +303,20 @@ $.fn.RutValidation = function (doValidation) {
         }
     });
 };
+
+function invertirFecha(fecha, separator) {
+    separator = separator || '-';
+
+    var partes = fecha.split(separator);
+
+    return partes[2] + separator + partes[1] + separator + partes[0];
+}
+
+function ellipsizeTextBox(id) {
+    var el = document.getElementById(id);
+    var wordArray = el.innerHTML.split(' ');
+    while(el.scrollHeight > el.offsetHeight) {
+        wordArray.pop();
+        el.innerHTML = wordArray.join(' ') + '...';
+    }
+}

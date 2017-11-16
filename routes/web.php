@@ -92,4 +92,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/search/{keyword}', 'GlobalController@search')->name('search');
 
     Route::get('/getnotif', 'GlobalController@getNotifications')->name('usuario.getnotification');
+
+    Route::post('/user/agenda/getagenda', 'UsuarioController@getAgenda')->name('user.getagenda');
 });

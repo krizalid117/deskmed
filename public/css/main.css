@@ -209,7 +209,7 @@ input, textarea {
     flex: 0 0 auto;
     position: fixed;
     height: 100%;
-    z-index: 3;
+    z-index: 4;
 }
 
 .content {

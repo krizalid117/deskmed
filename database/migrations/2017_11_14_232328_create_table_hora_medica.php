@@ -20,6 +20,7 @@ class CreateTableHoraMedica extends Migration
             $table->integer('estado')->default(0)->comment = "0: libre - 1: reservada - 2: cancelada";
             $table->string('hex_color')->default('#f1f1f1');
             $table->date('fecha');
+            $table->string('nombre', 200)->default('');
             $table->string('hora_inicio', 8);
             $table->string('hora_termino', 8);
             $table->timestamps();

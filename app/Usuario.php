@@ -64,4 +64,12 @@ class Usuario extends Model implements Authenticatable
     public function doctors() {
         return $this->hasMany('App\UsuarioDoctores', 'id_usuario');
     }
+
+    public function horasAsDoctor() {
+        return $this->hasMany('App\HoraMedica', 'id_medico');
+    }
+
+    public function horasAsPaciente() {
+        return $this->hasMany('App\HoraMedica', 'id_paciente');
+    }
 }

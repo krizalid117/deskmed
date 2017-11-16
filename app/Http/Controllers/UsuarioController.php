@@ -820,6 +820,29 @@ class UsuarioController extends Controller
         ]);
     }
 
+    public function getAgenda(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "horas" => [],
+        ];
+
+        $usuario = Auth::user();
+
+        if ($usuario->id_tipo_usuario === 2) {
+            $horas = $usuario->horasAsDoctor()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->get();
+        }
+        else {
+            $horas = $usuario->horasAsPaciente()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->get();
+        }
+
+        if (count($horas) > 0) {
+            $datos["horas"] = $horas;
+        }
+
+        return response()->json($datos);
+    }
+
     /* funciones estáticas */
 
     public static function downRut($rut) {

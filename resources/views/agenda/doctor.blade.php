@@ -42,7 +42,7 @@
 
         .tbl-agenda-weekly > thead > tr > th {
             background-color: var(--normal-background-color);
-            height: 40px;
+            height: 25px;
         }
 
         .tbl-agenda-weekly > thead > tr > th:not(:first-child) {
@@ -76,7 +76,7 @@
 
         .week-picker {
             position: absolute;
-            z-index: 2;
+            z-index: 3;
         }
 
         .weekly-labels .weekly-labels-button {
@@ -107,8 +107,38 @@
 
             border-left: 1px solid #ddd;
             text-align: center;
-            height: 50px;
+            height: 65px;
             padding: 0 !important;
+        }
+
+        .hora-container {
+            width: calc(100% - 4px);
+            position: absolute;
+            left: 2px;
+            /*top: 25%;*/
+            /*height: 200%;*/
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .hora-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /*background-color: green;*/
+            height: 100%;
+            width: 100%;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+
+            padding: 5px;
+            font-size: .65em;
+        }
+
+        .hora-text {
+            white-space: pre-wrap !important;
         }
     </style>
 @endsection
@@ -154,13 +184,13 @@
                         <thead>
                         <tr>
                             <th class="agenda-horario"></th>
-                            <th data-day="1" style="width: 13.5%;">Lunes</th>
-                            <th data-day="2" style="width: 13.5%;">Martes</th>
-                            <th data-day="3" style="width: 13.5%;">Miércoles</th>
-                            <th data-day="4" style="width: 13.5%;">Jueves</th>
-                            <th data-day="5" style="width: 13.5%;">Viernes</th>
-                            <th data-day="6" style="width: 13.5%;">Sábado</th>
-                            <th data-day="0" style="width: 13.5%;">Domingo</th>
+                            <th data-day="1" style="width: 13.5%;">Lunes <span class="weekly-header-date"></span></th>
+                            <th data-day="2" style="width: 13.5%;">Martes <span class="weekly-header-date"></span></th>
+                            <th data-day="3" style="width: 13.5%;">Miércoles <span class="weekly-header-date"></span></th>
+                            <th data-day="4" style="width: 13.5%;">Jueves <span class="weekly-header-date"></span></th>
+                            <th data-day="5" style="width: 13.5%;">Viernes <span class="weekly-header-date"></span></th>
+                            <th data-day="6" style="width: 13.5%;">Sábado <span class="weekly-header-date"></span></th>
+                            <th data-day="0" style="width: 13.5%;">Domingo <span class="weekly-header-date"></span></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -435,14 +465,16 @@
                     setTimeout(function () {
                         weekpicker.find('.ui-datepicker-current-day a').addClass('ui-state-active');
 
-                        if (!weekpicker.hasClass('hidden') && !monthChange) {
-                            weekpicker.addClass('hidden');
+                        setTimeout(function () {
+                            if (!weekpicker.hasClass('hidden') && !monthChange) {
+                                weekpicker.addClass('hidden');
 
-                            var icon = $('.weekly-labels-button').find('.ui-icon');
+                                var icon = $('.weekly-labels-button').find('.ui-icon');
 
-                            icon.toggleClass('ui-icon-triangle-1-s');
-                            icon.toggleClass('ui-icon-triangle-1-n');
-                        }
+                                icon.toggleClass('ui-icon-triangle-1-s');
+                                icon.toggleClass('ui-icon-triangle-1-n');
+                            }
+                        }, 200);
                     }, 1);
                 };
 
@@ -497,9 +529,30 @@
 
                 function updateWeekDates(callback) {
                     var date = weekpicker.datepicker('getDate');
-                    var startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 1);
-                    var endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + 7);
+
+                    var day = date.getDay() === 0 ? 7 : date.getDay();
+
+                    var startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - (day - 1));
+                    var endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - (day - 7));
                     var dateFormat = $.datepicker._defaults.dateFormat;
+
+                    //Se recorren los días de la semana para dejar las fechas en la cabecera de la tabla en formato dd/mm
+                    for (var i = 0; i < 7; i++) {
+                        var indice = (i + 1) === 7 ? 0 : (i + 1);
+                        var newDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+                        var fecha = $.datepicker.formatDate(dateFormat, newDate);
+                        var fechaHead = $.datepicker.formatDate("dd/mm", newDate);
+
+                        $('.tbl-agenda-weekly')
+                            .children('thead')
+                            .children('tr')
+                            .children('th[data-day="' + indice + '"]')
+                            .data('date', fecha)
+                                .find('.weekly-header-date')
+                                .text(fechaHead);
+
+                        $('.weekly-agenda-day[data-dia="' + indice + '"]').data('date', fecha);
+                    }
 
                     var s = $.datepicker.formatDate(dateFormat, startDate);
                     var e = $.datepicker.formatDate(dateFormat, endDate);
@@ -539,17 +592,29 @@
                 var extra = (document.documentElement.clientWidth <= 767) ? 15 : 0;
 
                 $('.agenda-wrapper').css('max-height', (agendaContainer.outerHeight() - extra) + 'px');
+
+                $('div[id^="hora-"]').each(function () {
+
+
+                    var $this = $(this);
+                    if (!$this.hasClass('hora-resizing')) {
+
+                        $this.addClass('hora-resizing');
+
+                        setTimeout(function () {
+                            $this.find('.hora-text').html($this.data('text')).promise().done(function () {
+                                ellipsizeTextBox($this.attr('id'));
+
+                                $this.removeClass('hora-resizing');
+                            });
+                        }, 1);
+                    }
+                });
             }).resize();
 
             updateEndTime($('.agenda-rango-hora.start'), function () {
                 ocultarFilasHorario();
             });
-
-            $('.weekly-agenda-row[data-hora="11:00"]').children('.weekly-agenda-day[data-dia="4"]').append('<div style="width: calc(100% - 4px); position: absolute; left: 2px; top: 25%; height: 200%; cursor: pointer; z-index: 1;">' +
-                '<div style="background-color: green; height: 100%; width: 100%; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;">' +
-                    'ASDASD' +
-                '</div>' +
-            '</div>');
         });
 
         function loadAgenda() {
@@ -561,7 +626,7 @@
 
             @elseif ($mode === "weekly")
 
-
+            loadWeeklyAgenda();
 
             @elseif ($mode === "monthly")
 
@@ -574,13 +639,11 @@
             var horaStart = parseInt($('.agenda-rango-hora.start').val().split(':')[0]);
             var horaEnd = parseInt($('.agenda-rango-hora.end').val().split(':')[0]);
 
-            console.log(horaStart, horaEnd);
-
             $('.weekly-agenda-row').each(function () {
                 var $this = $(this);
                 var hora = parseInt($this.data('hora').split(':')[0]);
 
-                console.log(hora);
+//                console.log(hora);
 
                 if (hora >= horaStart && hora <= horaEnd) {
                     if ($this.hasClass('hidden')) {
@@ -610,6 +673,45 @@
             if (callback) {
                 callback();
             }
+        }
+
+        function loadWeeklyAgenda() {
+            sendPost('{{ route('user.getagenda') }}', {
+                _token: '{{ csrf_token() }}',
+                inicio: $('#startDate').data('date'),
+                termino: $('#endDate').data('date')
+            }, function (res) {
+                $('.weekly-agenda-day').empty();
+
+                for (var i = 0; i < res.horas.length; i++) {
+                    var hora = res.horas[i];
+
+                    var horaInicio = hora.hora_inicio.split(':')[0];
+                    var minutosInicio = hora.hora_inicio.split(':')[1];
+                    var duracion = Math.floor(((new Date('2011/01/01 ' + hora.hora_termino) - new Date('2011/01/01 ' + hora.hora_inicio)) / 1000) / 60);
+
+                    var minutosInicioP = getMinutesPercent(minutosInicio);
+                    var duracionP = getMinutesPercent(duracion);
+
+                    var horaSquare = '<div id="hora-' + hora.id + '" class="hora-container" style="top: ' + minutosInicioP + '%; height: ' + duracionP + '%;" data-text="' + htmlEntities('<span class="bold">(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre)+ '">' +
+                        '<div class="hora-content" style="background-color: ' + hora.hex_color + ';" title="(' + hora.hora_inicio + ' - ' + hora.hora_termino + '):' + hora.nombre + '">' +
+                            '<span class="hora-text"><span class="bold">(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre + '</span>' +
+                        '</div>' +
+                    '</div>';
+
+                    $('.weekly-agenda-row[data-hora="' + horaInicio + ':00"]').children('.weekly-agenda-day').each(function () {
+                        if ($(this).data('date') === invertirFecha(hora.fecha)) {
+                            $(this).append(horaSquare);
+
+                            ellipsizeTextBox('hora-' + hora.id);
+                        }
+                    });
+                }
+            });
+        }
+
+        function getMinutesPercent(minutes) {
+            return ((parseInt(minutes) * 100) / 60);
         }
     </script>
 @endsection
