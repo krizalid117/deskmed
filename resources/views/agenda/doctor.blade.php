@@ -140,6 +140,11 @@
         .hora-text {
             white-space: pre-wrap !important;
         }
+
+        .agenda-acciones {
+            padding-top: 15px;
+            text-align: right;
+        }
     </style>
 @endsection
 
@@ -443,7 +448,18 @@
             @endif
         </div>
         <div class="agenda-acciones">
-            <button class="btn">Action</button>
+            <div class="btn-group dropup">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Nueva...&nbsp;{{--</button>--}}
+                {{--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
+                    <span class="caret"></span>
+                    {{--<span class="sr-only">Toggle Dropdown</span>--}}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a id="new-hora-single" href="#">Hora</a></li>
+                    <li><a id="new-hora-group" href="#">Grupo de horas</a></li>
+                    {{--<li role="separator" class="divider"></li>--}}
+                </ul>
+            </div>
         </div>
 
     </div>
@@ -595,7 +611,6 @@
 
                 $('div[id^="hora-"]').each(function () {
 
-
                     var $this = $(this);
                     if (!$this.hasClass('hora-resizing')) {
 
@@ -611,6 +626,43 @@
                     }
                 });
             }).resize();
+
+            $('#new-hora-single').click(function (e) {
+                e.preventDefault();
+
+                $('<div id="dlg-new-hora-single">' +
+                    '' +
+                '</div>').dialog({
+                    title: "Nueva hora",
+                    width: 500,
+                    classes: { 'ui-dialog': 'dialog-responsive' },
+                    resizable: false,
+                    modal: true,
+                    autoOpen: true,
+                    close: function () {
+                        $(this).dialog('destroy').remove();
+                    },
+                    closeOnEscape: false,
+                    buttons: [
+                        {
+                            text: "Cancelar",
+                            'class': 'btn',
+                            click: function () {
+                                $(this).dialog('close');
+                            }
+                        },
+                        {
+                            text: "Guardar",
+                            'class': 'btn btn-primary',
+                            click: function () {
+
+
+                                $(this).dialog('close');
+                            }
+                        }
+                    ]
+                });
+            });
 
             updateEndTime($('.agenda-rango-hora.start'), function () {
                 ocultarFilasHorario();
