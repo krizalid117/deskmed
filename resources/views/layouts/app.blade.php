@@ -74,6 +74,7 @@
 <script src="{{ URL::to('js/floatThead/jquery.floatThead.js') }}"></script>
 <script src="{{ URL::to('js/floatThead/jquery.floatThead._.js') }}"></script>
 <script src="{{ URL::to('js/timepicker/jquery.timepicker.min.js') }}"></script>
+<script src="{{ URL::to('js/jscolor.js') }}"></script>
 {{--<script src="{{ URL::to('js/datepair/src/Datepair.js') }}"></script>--}}
 {{--<script src="{{ URL::to('js/datepair/src/jquery.datepair.js') }}"></script>--}}
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>

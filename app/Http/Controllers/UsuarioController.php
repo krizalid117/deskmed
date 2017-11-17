@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\HoraMedica;
 use App\Notifications\AddListRequest;
 use App\Usuario;
 use App\Sexos;
@@ -843,6 +844,100 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    public function saveAgendaSingle(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $this->validate($request, [
+            "nombre" => "required|max:200",
+            "fecha" => 'required|max:10|date_format:"d-m-Y"',
+            "hora_inicio" => [ "required", "size:5", "regex:/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/", "different:hora_termino" ],
+            "hora_termino" => [ "required", "size:5", "regex:/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/" ],
+            "color" => [ "required", "regex:/^#[0-9A-F]{6}$/" ],
+        ], [
+            "color.regex" => "El campo \"Color\" no es un color en hexadecimal.",
+            "hora_inicio.regex" => "El campo \"Hora inicio\" debe ser una hora en formato: HH:MM.",
+            "hora_termino.regex" => "El campo \"Hora término\" debe ser una hora en formato: HH:MM.",
+            "fecha.date_format" => "El campo \"Fecha\" debe ser una fecha en formato: dd-mm-yyyy.",
+        ], [
+            "nombre" => "Nombre",
+            "fecha" => 'Fecha',
+            "hora_inicio" => "Hora inicio",
+            "hora_termino" => "Hora término",
+            "color" => "Color",
+        ]);
+
+        $idCondicion = $request["action"] === "edit" ? "and id <> {$request["id"]}" : "";
+
+        $consulta = "
+            select nombre
+            , to_char(fecha, 'dd-mm-yyyy') as fecha
+            , hora_inicio
+            , hora_termino
+            from hora_medica
+            where id_medico = :id_medico
+            and estado <> 2
+            and fecha = :fecha
+            and tsrange((fecha::varchar || ' ' || hora_inicio)::timestamp without time zone, (fecha::varchar || ' ' || hora_termino)::timestamp without time zone, '()') && tsrange((fecha::varchar || ' ' || :hora_inicio)::timestamp without time zone, (fecha::varchar || ' ' || :hora_termino)::timestamp without time zone, '()')
+            $idCondicion
+        ";
+
+        $r = DB::select($consulta, [
+            "id_medico" => Auth::user()->id,
+            "fecha" => $request["fecha"],
+            "hora_inicio" => $request["hora_inicio"],
+            "hora_termino" => $request["hora_termino"],
+        ]);
+
+        if (count($r) > 0) {
+            $r = $r[0];
+
+            $datos["error"] = true;
+            $datos["mensaje"] = "La hora <span class=\"bold\">\"{$r->nombre}\"</span>, (El {$r->fecha} entre las {$r->hora_inicio} y las {$r->hora_termino}) se superpone a la hora que intentas crear. Por favor, escoge otra fecha y/o otro rango horario para continuar.";
+        }
+        else {
+            if ($request["action"] === 'add') {
+                $hora = new HoraMedica();
+
+                $hora->id_medico = Auth::user()->id;
+                $hora->id_paciente = null;
+                $hora->estado = 0;
+                $hora->hex_color = $request["color"];
+                $hora->fecha = $request["fecha"];
+                $hora->nombre = $request["nombre"];
+                $hora->hora_inicio = $request["hora_inicio"];
+                $hora->hora_termino = $request["hora_termino"];
+
+                if (!$hora->save()) {
+                    $datos["error"] = true;
+                }
+            }
+            else if ($request["action"] === 'edit') {
+                $update = DB::table('hora_medica')
+                    ->where('id', $request["id"])
+                    ->update([
+                        "hex_color" => $request["color"],
+                        "fecha" => $request["fecha"],
+                        "nombre" => $request["nombre"],
+                        "hora_inicio" => $request["hora_inicio"],
+                        "hora_termino" => $request["hora_termino"],
+                    ]);
+
+                if (!$update) {
+                    $datos["error"] = true;
+                }
+            }
+            else {
+                $datos["error"] = true;
+                $datos["mensaje"] = "Acción desconocida.";
+            }
+        }
+
+        return response()->json($datos);
+    }
+
     /* funciones estáticas */
 
     public static function downRut($rut) {
@@ -855,8 +950,6 @@ class UsuarioController extends Controller
 
     public static function getProfilePic($path, $sex = 3) {
         $profilePic = "default_nonbinary.png";
-
-//        dd($path, $sex);
 
         if (!is_null($path) && $path !== "" && File::exists(public_path("profilePics/{$path}"))) {
             $profilePic = $path;

@@ -120,8 +120,7 @@
             cursor: pointer;
             z-index: 1;
         }
-
-        .hora-content {
+.hora-content {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -135,6 +134,11 @@
 
             padding: 5px;
             font-size: .65em;
+
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .hora-text {
@@ -449,7 +453,7 @@
         </div>
         <div class="agenda-acciones">
             <div class="btn-group dropup">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Nueva...&nbsp;{{--</button>--}}
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Crear&nbsp;{{--</button>--}}
                 {{--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
                     <span class="caret"></span>
                     {{--<span class="sr-only">Toggle Dropdown</span>--}}
@@ -599,7 +603,7 @@
                 'forceRoundTime': true,
                 useSelect: true
             }).on('changeTime', function () {
-                updateEndTime($(this), function () {
+                updateEndTime($('.agenda-rango-hora.start'), $('.agenda-rango-hora.end'), function () {
                     ocultarFilasHorario();
                 });
             });
@@ -630,48 +634,28 @@
             $('#new-hora-single').click(function (e) {
                 e.preventDefault();
 
-                $('<div id="dlg-new-hora-single">' +
-                    '' +
-                '</div>').dialog({
-                    title: "Nueva hora",
-                    width: 500,
-                    classes: { 'ui-dialog': 'dialog-responsive' },
-                    resizable: false,
-                    modal: true,
-                    autoOpen: true,
-                    close: function () {
-                        $(this).dialog('destroy').remove();
-                    },
-                    closeOnEscape: false,
-                    buttons: [
-                        {
-                            text: "Cancelar",
-                            'class': 'btn',
-                            click: function () {
-                                $(this).dialog('close');
-                            }
-                        },
-                        {
-                            text: "Guardar",
-                            'class': 'btn btn-primary',
-                            click: function () {
+                editarAgregarHoraSimple('add');
+            });
 
+            tblAgenda.on('click', 'div[id^="hora-"]', function () {
+                var data = $(this).data('datos');
 
-                                $(this).dialog('close');
-                            }
-                        }
-                    ]
+                editarAgregarHoraSimple('edit', {
+                    codigo: data.id,
+                    nombre: data.nombre,
+                    fecha: invertirFecha(data.fecha),
+                    hora_inicio: data.hora_inicio,
+                    hora_termino: data.hora_termino,
+                    color: data.hex_color
                 });
             });
 
-            updateEndTime($('.agenda-rango-hora.start'), function () {
+            updateEndTime($('.agenda-rango-hora.start'), $('.agenda-rango-hora.end'), function () {
                 ocultarFilasHorario();
             });
         });
 
         function loadAgenda() {
-            mensajes.loading_open();
-
             var tbody = $('.tbl-agenda').children('tbody');
 
             @if ($mode === "daily")
@@ -683,8 +667,6 @@
             @elseif ($mode === "monthly")
 
             @endif
-
-            mensajes.loading_close();
         }
 
         function ocultarFilasHorario() {
@@ -694,8 +676,6 @@
             $('.weekly-agenda-row').each(function () {
                 var $this = $(this);
                 var hora = parseInt($this.data('hora').split(':')[0]);
-
-//                console.log(hora);
 
                 if (hora >= horaStart && hora <= horaEnd) {
                     if ($this.hasClass('hidden')) {
@@ -710,16 +690,15 @@
             });
         }
 
-        function updateEndTime($this, callback) {
+        function updateEndTime($start, $end, callback) {
 
-            if ($this.hasClass('start')) {
-                var $end = $('.agenda-rango-hora.end');
+            if ($start.hasClass('start') && $end.hasClass('end')) {
 
-                if ($end.timepicker('getTime') < $this.timepicker('getTime')) {
-                    $end.timepicker('setTime', $this.timepicker('getTime'));
+                if ($end.timepicker('getTime') < $start.timepicker('getTime')) {
+                    $end.timepicker('setTime', $start.timepicker('getTime'));
                 }
 
-                $end.timepicker('option', { 'minTime': $this.val() });
+                $end.timepicker('option', { 'minTime': $start.val() });
             }
 
             if (callback) {
@@ -755,10 +734,107 @@
                         if ($(this).data('date') === invertirFecha(hora.fecha)) {
                             $(this).append(horaSquare);
 
+                            $('#hora-' + hora.id).data('datos', hora);
+
                             ellipsizeTextBox('hora-' + hora.id);
                         }
                     });
                 }
+            });
+        }
+
+        function editarAgregarHoraSimple(action, hora) {
+            var h = {
+                codigo: 0,
+                nombre: "",
+                fecha: "{{ date('d-m-Y') }}",
+                hora_inicio: "",
+                hora_termino: "",
+                color: "f1f1f1"
+            };
+
+            if (action === 'edit') {
+                h = hora;
+            }
+
+            $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
+                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '">' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
+                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" readonly>' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
+                    '<div class="form-control" style="border: none; box-shadow: none;">' +
+                        '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
+                        '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
+                    '</div>' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="hora-single-color" class="form-label">Color</label>' +
+                    '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" readonly>' +
+                '</div>' +
+            '</div>').dialog({
+                title: (action === 'add') ? "Nueva hora" : "Editar hora: \"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
+                width: 440,
+                classes: { 'ui-dialog': 'dialog-responsive' },
+                resizable: false,
+                modal: true,
+                autoOpen: true,
+                close: function () {
+                    $(this).dialog('destroy').remove();
+                },
+                closeOnEscape: false,
+                buttons: [
+                    {
+                        text: "Cancelar",
+                        'class': 'btn',
+                        click: function () {
+                            $(this).dialog('close');
+                        }
+                    },
+                    {
+                        text: "Guardar",
+                        'class': 'btn btn-primary',
+                        click: function () {
+                            sendPost('{{ route('user.saveagenda_single') }}', {
+                                _token: '{{ csrf_token() }}',
+                                action: action,
+                                id: h.codigo,
+                                nombre: $('#hora-single-nombre').val(),
+                                fecha: $('#hora-single-fecha').val(),
+                                hora_inicio: $('#hora-single-hora-start').val(),
+                                hora_termino: $('#hora-single-hora-end').val(),
+                                color: $('#hora-single-color').val()
+                            }, function (res) {
+                                mensajes.alerta((action === 'add') ? "¡Tu hora ha sido creada!" : "¡Tu hora ha sido modificada!", "Horas médicas", function () {
+                                    $("#dlg-new-hora-single").dialog('close');
+                                    loadAgenda();
+                                });
+                            });
+                        }
+                    }
+                ]
+            });
+
+            var color = new jscolor($('#hora-single-color')[0], {
+                hash: true
+            });
+
+            $('#hora-single-fecha').datepicker();
+
+            $('.hora-single-time').timepicker({
+                'timeFormat': 'H:i',
+                'step': 15,
+                'minTime': '00:00',
+                'maxTime': '23:45',
+                'forceRoundTime': true,
+                useSelect: true
+            }).on('changeTime', function () {
+                updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
             });
         }
 

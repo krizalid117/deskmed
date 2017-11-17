@@ -94,4 +94,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/getnotif', 'GlobalController@getNotifications')->name('usuario.getnotification');
 
     Route::post('/user/agenda/getagenda', 'UsuarioController@getAgenda')->name('user.getagenda');
+
+    Route::post('/user/agenda/save_single', 'UsuarioController@saveAgendaSingle')->name('user.saveagenda_single');
 });

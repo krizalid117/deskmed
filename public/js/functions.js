@@ -19,7 +19,7 @@ function sendPost(__url, __opt, __func, __errorcb) {
                 }
             }
             else {
-                var errorMsj = response.hasOwnProperty('mensaje') ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
+                var errorMsj = (response.hasOwnProperty('mensaje') && response.mensaje !== "") ? response.mensaje : 'Hubo un error. Por favor, intente de nuevo más tarde.';
 
                 mensajes.alerta(errorMsj, "Error", function () {
                     if (__errorcb) {
