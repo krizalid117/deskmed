@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ URL::to('css/pretty.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/DataTables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/timepicker/jquery.timepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ URL::to('js/multidatespicker/jquery-ui.multidatespicker.css') }}">
 
     @yield('stylesheets')
 </head>

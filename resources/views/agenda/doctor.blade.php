@@ -149,6 +149,14 @@
             padding-top: 15px;
             text-align: right;
         }
+
+        #hora-masiva-mdpicker .ui-datepicker-current-day:not(.ui-state-highlight) > .ui-state-active
+        , #hora-masiva-mdpicker .ui-datepicker-today:not(.ui-state-highlight) > a {
+            border: 1px solid #666666 !important;
+            background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x !important;;
+            font-weight: normal !important;;
+            color: #eeeeee !important;;
+        }
     </style>
 @endsection
 
@@ -459,8 +467,8 @@
                     {{--<span class="sr-only">Toggle Dropdown</span>--}}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a id="new-hora-single" href="#">Hora</a></li>
-                    <li><a id="new-hora-group" href="#">Grupo de horas</a></li>
+                    <li><a id="new-hora-single" href="#">Hora individual</a></li>
+                    <li><a id="new-hora-group" href="#">Creación masiva de horas para el mes</a></li>
                     {{--<li role="separator" class="divider"></li>--}}
                 </ul>
             </div>
@@ -471,6 +479,7 @@
 
 
 @section('scripts')
+    <script type="text/javascript" src="{{ URL::to('js/multidatespicker/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript">
 
         $(function () {
@@ -635,6 +644,12 @@
                 e.preventDefault();
 
                 editarAgregarHoraSimple('add');
+            });
+
+            $('#new-hora-group').click(function (e) {
+                e.preventDefault();
+
+                creacionHorasMasivo();
             });
 
             tblAgenda.on('click', 'div[id^="hora-"]', function () {
@@ -810,7 +825,7 @@
                                 hora_termino: $('#hora-single-hora-end').val(),
                                 color: $('#hora-single-color').val()
                             }, function (res) {
-                                mensajes.alerta((action === 'add') ? "¡Tu hora ha sido creada!" : "¡Tu hora ha sido modificada!", "Horas médicas", function () {
+                                mensajes.alerta((action === 'add') ? "¡Tu hora ha sido creada!" : "Tu hora ha sido modificada correctamente.", "Horas médicas", function () {
                                     $("#dlg-new-hora-single").dialog('close');
                                     loadAgenda();
                                 });
@@ -838,8 +853,66 @@
             });
         }
 
-        function getMinutesPercent(minutes) {
-            return ((parseInt(minutes) * 100) / 60);
+        function creacionHorasMasivo() {
+            var nmonth = parseInt('{{ date('m') }}') - 1;
+            var anio = '{{ date('Y') }}';
+
+            $('<div id="dlg-new-hora-group">' +
+                '<fieldset class="fs-collapsable" data-collapsed="false">' +
+                    '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Días en que se crearán las horas</legend>' +
+                    '<div class="fs-collapsable-content">' +
+                        '<div id="hora-masiva-mdpicker"></div>' +
+                    '</div>' +
+                '</fieldset>' +
+                '<fieldset class="fs-collapsable" data-collapsed="false">' +
+                    '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Horas por día</legend>' +
+                    '<div class="fs-collapsable-content">' +
+                        'asdasd' +
+                    '</div>' +
+                '</fieldset>' +
+            '</div>').dialog({
+                title: 'Creación de horas para mes de ' + $.datepicker.regional["es"].monthNames[nmonth] + ' de ' + anio,
+                width: 800,
+                classes: { 'ui-dialog': 'dialog-responsive' },
+                resizable: false,
+                modal: true,
+                autoOpen: true,
+                close: function () {
+                    $(this).dialog('destroy').remove();
+                },
+                closeOnEscape: false,
+                buttons: [
+                    {
+                        text: "Cancelar",
+                        'class': 'btn',
+                        click: function () {
+                            $(this).dialog('close');
+                        }
+                    },
+                    {
+                        text: "Guardar",
+                        'class': 'btn btn-primary',
+                        click: function () {
+                            sendPost('{{ route('user.saveagenda_masive') }}', {
+                                _token: '{{ csrf_token() }}'
+                            }, function (res) {
+                                mensajes.alerta("¡Tus horas fueron creadas!", "Horas médicas", function () {
+                                    $("#dlg-new-hora-group").dialog('close');
+                                    loadAgenda();
+                                });
+                            });
+                        }
+                    }
+                ]
+            });
+
+            $('#hora-masiva-mdpicker').multiDatesPicker({
+                hideIfNoPrevNext: true,
+                changeMonth: false,
+                changeYear: false,
+                minDate: '01-{{ date('m-Y') }}',
+                maxDate: '{{ date('t-m-Y') }}'
+            });
         }
     </script>
 @endsection

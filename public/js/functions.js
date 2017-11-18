@@ -320,3 +320,7 @@ function ellipsizeTextBox(id) {
         el.innerHTML = wordArray.join(' ') + '...';
     }
 }
+
+function getMinutesPercent(minutes) {
+    return ((parseInt(minutes) * 100) / 60);
+}

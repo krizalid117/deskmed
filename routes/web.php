@@ -96,4 +96,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/agenda/getagenda', 'UsuarioController@getAgenda')->name('user.getagenda');
 
     Route::post('/user/agenda/save_single', 'UsuarioController@saveAgendaSingle')->name('user.saveagenda_single');
+
+    Route::post('/user/agenda/save_masive', 'UsuarioController@saveAgendaMasive')->name('user.saveagenda_masive');
 });

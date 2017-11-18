@@ -938,6 +938,17 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    public function saveAgendaMasive() {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+
+
+        return response()->json($datos);
+    }
+
     /* funciones estáticas */
 
     public static function downRut($rut) {
