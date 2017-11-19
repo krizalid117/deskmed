@@ -59,7 +59,7 @@
             border-bottom: none !important;
         }
 
-        .table > thead > tr > th:first-child {
+        .tbl-agenda > thead > tr > th:first-child {
             border-bottom: none !important;
         }
 
@@ -120,7 +120,8 @@
             cursor: pointer;
             z-index: 1;
         }
-.hora-content {
+
+        .hora-content {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -153,9 +154,13 @@
         #hora-masiva-mdpicker .ui-datepicker-current-day:not(.ui-state-highlight) > .ui-state-active
         , #hora-masiva-mdpicker .ui-datepicker-today:not(.ui-state-highlight) > a {
             border: 1px solid #666666 !important;
-            background: #555555 url(images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x !important;;
+            background: #555555 url(/js/jquery-ui-1.12.1.custom/images/ui-bg_glass_20_555555_1x400.png) 50% 50% repeat-x !important;
             font-weight: normal !important;;
             color: #eeeeee !important;;
+        }
+
+        #hora-masiva-mdpicker > .ui-datepicker {
+            margin: 0 auto;
         }
     </style>
 @endsection
@@ -482,9 +487,10 @@
     <script type="text/javascript" src="{{ URL::to('js/multidatespicker/jquery-ui.multidatespicker.js') }}"></script>
     <script type="text/javascript">
 
+        var tblAgenda = $('.tbl-agenda');
+        var agendaContainer = $('.agenda-container');
+
         $(function () {
-            var tblAgenda = $('.tbl-agenda');
-            var agendaContainer = $('.agenda-container');
 
             @if($mode === "weekly")
 
@@ -573,8 +579,7 @@
                         var fechaHead = $.datepicker.formatDate("dd/mm", newDate);
 
                         $('.tbl-agenda-weekly')
-                            .children('thead')
-                            .children('tr')
+                            .children('thead').children('tr')
                             .children('th[data-day="' + indice + '"]')
                             .data('date', fecha)
                                 .find('.weekly-header-date')
@@ -614,6 +619,8 @@
             }).on('changeTime', function () {
                 updateEndTime($('.agenda-rango-hora.start'), $('.agenda-rango-hora.end'), function () {
                     ocultarFilasHorario();
+
+                    tblAgenda.floatThead('reflow');
                 });
             });
 
@@ -709,11 +716,13 @@
 
             if ($start.hasClass('start') && $end.hasClass('end')) {
 
+                var endTimeNewMin = new Date($start.timepicker('getTime').getTime() + ($start.timepicker('option', 'step') * 60000));
+
                 if ($end.timepicker('getTime') < $start.timepicker('getTime')) {
-                    $end.timepicker('setTime', $start.timepicker('getTime'));
+                    $end.timepicker('setTime', endTimeNewMin);
                 }
 
-                $end.timepicker('option', { 'minTime': $start.val() });
+                $end.timepicker('option', { 'minTime': endTimeNewMin });
             }
 
             if (callback) {
@@ -857,23 +866,52 @@
             var nmonth = parseInt('{{ date('m') }}') - 1;
             var anio = '{{ date('Y') }}';
 
+            var horas = [];
+
             $('<div id="dlg-new-hora-group">' +
                 '<fieldset class="fs-collapsable" data-collapsed="false">' +
                     '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Días en que se crearán las horas</legend>' +
                     '<div class="fs-collapsable-content">' +
-                        '<div id="hora-masiva-mdpicker"></div>' +
+                        'Seleccione los días en los que se crearán las horas:' +
+                        '<div id="hora-masiva-mdpicker" style="margin-top: 10px;"></div>' +
                     '</div>' +
                 '</fieldset>' +
                 '<fieldset class="fs-collapsable" data-collapsed="false">' +
-                    '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Horas por día</legend>' +
+                    '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Horas a crear por día</legend>' +
                     '<div class="fs-collapsable-content">' +
-                        'asdasd' +
+                        'Especifique las horas a crear para <span class="bold">cada día</span> seleccionado:' +
+                        '<div class="table-responsive" style="margin-top: 10px; overflow: auto; max-height: 100px;">' +
+                            '<table id="tbl-horas-masivas" class="table table-condensed table-bordered" style="margin-bottom: 0;">' +
+                                '<thead>' +
+                                    '<tr style="background-color: #fff;">' +
+                                        '<th style="text-align: center;">Nombre</th>' +
+                                        '<th style="text-align: center; width: 100px;">Hora</th>' +
+                                        '<th style="text-align: center; width: 50px;">' +
+                                            '<span id="delete-all-horas" class="ui-icon ui-icon-trash" style="cursor: pointer;" title="Eliminar todas las horas"></span>' +
+                                        '</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody id="tbody-horas-masivas">' +
+                                    '<tr>' +
+                                        '<td colspan="3" style="text-align: center;">' +
+                                            'No hay horas a ser creadas' +
+                                        '</td>' +
+                                    '</tr>' +
+                                '</tbody>' +
+                            '</table>' +
+                        '</div>' +
+                        '<div style="margin-top: 10px;">' +
+                            '<span style="float: left;" id="nhoras-masiva">Horas a crear: <span class="bold">0</span></span>' +
+                            '<button id="btn-add-hora-masiva-group" class="btn btn-xs btn-info" style="font-size: .9em; margin-left: 10px; float: right; margin-bottom: 10px; width: 145px;">Agregar grupo de horas</button>' +
+                            '<button id="btn-add-hora-masiva" class="btn btn-xs btn-primary" style="font-size: .9em; float: right; margin-bottom: 10px; width: 145px;">Agregar hora simple</button>' +
+                        '</div>' +
                     '</div>' +
                 '</fieldset>' +
             '</div>').dialog({
                 title: 'Creación de horas para mes de ' + $.datepicker.regional["es"].monthNames[nmonth] + ' de ' + anio,
                 width: 800,
                 classes: { 'ui-dialog': 'dialog-responsive' },
+                position: { my: 'center top', at: 'center top+65' },
                 resizable: false,
                 modal: true,
                 autoOpen: true,
@@ -906,6 +944,13 @@
                 ]
             });
 
+            $('#delete-all-horas').click(function () {
+                mensajes.confirmacion_sino('¿Está seguro de quitar <span class="bold">TODAS</span> las horas de la lista de horas a crear?', function () {
+                    horas = [];
+                    actualizarHorasMasivas();
+                });
+            });
+
             $('#hora-masiva-mdpicker').multiDatesPicker({
                 hideIfNoPrevNext: true,
                 changeMonth: false,
@@ -913,6 +958,340 @@
                 minDate: '01-{{ date('m-Y') }}',
                 maxDate: '{{ date('t-m-Y') }}'
             });
+
+            $('#tbl-horas-masivas').floatThead({
+                scrollContainer: function ($table) {
+                    return $table.closest('.table-responsive');
+                }
+            });
+
+            $('#btn-add-hora-masiva').click(function () {
+
+                var horasIniciales = [ "00:00", "00:15" ];
+
+                if (horas.length > 0) {
+                    horasIniciales[0] = horas[horas.length - 1].hora_termino;
+
+                    var horaTerminoInicial = new Date(new Date('2011/01/01 ' + horasIniciales[0] + ':00').getTime() + (15 * 60000));
+
+                    var h = horaTerminoInicial.getHours();
+                    var m = horaTerminoInicial.getMinutes();
+
+                    h = h < 10 ? ('0' + h) : ('' + h);
+                    m = m < 10 ? ('0' + m) : ('' + m);
+
+                    horasIniciales[1] = h + ':' + m;
+                }
+
+                $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
+                        '<input type="text" id="hora-single-nombre" class="form-control">' +
+                    '</div>' +
+                    '<div class="col-sm-6 form-group">' +
+                        '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
+                        '<div class="form-control" style="border: none; box-shadow: none;">' +
+                            '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + horasIniciales[0] + '"> - ' +
+                            '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + horasIniciales[1] + '">' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-6 form-group">' +
+                        '<label for="hora-single-color" class="form-label">Color</label>' +
+                        '<input id="hora-single-color" class="form-control jscolor" value="#F1F1F1" placeholder="#F1F1F1" readonly>' +
+                    '</div>' +
+                '</div>').dialog({
+                    title: "Nueva hora",
+                    width: 440,
+                    classes: { 'ui-dialog': 'dialog-responsive' },
+                    position: { my: 'center center', at: 'center center', of: '#dlg-new-hora-group' },
+                    resizable: false,
+                    modal: true,
+                    autoOpen: true,
+                    close: function () {
+                        $(this).dialog('destroy').remove();
+                    },
+                    closeOnEscape: false,
+                    buttons: [
+                        {
+                            text: "Cancelar",
+                            'class': 'btn',
+                            click: function () {
+                                $(this).dialog('close');
+                            }
+                        },
+                        {
+                            text: "Aceptar",
+                            'class': 'btn btn-primary',
+                            click: function () {
+
+                                var ok = true;
+
+                                if ($.trim($('#hora-single-nombre').val()) === "") {
+                                    ok = "Debe ingresar un nombre";
+                                }
+                                else if ($.trim($('#hora-single-color').val()) === "") {
+                                    ok = "Debe ingresar un color";
+                                }
+                                else if ($.trim($('#hora-single-hora-start').val()) === "") {
+                                    ok = "Debe ingresar una hora de inicio";
+                                }
+                                else if ($.trim($('#hora-single-hora-end').val()) === "") {
+                                    ok = "Debe ingresar una hora de término";
+                                }
+
+                                if (ok === true) {
+                                    var overlapErrorObject = {};
+
+                                    var checkNoOverlapOccurs = function () {
+                                        if (horas.length > 0) {
+                                            var hi1 = +new Date('2011/01/01 ' + $.trim($('#hora-single-hora-start').val()) + ':00');
+                                            var ht1 = +new Date('2011/01/01 ' + $.trim($('#hora-single-hora-end').val()) + ':00');
+
+                                            for (var i = 0; i < horas.length; i++) {
+                                                var hi2 = +new Date('2011/01/01 ' + horas[i].hora_inicio + ':00');
+                                                var ht2 = +new Date('2011/01/01 ' + horas[i].hora_termino + ':00');
+
+                                                if ((hi1 < ht2) && (hi2 < ht1)) {
+                                                    overlapErrorObject = horas[i];
+
+                                                    return false;
+                                                }
+                                            }
+
+                                            return true;
+                                        }
+                                        else {
+                                            return true;
+                                        }
+                                    };
+
+                                    if (checkNoOverlapOccurs()) {
+
+                                        horas.push({
+                                            nombre: $.trim($('#hora-single-nombre').val()),
+                                            color: $.trim($('#hora-single-color').val()),
+                                            hora_inicio: $('#hora-single-hora-start').val(),
+                                            hora_termino: $('#hora-single-hora-end').val()
+                                        });
+
+                                        actualizarHorasMasivas();
+
+                                        $('#dlg-new-hora-single').dialog('close');
+                                    }
+                                    else {
+                                        mensajes.alerta('La hora "<span style="color: ' + overlapErrorObject.color + ';">' + overlapErrorObject.nombre + '</span>" <span class="bold">(' + overlapErrorObject.hora_inicio + ' - ' + overlapErrorObject.hora_termino + ')</span> se superpone con la hora que intentas crear. Por favor, haga cambios en el rango horario antes de continuar.');
+                                    }
+                                }
+                                else {
+                                    mensajes.alerta(ok + '.');
+                                }
+                            }
+                        }
+                    ]
+                });
+
+                var color = new jscolor($('#hora-single-color')[0], {
+                    hash: true
+                });
+
+                $('.hora-single-time').timepicker({
+                    'timeFormat': 'H:i',
+                    'step': 15,
+                    'minTime': '00:00',
+                    'maxTime': '23:45',
+                    'forceRoundTime': true,
+                    useSelect: true
+                }).on('changeTime', function () {
+                    updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
+                });
+            });
+
+            $('#btn-add-hora-masiva-group').click(function () {
+                $('<div id="dlg-grupo-horas-masiva">' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<label for="grupo-horas-nhoras" class="form-label">Cantidad de horas</label>' +
+                        '<select id="grupo-horas-nhoras" class="form-control">' +
+                            '<option value="1" selected>1</option>' +
+                            '<option value="2">2</option>' +
+                            '<option value="3">3</option>' +
+                            '<option value="4">4</option>' +
+                            '<option value="5">5</option>' +
+                            '<option value="6">6</option>' +
+                            '<option value="7">7</option>' +
+                            '<option value="8">8</option>' +
+                            '<option value="9">9</option>' +
+                            '<option value="10">10</option>' +
+                            '<option value="11">11</option>' +
+                            '<option value="12">12</option>' +
+                            '<option value="13">13</option>' +
+                            '<option value="14">14</option>' +
+                            '<option value="15">15</option>' +
+                            '<option value="16">16</option>' +
+                            '<option value="17">17</option>' +
+                            '<option value="18">18</option>' +
+                            '<option value="19">19</option>' +
+                            '<option value="20">20</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<label for="grupo-horas-min" class="form-label">Minutos por hora</label>' +
+                        '<select id="grupo-horas-min" class="form-control">' +
+                            '<option value="15">15 minutos</option>' +
+                            '<option value="30">30 minutos</option>' +
+                            '<option value="45">45 minutos</option>' +
+                            '<option value="60">60 minutos</option>' +
+                            '<option value="75">75 minutos</option>' +
+                            '<option value="90">90 minutos</option>' +
+                            '<option value="105">105 minutos</option>' +
+                            '<option value="120">120 minutos</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<label for="grupo-horas-nombre" class="form-label">Nombre por hora</label>' +
+                        '<input type="text" id="grupo-horas-nombre" class="form-control">' +
+                    '</div>' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<label for="grupo-horas-color" class="form-label">Color por hora</label>' +
+                        '<div class="input-group">' +
+                            '<input type="text" id="grupo-horas-color" class="form-control jscolor" value="#F1F1F1" readonly>' +
+                            '<span class="input-group-addon">' +
+                                '<div style="display: flex; align-items: center; justify-content: center;">' +
+                                    '<input style="cursor: pointer;" type="checkbox" aria-label="Color aleatorio" id="grupo-horas-color-random">' +
+                                    '<label style="margin-left: 5px; margin-bottom: 0; cursor: pointer; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;" for="grupo-horas-color-random">Aleatorio</label>' +
+                                '</div>' +
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="col-sm-12 form-group">' +
+                        '<hr>' +
+                        '<span id="grupo-horas-info">Se agregará una hora de 15 minutos al listado de horas.</span>' +
+                    '</div>' +
+                '</div>').dialog({
+                    title: "Nuevo grupo de horas",
+                    width: 440,
+                    classes: { 'ui-dialog': 'dialog-responsive' },
+                    position: { my: 'center center', at: 'center center', of: '#dlg-new-hora-group' },
+                    resizable: false,
+                    modal: true,
+                    autoOpen: true,
+                    close: function () {
+                        $(this).dialog('destroy').remove();
+                    },
+                    closeOnEscape: false,
+                    buttons: [
+                        {
+                            text: "Cancelar",
+                            'class': 'btn',
+                            click: function () {
+                                $(this).dialog('close');
+                            }
+                        },
+                        {
+                            text: "Aceptar",
+                            'class': 'btn btn-primary',
+                            click: function () {
+                                if ($.trim($('#grupo-horas-nombre').val()) !== "") {
+                                    if ($.trim($('#grupo-horas-color').val()) !== "" || $('#grupo-horas-color-random').is(':checked')) {
+
+
+                                        $('#dlg-grupo-horas-masiva').dialog('close');
+                                    }
+                                    else {
+                                        mensajes.alerta("Debe ingresar un color para las horas a crear.");
+                                    }
+                                }
+                                else {
+                                    mensajes.alerta("Debe ingresar un nombre para las horas a crear.");
+                                }
+                            }
+                        }
+                    ]
+                });
+
+                var colorElement = $('#grupo-horas-color').clone(true);
+
+                var color = new jscolor($('#grupo-horas-color')[0], {
+                    hash: true
+                });
+
+                $('#grupo-horas-color-random').change(function () {
+                    var checked = $(this).is(':checked');
+
+                    if (checked) {
+                        colorElement.replaceAll('#grupo-horas-color');
+
+                        colorElement = colorElement.clone();
+                    }
+                    else {
+                        color = new jscolor($('#grupo-horas-color')[0], {
+                            hash: true
+                        });
+                    }
+
+                    $('#grupo-horas-color')
+                        .prop('disabled', checked)
+                        .val(checked ? '' : '#F1F1F1')
+                        .css('background-color', '#F1F1F1');
+                });
+
+                $('#grupo-horas-nhoras').change(function () {
+                    actualizarInfoGrupoHoras();
+                });
+
+                $('#grupo-horas-min').change(function () {
+                    actualizarInfoGrupoHoras();
+                });
+
+                function actualizarInfoGrupoHoras() {
+                    var nhoras = $('#grupo-horas-nhoras').val();
+                    var minutos = $('#grupo-horas-min').val();
+
+                    var plural = (nhoras !== "1");
+
+                    console.log(nhoras, minutos, plural);
+
+                    $('#grupo-horas-info').html('Se agregará' + (plural ? "n" : "") + ' ' + (plural ? nhoras : "una") + ' hora' + (plural ? "s" : "") + ' de ' + minutos + ' minutos al listado de horas.');
+                }
+            });
+
+            function actualizarHorasMasivas() {
+                var tbody = $('#tbody-horas-masivas').empty();
+
+                if (horas.length > 0) {
+                    for (var i = 0; i < horas.length; i++) {
+                        tbody.append('<tr index="' + i + '">' +
+                            '<td style="background-color: ' + horas[i].color + ';">' + horas[i].nombre + '</td>' +
+                            '<td style="text-align: center;">' + horas[i].hora_inicio + ' - ' + horas[i].hora_termino + '</td>' +
+                            '<td style="text-align: center;">' +
+                                '<span class="ui-icon ui-icon-trash delete-hora-masiva" style="cursor: pointer;"></span>' +
+                            '</td>' +
+                        '</tr>');
+                    }
+
+                    $('#tbl-horas-masivas').floatThead('reflow');
+
+                    $('.delete-hora-masiva').click(function () {
+                        var $this = $(this);
+
+                        mensajes.confirmacion_sino("¿Desea quitar esta hora de la lista de horas a crear?", function () {
+                            var index = parseInt($this.closest('tr').attr('index'));
+
+                            horas.splice(index, 1);
+
+                            actualizarHorasMasivas();
+                        });
+                    });
+                }
+                else {
+                    tbody.append('<tr>' +
+                        '<td colspan="3" style="text-align: center;">' +
+                            'No hay horas a ser creadas' +
+                        '</td>' +
+                    '</tr>');
+                }
+
+                $('#nhoras-masiva').html('Horas a crear: <span class="bold">' + horas.length + '</span>');
+            }
         }
     </script>
 @endsection
