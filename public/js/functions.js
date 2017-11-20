@@ -8,8 +8,12 @@ $.fn.removeClassPrefix = function(prefix) {
     return this;
 };
 
-function sendPost(__url, __opt, __func, __errorcb) {
-    mensajes.loading_open();
+function sendPost(__url, __opt, __func, __errorcb, showLoading) {
+    showLoading = showLoading || true;
+
+    if (showLoading) {
+        mensajes.loading_open();
+    }
 
     $.post(__url, __opt, function (response) {
         try {
@@ -33,7 +37,10 @@ function sendPost(__url, __opt, __func, __errorcb) {
                 __errorcb(null);
             }
 
-            mensajes.loading_close();
+            if (showLoading) {
+                mensajes.loading_close();
+            }
+
             mensajes.alerta("Error al ejecutar la acción: " + ex);
         }
     }, 'json')
@@ -50,7 +57,9 @@ function sendPost(__url, __opt, __func, __errorcb) {
             }
         })
         .always(function () {
-            mensajes.loading_close();
+            if (showLoading) {
+                mensajes.loading_close();
+            }
         });
 }
 
@@ -323,4 +332,15 @@ function ellipsizeTextBox(id) {
 
 function getMinutesPercent(minutes) {
     return ((parseInt(minutes) * 100) / 60);
+}
+
+
+function getRandomColor() {
+    var color = '';
+
+    while (color.length < 6) {
+        color = Math.floor(Math.random() * 16777215).toString(16);
+    }
+
+    return '#' + color;
 }

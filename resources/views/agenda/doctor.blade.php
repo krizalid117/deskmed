@@ -172,11 +172,11 @@
 
         <div class="agenda-filtros">
             <div class="form-group col-sm-4">
-                <label for="sel-mode" class="form-label">Vista:</label>
+                <label for="sel-mode" class="form-label">Ver horas:</label>
                 <select id="sel-mode" class="form-control">
-                    <option value="daily" {{ ($mode === "daily" ? "selected" : "") }}>Diaria</option>
-                    <option value="weekly" {{ ($mode === "weekly" ? "selected" : "") }}>Semanal</option>
-                    <option value="monthly" {{ ($mode === "monthly" ? "selected" : "") }}>Mensual</option>
+                    <option value="all">Todas</option>
+                    <option value="0">Libres</option>
+                    <option value="1">Reservadas</option>
                 </select>
             </div>
             <div class="col-sm-4 hidden-xs"></div>
@@ -668,8 +668,15 @@
                     fecha: invertirFecha(data.fecha),
                     hora_inicio: data.hora_inicio,
                     hora_termino: data.hora_termino,
-                    color: data.hex_color
+                    color: data.hex_color,
+                    estado: data.estado,
+                    id_paciente: data.id_paciente,
+                    id_medico: data.id_medico
                 });
+            });
+
+            $('#sel-mode').change(function () {
+                loadAgenda();
             });
 
             updateEndTime($('.agenda-rango-hora.start'), $('.agenda-rango-hora.end'), function () {
@@ -734,7 +741,8 @@
             sendPost('{{ route('user.getagenda') }}', {
                 _token: '{{ csrf_token() }}',
                 inicio: $('#startDate').data('date'),
-                termino: $('#endDate').data('date')
+                termino: $('#endDate').data('date'),
+                mode: $('#sel-mode').val()
             }, function (res) {
                 $('.weekly-agenda-day').empty();
 
@@ -748,9 +756,11 @@
                     var minutosInicioP = getMinutesPercent(minutosInicio);
                     var duracionP = getMinutesPercent(duracion);
 
-                    var horaSquare = '<div id="hora-' + hora.id + '" class="hora-container" style="top: ' + minutosInicioP + '%; height: ' + duracionP + '%;" data-text="' + htmlEntities('<span class="bold">(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre)+ '">' +
-                        '<div class="hora-content" style="background-color: ' + hora.hex_color + ';" title="(' + hora.hora_inicio + ' - ' + hora.hora_termino + '):' + hora.nombre + '">' +
-                            '<span class="hora-text"><span class="bold">(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre + '</span>' +
+                    var isReservada = (hora.estado === 1);
+
+                    var horaSquare = '<div id="hora-' + hora.id + '" class="hora-container" style="top: ' + minutosInicioP + '%; height: ' + duracionP + '%;" data-text="' + htmlEntities('<span class="bold">' + (isReservada ? '[R]' : '') + '(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre)+ '">' +
+                        '<div class="hora-content" style="background-color: ' + hora.hex_color + ';" title="' + (isReservada ? '[Reservada]' : '') + '(' + hora.hora_inicio + ' - ' + hora.hora_termino + '): ' + hora.nombre + '">' +
+                            '<span class="hora-text"><span class="bold">' + (isReservada ? '[R]' : '') + '(' + hora.hora_inicio + '-' + hora.hora_termino + '): </span>' + hora.nombre + '</span>' +
                         '</div>' +
                     '</div>';
 
@@ -774,8 +784,11 @@
                 fecha: "{{ date('d-m-Y') }}",
                 hora_inicio: "",
                 hora_termino: "",
+                estado: 0,
                 color: "f1f1f1"
             };
+
+            var textoReserva = '';
 
             if (action === 'edit') {
                 h = hora;
@@ -783,28 +796,32 @@
 
             $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
                 '<div class="col-sm-6 form-group">' +
-                    '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
-                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '">' +
+                '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
+                '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '">' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
-                    '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
-                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" readonly>' +
+                '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
+                '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" readonly>' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
-                    '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
-                    '<div class="form-control" style="border: none; box-shadow: none;">' +
-                        '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
-                        '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
-                    '</div>' +
+                '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
+                '<div class="form-control" style="border: none; box-shadow: none;">' +
+                '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
+                '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
+                '</div>' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
-                    '<label for="hora-single-color" class="form-label">Color</label>' +
-                    '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" readonly>' +
+                '<label for="hora-single-color" class="form-label">Color</label>' +
+                '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" readonly>' +
                 '</div>' +
+                (h.estado === 1 ? '' +
+                '<div class="col-sm-12" id="reserva-container">' +
+                    '<img src="/img/loading.gif" alt="Cargando..." style="display: inline-block; width: 40px; height: 40px; margin: 0 auto;">' +
+                '</div>' : '') +
             '</div>').dialog({
                 title: (action === 'add') ? "Nueva hora" : "Editar hora: \"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
                 width: 440,
-                classes: { 'ui-dialog': 'dialog-responsive' },
+                classes: {'ui-dialog': 'dialog-responsive'},
                 resizable: false,
                 modal: true,
                 autoOpen: true,
@@ -844,6 +861,25 @@
                 ]
             });
 
+            if (h.estado === 1) {
+                sendPost('{{ route('user.get_info_patient') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id: h.id_paciente
+                }, function (res) {
+                    var imgProfile = (res.paciente.profile_pic_path !== null) ? res.paciente.profile_pic_path : (id_sexo === 1 ? 'default_male.png' : (id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
+
+                    $('#reserva-container').html(
+                        '<fieldset>' +
+                            '<legend>Reserva</legend>' +
+                            'Reservado por: <br>' +
+                            '<a href="/patients/' + res.paciente.id + '/record/">' +
+                                '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.paciente.nombres + ' ' + res.paciente.apellidos +
+                            '</a>' +
+                        '</fieldset>'
+                    );
+                }, null, false);
+            }
+
             var color = new jscolor($('#hora-single-color')[0], {
                 hash: true
             });
@@ -868,6 +904,33 @@
 
             var horas = [];
 
+            var overlapErrorObject = {};
+
+            var checkNoOverlapOccurs = function (_hora_inicio, _hora_termino, _horas) {
+                overlapErrorObject = {};
+
+                if (_horas.length > 0) {
+                    var hi1 = +new Date('2011/01/01 ' + _hora_inicio + ':00');
+                    var ht1 = +new Date('2011/01/01 ' + _hora_termino + ':00');
+
+                    for (var i = 0; i < _horas.length; i++) {
+                        var hi2 = +new Date('2011/01/01 ' + _horas[i].hora_inicio + ':00');
+                        var ht2 = +new Date('2011/01/01 ' + _horas[i].hora_termino + ':00');
+
+                        if ((hi1 < ht2) && (hi2 < ht1)) {
+                            overlapErrorObject = _horas[i];
+
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+                else {
+                    return true;
+                }
+            };
+
             $('<div id="dlg-new-hora-group">' +
                 '<fieldset class="fs-collapsable" data-collapsed="false">' +
                     '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Días en que se crearán las horas</legend>' +
@@ -880,7 +943,7 @@
                     '<legend class="fs-collapsable-title"><span class="ui-icon ui-icon-minus"></span>Horas a crear por día</legend>' +
                     '<div class="fs-collapsable-content">' +
                         'Especifique las horas a crear para <span class="bold">cada día</span> seleccionado:' +
-                        '<div class="table-responsive" style="margin-top: 10px; overflow: auto; max-height: 100px;">' +
+                        '<div class="table-responsive" style="margin-top: 10px; overflow: auto; max-height: 150px;">' +
                             '<table id="tbl-horas-masivas" class="table table-condensed table-bordered" style="margin-bottom: 0;">' +
                                 '<thead>' +
                                     '<tr style="background-color: #fff;">' +
@@ -931,24 +994,40 @@
                         text: "Guardar",
                         'class': 'btn btn-primary',
                         click: function () {
-                            sendPost('{{ route('user.saveagenda_masive') }}', {
-                                _token: '{{ csrf_token() }}'
-                            }, function (res) {
-                                mensajes.alerta("¡Tus horas fueron creadas!", "Horas médicas", function () {
-                                    $("#dlg-new-hora-group").dialog('close');
-                                    loadAgenda();
-                                });
-                            });
+
+                            if (horas.length > 0) {
+                                if ($('#hora-masiva-mdpicker').multiDatesPicker('getDates').length > 0) {
+                                    sendPost('{{ route('user.saveagenda_masive') }}', {
+                                        _token: '{{ csrf_token() }}',
+                                        dias: $('#hora-masiva-mdpicker').multiDatesPicker('getDates'),
+                                        horas: horas
+                                    }, function () {
+                                        mensajes.alerta("Horas creadas correctamente.", "Horas médicas", function () {
+                                            location.reload();
+                                        });
+                                    });
+                                }
+                                else {
+                                    mensajes.alerta("Por favor, seleccione días antes de continuar.");
+                                }
+                            }
+                            else {
+                                mensajes.alerta("No hay horas a ser creadas.");
+                            }
+
+
                         }
                     }
                 ]
             });
 
             $('#delete-all-horas').click(function () {
-                mensajes.confirmacion_sino('¿Está seguro de quitar <span class="bold">TODAS</span> las horas de la lista de horas a crear?', function () {
-                    horas = [];
-                    actualizarHorasMasivas();
-                });
+                if (horas.length > 0) {
+                    mensajes.confirmacion_sino('¿Está seguro de quitar <span class="bold">TODAS</span> las horas de la lista de horas a crear?', function () {
+                        horas = [];
+                        actualizarHorasMasivas();
+                    });
+                }
             });
 
             $('#hora-masiva-mdpicker').multiDatesPicker({
@@ -1040,32 +1119,8 @@
                                 }
 
                                 if (ok === true) {
-                                    var overlapErrorObject = {};
 
-                                    var checkNoOverlapOccurs = function () {
-                                        if (horas.length > 0) {
-                                            var hi1 = +new Date('2011/01/01 ' + $.trim($('#hora-single-hora-start').val()) + ':00');
-                                            var ht1 = +new Date('2011/01/01 ' + $.trim($('#hora-single-hora-end').val()) + ':00');
-
-                                            for (var i = 0; i < horas.length; i++) {
-                                                var hi2 = +new Date('2011/01/01 ' + horas[i].hora_inicio + ':00');
-                                                var ht2 = +new Date('2011/01/01 ' + horas[i].hora_termino + ':00');
-
-                                                if ((hi1 < ht2) && (hi2 < ht1)) {
-                                                    overlapErrorObject = horas[i];
-
-                                                    return false;
-                                                }
-                                            }
-
-                                            return true;
-                                        }
-                                        else {
-                                            return true;
-                                        }
-                                    };
-
-                                    if (checkNoOverlapOccurs()) {
+                                    if (checkNoOverlapOccurs($('#hora-single-hora-start').val(), $('#hora-single-hora-end').val(), horas)) {
 
                                         horas.push({
                                             nombre: $.trim($('#hora-single-nombre').val()),
@@ -1109,6 +1164,107 @@
             $('#btn-add-hora-masiva-group').click(function () {
                 $('<div id="dlg-grupo-horas-masiva">' +
                     '<div class="col-sm-12 form-group">' +
+                        '<label for="hora-masiva-inicio" class="form-label">Hora de inicio</label>' +
+                        '<select class="form-control" id="hora-masiva-inicio">' +
+                            '<option value="00:00">00:00</option>' +
+                            '<option value="00:15">00:15</option>' +
+                            '<option value="00:30">00:30</option>' +
+                            '<option value="00:45">00:45</option>' +
+                            '<option value="01:00">01:00</option>' +
+                            '<option value="01:15">01:15</option>' +
+                            '<option value="01:30">01:30</option>' +
+                            '<option value="01:45">01:45</option>' +
+                            '<option value="02:00">02:00</option>' +
+                            '<option value="02:15">02:15</option>' +
+                            '<option value="02:30">02:30</option>' +
+                            '<option value="02:45">02:45</option>' +
+                            '<option value="03:00">03:00</option>' +
+                            '<option value="03:15">03:15</option>' +
+                            '<option value="03:30">03:30</option>' +
+                            '<option value="03:45">03:45</option>' +
+                            '<option value="04:00">04:00</option>' +
+                            '<option value="04:15">04:15</option>' +
+                            '<option value="04:30">04:30</option>' +
+                            '<option value="04:45">04:45</option>' +
+                            '<option value="05:00">05:00</option>' +
+                            '<option value="05:15">05:15</option>' +
+                            '<option value="05:30">05:30</option>' +
+                            '<option value="05:45">05:45</option>' +
+                            '<option value="06:00">06:00</option>' +
+                            '<option value="06:15">06:15</option>' +
+                            '<option value="06:30">06:30</option>' +
+                            '<option value="06:45">06:45</option>' +
+                            '<option value="07:00">07:00</option>' +
+                            '<option value="07:15">07:15</option>' +
+                            '<option value="07:30">07:30</option>' +
+                            '<option value="07:45">07:45</option>' +
+                            '<option value="08:00">08:00</option>' +
+                            '<option value="08:15">08:15</option>' +
+                            '<option value="08:30">08:30</option>' +
+                            '<option value="08:45">08:45</option>' +
+                            '<option value="09:00">09:00</option>' +
+                            '<option value="09:15">09:15</option>' +
+                            '<option value="09:30">09:30</option>' +
+                            '<option value="09:45">09:45</option>' +
+                            '<option value="10:00">10:00</option>' +
+                            '<option value="10:15">10:15</option>' +
+                            '<option value="10:30">10:30</option>' +
+                            '<option value="10:45">10:45</option>' +
+                            '<option value="11:00">11:00</option>' +
+                            '<option value="11:15">11:15</option>' +
+                            '<option value="11:30">11:30</option>' +
+                            '<option value="11:45">11:45</option>' +
+                            '<option value="12:00">12:00</option>' +
+                            '<option value="12:15">12:15</option>' +
+                            '<option value="12:30">12:30</option>' +
+                            '<option value="12:45">12:45</option>' +
+                            '<option value="13:00">13:00</option>' +
+                            '<option value="13:15">13:15</option>' +
+                            '<option value="13:30">13:30</option>' +
+                            '<option value="13:45">13:45</option>' +
+                            '<option value="14:00">14:00</option>' +
+                            '<option value="14:15">14:15</option>' +
+                            '<option value="14:30">14:30</option>' +
+                            '<option value="14:45">14:45</option>' +
+                            '<option value="15:00">15:00</option>' +
+                            '<option value="15:15">15:15</option>' +
+                            '<option value="15:30">15:30</option>' +
+                            '<option value="15:45">15:45</option>' +
+                            '<option value="16:00">16:00</option>' +
+                            '<option value="16:15">16:15</option>' +
+                            '<option value="16:30">16:30</option>' +
+                            '<option value="16:45">16:45</option>' +
+                            '<option value="17:00">17:00</option>' +
+                            '<option value="17:15">17:15</option>' +
+                            '<option value="17:30">17:30</option>' +
+                            '<option value="17:45">17:45</option>' +
+                            '<option value="18:00">18:00</option>' +
+                            '<option value="18:15">18:15</option>' +
+                            '<option value="18:30">18:30</option>' +
+                            '<option value="18:45">18:45</option>' +
+                            '<option value="19:00">19:00</option>' +
+                            '<option value="19:15">19:15</option>' +
+                            '<option value="19:30">19:30</option>' +
+                            '<option value="19:45">19:45</option>' +
+                            '<option value="20:00">20:00</option>' +
+                            '<option value="20:15">20:15</option>' +
+                            '<option value="20:30">20:30</option>' +
+                            '<option value="20:45">20:45</option>' +
+                            '<option value="21:00">21:00</option>' +
+                            '<option value="21:15">21:15</option>' +
+                            '<option value="21:30">21:30</option>' +
+                            '<option value="21:45">21:45</option>' +
+                            '<option value="22:00">22:00</option>' +
+                            '<option value="22:15">22:15</option>' +
+                            '<option value="22:30">22:30</option>' +
+                            '<option value="22:45">22:45</option>' +
+                            '<option value="23:00">23:00</option>' +
+                            '<option value="23:15">23:15</option>' +
+                            '<option value="23:30">23:30</option>' +
+                            '<option value="23:45">23:45</option>' +
+                        '</select>' +
+                    '</div>' +
+                    '<div class="col-sm-12 form-group">' +
                         '<label for="grupo-horas-nhoras" class="form-label">Cantidad de horas</label>' +
                         '<select id="grupo-horas-nhoras" class="form-control">' +
                             '<option value="1" selected>1</option>' +
@@ -1131,6 +1287,26 @@
                             '<option value="18">18</option>' +
                             '<option value="19">19</option>' +
                             '<option value="20">20</option>' +
+                            '<option value="21">21</option>' +
+                            '<option value="22">22</option>' +
+                            '<option value="23">23</option>' +
+                            '<option value="24">24</option>' +
+                            '<option value="25">25</option>' +
+                            '<option value="26">26</option>' +
+                            '<option value="27">27</option>' +
+                            '<option value="28">28</option>' +
+                            '<option value="29">29</option>' +
+                            '<option value="30">30</option>' +
+                            '<option value="31">31</option>' +
+                            '<option value="32">32</option>' +
+                            '<option value="33">33</option>' +
+                            '<option value="34">34</option>' +
+                            '<option value="35">35</option>' +
+                            '<option value="36">36</option>' +
+                            '<option value="37">37</option>' +
+                            '<option value="38">38</option>' +
+                            '<option value="39">39</option>' +
+                            '<option value="40">40</option>' +
                         '</select>' +
                     '</div>' +
                     '<div class="col-sm-12 form-group">' +
@@ -1188,13 +1364,61 @@
                         },
                         {
                             text: "Aceptar",
-                            'class': 'btn btn-primary',
+                            'class': 'btn btn-primary btn-aceptar-grupo-horas',
                             click: function () {
                                 if ($.trim($('#grupo-horas-nombre').val()) !== "") {
                                     if ($.trim($('#grupo-horas-color').val()) !== "" || $('#grupo-horas-color-random').is(':checked')) {
+                                        var nhoras = parseInt($('#grupo-horas-nhoras').val());
+                                        var minutos = $('#grupo-horas-min').val();
+                                        var horaInicio = $('#hora-masiva-inicio').val();
+                                        var grupoHoras = [];
 
+                                        var error = false;
 
-                                        $('#dlg-grupo-horas-masiva').dialog('close');
+                                        for (var i = 0; i < nhoras; i++) {
+                                            console.log(horaInicio);
+                                            console.log((parseInt(minutos) * i));
+
+                                            var min = i === 0 ? 0 : parseInt(minutos);
+
+                                            var nuevaHoraInicio = new Date(new Date('2011/01/01 ' + horaInicio + ':00').getTime() + (min * 60000));
+
+                                            horaInicio = (nuevaHoraInicio.getHours() < 10 ? '0' + nuevaHoraInicio.getHours() : '' + nuevaHoraInicio.getHours()) +
+                                                    ':' + (nuevaHoraInicio.getMinutes() < 10 ? '0' + nuevaHoraInicio.getMinutes() : '' + nuevaHoraInicio.getMinutes());
+
+                                            console.log(horaInicio);
+                                            console.log('-------------------------');
+
+                                            var hTermino = new Date(new Date('2011/01/01 ' + horaInicio + ':00').getTime() + (parseInt(minutos) * 60000));
+                                            var horaTerminoHora = hTermino.getHours() < 10 ? '0' + hTermino.getHours() : '' + hTermino.getHours();
+                                            var horaTerminoMinutos = hTermino.getMinutes() < 10 ? '0' + hTermino.getMinutes() : '' + hTermino.getMinutes();
+
+                                            if (checkNoOverlapOccurs(horaInicio, (horaTerminoHora + ':' + horaTerminoMinutos), horas)) {
+                                                //getRandomColor
+
+                                                grupoHoras.push({
+                                                    nombre: $.trim($('#grupo-horas-nombre').val()),
+                                                    color: $('#grupo-horas-color-random').is(':checked') ? getRandomColor() : $.trim($('#grupo-horas-color').val()),
+                                                    hora_inicio: horaInicio,
+                                                    hora_termino: horaTerminoHora + ':' + horaTerminoMinutos
+                                                });
+                                            }
+                                            else {
+                                                mensajes.alerta('La hora "<span style="color: ' + overlapErrorObject.color + ';">' + overlapErrorObject.nombre + '</span>" <span class="bold">(' + overlapErrorObject.hora_inicio + ' - ' + overlapErrorObject.hora_termino + ')</span> se superpone con la hora que intentas crear. Por favor, haga cambios en el rango horario antes de continuar.');
+
+                                                error = true;
+
+                                                break;
+                                            }
+                                        }
+
+                                        if (error === false) {
+                                            horas = horas.concat(grupoHoras);
+
+                                            actualizarHorasMasivas();
+
+                                            $('#dlg-grupo-horas-masiva').dialog('close');
+                                        }
                                     }
                                     else {
                                         mensajes.alerta("Debe ingresar un color para las horas a crear.");
@@ -1234,6 +1458,10 @@
                         .css('background-color', '#F1F1F1');
                 });
 
+                $('#hora-masiva-inicio').change(function () {
+                    actualizarInfoGrupoHoras();
+                });
+
                 $('#grupo-horas-nhoras').change(function () {
                     actualizarInfoGrupoHoras();
                 });
@@ -1245,12 +1473,32 @@
                 function actualizarInfoGrupoHoras() {
                     var nhoras = $('#grupo-horas-nhoras').val();
                     var minutos = $('#grupo-horas-min').val();
+                    var horaInicio = $('#hora-masiva-inicio').val();
+
+                    var horaTermino = new Date(new Date('2011/01/01 ' + horaInicio + ':00').getTime() + ((parseInt(nhoras) * parseInt(minutos)) * 60000));
+                    var ht = horaTermino.getHours();
+                    var mt = horaTermino.getMinutes();
+
+                    ht = ht < 10 ? '0' + ht : '' + ht;
+                    mt = mt < 10 ? '0' + mt : '' + mt;
 
                     var plural = (nhoras !== "1");
 
-                    console.log(nhoras, minutos, plural);
+                    $('#grupo-horas-info').html('Se agregará' + (plural ? "n" : "") +
+                        ' ' + (plural ? nhoras : "una") +
+                        ' hora' + (plural ? "s" : "") +
+                        ' de ' + minutos +
+                        ' minutos, desde las ' + horaInicio + ' hasta las ' + (ht +  ':' + mt) + ', al listado de horas.'
+                    );
 
-                    $('#grupo-horas-info').html('Se agregará' + (plural ? "n" : "") + ' ' + (plural ? nhoras : "una") + ' hora' + (plural ? "s" : "") + ' de ' + minutos + ' minutos al listado de horas.');
+                    if (new Date('2011/01/01 ' + horaInicio + ':00').getDay() !== horaTermino.getDay()) { //Si es que se pasa a otro día con las horas...
+                        mensajes.alerta("El grupo de horas que desea crear pasará al siguiente día. Debe arreglar las opciones para evitar que esto pase." , "Alerta", function () {
+                            $('.btn-aceptar-grupo-horas').prop('disabled', true);
+                        });
+                    }
+                    else {
+                        $('.btn-aceptar-grupo-horas').prop('disabled', false);
+                    }
                 }
             });
 
@@ -1258,6 +1506,10 @@
                 var tbody = $('#tbody-horas-masivas').empty();
 
                 if (horas.length > 0) {
+                    horas.sort(function (a, b) {
+                        return (+new Date('2011/01/01 ' + a.hora_inicio + ':00')) - (+new Date('2011/01/01 ' + b.hora_inicio + ':00'));
+                    });
+
                     for (var i = 0; i < horas.length; i++) {
                         tbody.append('<tr index="' + i + '">' +
                             '<td style="background-color: ' + horas[i].color + ';">' + horas[i].nombre + '</td>' +

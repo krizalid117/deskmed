@@ -59,7 +59,15 @@ class UsuarioController extends Controller
         ]);
     }
 
-    public function doctorProfile(Request $request, $id) {
+    public function doctorProfile(Request $request, $id, $notification_uuid = null) {
+        if (!is_null($notification_uuid)) {
+            $n = Auth::user()->unreadNotifications()->where('id', $notification_uuid)->first();
+
+            if ($n) {
+                $n->update(['read_at' => Carbon::now()]);
+            }
+        }
+
         return view('career', [
             "usuario" => Auth::user(),
             "id" => $id,
@@ -830,11 +838,17 @@ class UsuarioController extends Controller
 
         $usuario = Auth::user();
 
+        $modo = $request["mode"];
+
+        $modo = $modo === "all" ? "2" : $modo;
+
+        $opModo = $modo === "2" ? "<>" : "=";
+
         if ($usuario->id_tipo_usuario === 2) {
-            $horas = $usuario->horasAsDoctor()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->get();
+            $horas = $usuario->horasAsDoctor()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->where('estado', $opModo, $modo)->get();
         }
         else {
-            $horas = $usuario->horasAsPaciente()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->get();
+            $horas = $usuario->horasAsPaciente()->where('fecha', '>=', $request["inicio"])->where('fecha', '<=', $request["termino"])->where('estado', $opModo, $modo)->get();
         }
 
         if (count($horas) > 0) {
@@ -938,13 +952,91 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
-    public function saveAgendaMasive() {
+    public function saveAgendaMasive(Request $request) {
         $datos = [
             "error" => false,
             "mensaje" => "",
         ];
 
+        $dias_ = $request["dias"];
+        $horas_ = $request["horas"];
 
+        DB::beginTransaction();
+
+        foreach ($dias_ as $dia) {
+            if ($datos["error"] === true) {
+                break;
+            }
+
+            foreach ($horas_ as $hora) {
+
+                if ($datos["error"] === true) {
+                    break;
+                }
+
+                $consulta = "
+                    select nombre
+                    , to_char(fecha, 'dd-mm-yyyy') as fecha
+                    , hora_inicio
+                    , hora_termino
+                    from hora_medica
+                    where id_medico = :id_medico
+                    and estado <> 2
+                    and fecha = :fecha
+                    and tsrange((fecha::varchar || ' ' || hora_inicio)::timestamp without time zone, (fecha::varchar || ' ' || hora_termino)::timestamp without time zone, '()') && tsrange((fecha::varchar || ' ' || :hora_inicio)::timestamp without time zone, (fecha::varchar || ' ' || :hora_termino)::timestamp without time zone, '()')
+                ";
+
+                $r = DB::select($consulta, [
+                    "id_medico" => Auth::user()->id,
+                    "fecha" => $dia,
+                    "hora_inicio" => $hora["hora_inicio"],
+                    "hora_termino" => $hora["hora_termino"],
+                ]);
+
+                if (count($r) > 0) {
+                    $r = $r[0];
+
+                    $datos["error"] = true;
+                    $datos["mensaje"] = "La hora <span class=\"bold\">\"{$r->nombre}\"</span>, (El {$r->fecha} entre las {$r->hora_inicio} y las {$r->hora_termino}) se superpone a la hora que intentas crear. Por favor, escoge otra fecha y/o otro rango horario para continuar.";
+                }
+                else {
+                    DB::insert('insert into hora_medica (id_medico, hex_color, fecha, nombre, hora_inicio, hora_termino) values (?, ?, ?, ?, ?, ?)', [
+                        Auth::user()->id,
+                        $hora["color"],
+                        $dia,
+                        $hora["nombre"],
+                        $hora["hora_inicio"],
+                        $hora["hora_termino"],
+                    ]);
+                }
+            }
+        }
+
+        if ($datos["error"] === false) {
+            DB::commit();
+        }
+        else {
+            DB::rollBack();
+        }
+
+        return response()->json($datos);
+    }
+
+    public function getInfoPatient(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "paciente" => []
+        ];
+
+        $paciente = Usuario::find($request["id"]);
+
+        if (!is_null($paciente)) {
+            $datos["paciente"] = $paciente;
+        }
+        else {
+            $datos["error"] = true;
+        }
 
         return response()->json($datos);
     }

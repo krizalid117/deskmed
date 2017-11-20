@@ -79,7 +79,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');
 
-    Route::get('/professionals/{id}/profile', 'UsuarioController@doctorProfile')->name('doctors.profile');
+    Route::get('/professionals/{id}/profile/{notification_uuid?}', 'UsuarioController@doctorProfile')->name('doctors.profile');
 
     Route::get('/user/profile', 'UsuarioController@profile')->name('usuario.profile');
 
@@ -98,4 +98,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/agenda/save_single', 'UsuarioController@saveAgendaSingle')->name('user.saveagenda_single');
 
     Route::post('/user/agenda/save_masive', 'UsuarioController@saveAgendaMasive')->name('user.saveagenda_masive');
+
+    Route::post('/user/getinfopatient', 'UsuarioController@getInfoPatient')->name('user.get_info_patient');
 });
