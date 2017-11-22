@@ -1,3 +1,9 @@
+<?php
+
+    \Debugbar::disable();
+
+?>
+
 <!doctype html>
 <html>
 <head>
@@ -433,6 +439,62 @@
         }, function (response) {
             mensajes.alerta(response.mensaje, "Solicitud de verificación", function () {
                 reloadNotifications();
+            });
+        });
+    }
+
+    function verHora(esReserva, id, n) { //esReserva = true, false si es cancelación
+        sendPost('{{ route('user.getinfohora') }}', {
+            _token: '{{ csrf_token() }}',
+            id: id,
+            n: n
+        }, function (res) {
+            reloadNotifications();
+
+            $('<div id="dlg-notif-hora">' +
+                (esReserva ? '¡Han reservado una de tus horas!' : 'Una de tus horas ha sido cancelada.<br><br>') +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="notif-hora-nombre" class="form-label">Hora</label>' +
+                    '<input type="text" id="notif-hora-nombre" class="form-control" value="' + res.hora.nombre + '" readonly>' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="notif-hora-fecha" class="form-label">Fecha</label>' +
+                    '<input type="text" id="notif-hora-fecha" class="form-control" value="' + res.hora.fecha + '" readonly>' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="notif-hora-inicio" class="form-label">Hora inicio</label>' +
+                    '<input type="text" id="notif-hora-inicio" class="form-control" value="' + res.hora.hora_inicio + '" readonly>' +
+                '</div>' +
+                '<div class="col-sm-6 form-group">' +
+                    '<label for="notif-hora-termino" class="form-label">Hora término</label>' +
+                    '<input type="text" id="notif-hora-termino" class="form-control" value="' + res.hora.hora_termino + '" readonly>' +
+                '</div>' +
+                '<div class="col-sm-12">' +
+                    'Reservado por: <br>' +
+                    '<a href="/patients/' + res.usuario.id + '/record">' +
+                        '<img style="width: 40px; height: 40px;" class="img-circle" src="' + res.usuario.imgProfile + '"> ' + res.usuario.nombres + ' ' + res.usuario.apellidos +
+                    '</a>' +
+                '</div>' +
+            '</div>').dialog({
+                title: esReserva ? 'Reserva de hora' : 'Cancelación de reserva',
+                width: 400,
+                classes: { 'ui-dialog': 'dialog-responsive' },
+                resizable: false,
+                modal: true,
+                autoOpen: true,
+                close: function () {
+                    $(this).dialog('destroy').remove();
+                },
+                closeOnEscape: false,
+                buttons: [
+                    {
+                        text: "Cerrar",
+                        'class': 'btn',
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
             });
         });
     }

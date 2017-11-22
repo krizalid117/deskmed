@@ -75,6 +75,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/add_doctor/{id}', 'UsuarioController@addDoctorToList')->name('patients.addDoctor');
 
         Route::get('/patient/agenda/{mode?}', 'UsuarioController@agenda')->name('patient.agenda');
+
+        Route::post('/patient/getdocfreehours', 'UsuarioController@getDocFreeHours')->name('patient.searchfreehoursdoc');
+
+        Route::post('/patient/reservarhora', 'UsuarioController@reservarHora')->name('patient.reservarhora');
+
+        Route::post('/patient/cancelreserva', 'UsuarioController@cancelarReserva')->name('patient.cancelreserva');
     });
 
     Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');
@@ -99,5 +105,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/user/agenda/save_masive', 'UsuarioController@saveAgendaMasive')->name('user.saveagenda_masive');
 
-    Route::post('/user/getinfopatient', 'UsuarioController@getInfoPatient')->name('user.get_info_patient');
+    Route::post('/user/getinfouser', 'UsuarioController@getInfoUser')->name('user.get_info_user');
+
+    //notifiable only
+    Route::post('/user/getinfohora', 'UsuarioController@getInfoHora')->name('user.getinfohora');
 });

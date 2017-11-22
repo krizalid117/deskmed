@@ -1,5 +1,7 @@
 <?php
     $isMedico = Auth::user()->id_tipo_usuario === 2 || Auth::user()->id_tipo_usuario === 1;
+
+//    dd(Auth::user()->doctors()->get());
 ?>
 
 @extends('layouts.app')
@@ -165,6 +167,110 @@
 
         #hora-masiva-mdpicker > .ui-datepicker {
             margin: 0 auto;
+        }
+
+        .reservas-doclist {
+            list-style: none;
+            margin-top: 10px;
+
+            overflow-y: auto;
+            max-height: 350px;
+        }
+
+        .reservas-doclist > li {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .reservas-doclist > li:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+
+        .reservas-doclist > li:hover {
+            background-color: #ece7e7;
+        }
+
+        .reservas-doclist-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .reservas-doclist-img {
+            flex: 0 0 auto;
+            position: relative;
+        }
+
+        .reservas-img-estado {
+            position: absolute;
+            top: 0;
+            right: -5px;
+
+            width: 20px;
+            height: 20px;
+        }
+
+        .reservas-img-profile {
+            width: 50px;
+            height: 50px;
+
+            background-color: #f09006;
+            padding: 2px;
+        }
+
+        .reservas-doclist-name {
+            flex: 1 1 auto;
+            padding-left: 10px;
+        }
+
+        .reservas-doclist-op {
+            flex: 0 0 auto;
+            padding-right: 10px;
+        }
+
+        .freehoras-list {
+            list-style: none;
+            margin-top: 10px;
+
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .freehoras-list > li {
+            width: 100%;
+            padding: 5px 15px;
+            margin-bottom: 5px;
+
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+
+        .freehoras-list > li:hover {
+            filter: brightness(85%);
+        }
+
+        .freehoras-list > li:hover button {
+            filter: brightness(100%) !important;
+            background-color: #82de82 !important;
+        }
+
+        .freehoras-list-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .freehoras-nombre {
+            flex: 1 1 auto;
+            padding-right: 5px;
+        }
+
+        .freehoras-op {
+            flex: 0 0 auto;
         }
     </style>
 @endsection
@@ -711,12 +817,32 @@
                         '</ul>' +
                         '<div id="reservas-lista-prof">' +
                             '<span class="bold">Tu lista de profesionales:</span>' +
-                            @foreach(Auth::user()->doctors() as $docs)
-
-                            @endforeach
+                            @if (count(Auth::user()->doctors()->get()) > 0)
+                                '<ul class="reservas-doclist">' +
+                                @foreach (Auth::user()->doctors()->get() as $docs)
+                                    '<li>' +
+                                        '<div class="reservas-doclist-item">' +
+                                            '<div class="reservas-doclist-img hidden-xs">' +
+                                                '<img class="reservas-img-estado" src="{{ URL::to('img/' . $docs->doctor()->first()->getProfessionalStatus()["estado_img"] . '.png') }}">' +
+                                                '<img class="reservas-img-profile img-circle" src="{{ $docs->doctor()->first()->getProfileImage() }}">' +
+                                            '</div>' +
+                                            '<div class="reservas-doclist-name">' +
+                                                '<div class="doc-name">{{ $docs->doctor()->first()->nombres . " " . $docs->doctor()->first()->apellidos }}</div>' +
+                                                '<div class="doc-title small">Título: {{ $docs->doctor()->first()->getProfessionalStatus()["titulo"] }}</div>' +
+                                            '</div>' +
+                                            '<div class="reservas-doclist-op">' +
+                                                '<button class="btn btn-success btn-xs btn-ver-horas-libres" title="Ver reservas libres" data-ndoc="{{ $docs->doctor()->first()->nombres . " " . $docs->doctor()->first()->apellidos }}" data-idm="{{ $docs->doctor()->first()->id }}"><span class="glyphicon glyphicon-eye-open"></span></button>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</li>' +
+                                @endforeach
+                                '</ul>' +
+                            @else
+                                'No tiene profesionales agregados a su lista' +
+                            @endif
                         '</div>' +
                         '<div id="reservas-general">' +
-                            '2' +
+                            'En construcción... :(' +
                         '</div>' +
                     '</div>' +
                 '</div>').dialog({
@@ -744,8 +870,102 @@
                 $('.tabs-reservas').tabs({
                     active: 0
                 });
+
+                $('.btn-ver-horas-libres').click(function () {
+                    var $this = $(this);
+
+                    sendPost('{{ route('patient.searchfreehoursdoc') }}', {
+                        _token: '{{ csrf_token() }}',
+                        id_doc: $(this).data('idm')
+                    }, function (res) {
+                        var horas = res.horas;
+
+                        if (horas.length > 0) {
+                            listarHorasLibres(horas, $this.data('idm'), $this.data('ndoc'));
+                        }
+                        else {
+                            mensajes.alerta("No hay reservas libres para el profesional seleccionado.");
+                        }
+                    });
+                }).tooltip();
             });
         });
+
+        function listarHorasLibres(horas, id_doc, nombre_doctor) {
+            var listado = '';
+
+            for (var i = 0; i < horas.length; i++) {
+                var h = horas[i];
+
+                var fecha = new Date(h.fecha);
+
+                var nombreFecha = $.datepicker.regional["es"].dayNames[fecha.getUTCDay()] + ' ' + (fecha.getUTCDate() < 10 ? '0' + fecha.getUTCDate() : '' + fecha.getUTCDate()) + ' de ' + $.datepicker.regional["es"].monthNames[fecha.getUTCMonth()] + ", " + fecha.getUTCFullYear() + ". De " + h.hora_inicio + ' a ' + h.hora_termino;
+
+                listado += '<li style="background-color: ' + h.hex_color + ';" data-datos="' + htmlEntities(JSON.stringify(h)) + '">' +
+                    '<div class="freehoras-list-item">' +
+                        '<div class="freehoras-nombre">' +
+                            '<span class="bold">"' + h.nombre + '"</span><br>' +
+                            '<span class="small">' + nombreFecha + '</span>' +
+                        '</div>' +
+                        '<div class="freehoras-op">' +
+                            '<button class="btn btn-success btn-sm btn-reserva" data-idhora="' + h.id + '">Reservar</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</li>';
+            }
+
+            $('<div id="dlg-free-hours-list">' +
+                '<ul class="freehoras-list">' +
+                    listado +
+                '</ul>' +
+            '</div>').dialog({
+                title: "Horas disponibles para el doctor: " + nombre_doctor,
+                width: 500,
+                classes: { 'ui-dialog': 'dialog-responsive' },
+                resizable: false,
+                modal: true,
+                autoOpen: true,
+                show: {
+                    effect: "fade",
+                    duration: 150
+                },
+                close: function () {
+                    $(this).dialog('destroy').remove();
+                },
+                closeOnEscape: false,
+                buttons: [
+                    {
+                        text: "Cerrar",
+                        'class': 'btn',
+                        click: function () {
+                            $(this).dialog('close');
+                        }
+                    }
+                ]
+            });
+
+            $('.btn-reserva').click(function () {
+                var $this = $(this);
+                var datos = $this.closest('li').data('datos');
+
+                mensajes.confirmacion_sino('¿Desea reservar esta hora? <br>' +
+                    '<br><span class="bold">Hora: </span>' + datos.nombre +
+                    '<br><span class="bold">Profesional: </span>' + nombre_doctor +
+                    '<br>El ' + $this.closest('li').find('.freehoras-nombre').find('span.small').text()
+                , function () {
+                    sendPost('{{ route('patient.reservarhora') }}', {
+                        _token: '{{ csrf_token() }}',
+                        id: datos.id
+                    }, function (res) {
+                        mensajes.alerta("¡Hora reservada correctamente!", "Reserva", function () {
+                            $('#dlg-free-hours-list').dialog('close');
+
+                            loadAgenda();
+                        });
+                    });
+                });
+            });
+        }
 
         function loadAgenda() {
             var tbody = $('.tbl-agenda').children('tbody');
@@ -860,7 +1080,7 @@
                 '</div>' +
                 '<div class="col-sm-{{ ($isMedico ? "6" : "12") }} form-group">' +
                     '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
-                    '<div class="form-control" style="border: none; box-shadow: none;">' +
+                    '<div class="form-control" style="border: none; box-shadow: none; white-space: nowrap;">' +
                         @if ($isMedico)
                             '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
                             '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
@@ -870,14 +1090,18 @@
                     '</div>' +
                 '</div>' +
                 @if ($isMedico)
-                '<div class="col-sm-6 form-group">' +
-                    '<label for="hora-single-color" class="form-label">Color</label>' +
-                    '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" {{ ($isMedico ? "" : "disabled") }} readonly>' +
-                '</div>' +
-                (h.estado === 1 ? '' +
-                '<div class="col-sm-12" id="reserva-container">' +
-                    '<img src="/img/loading.gif" alt="Cargando..." style="display: inline-block; width: 40px; height: 40px; margin: 0 auto;">' +
-                '</div>' : '') +
+                    '<div class="col-sm-6 form-group">' +
+                        '<label for="hora-single-color" class="form-label">Color</label>' +
+                        '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" {{ ($isMedico ? "" : "disabled") }} readonly>' +
+                    '</div>' +
+                    (h.estado === 1 ? '' +
+                    '<div class="col-sm-12" id="reserva-container">' +
+                        '<img src="/img/loading.gif" alt="Cargando..." style="display: inline-block; width: 40px; height: 40px; margin: 0 auto;">' +
+                    '</div>' : '') +
+                @else
+                    '<div class="col-sm-12" id="reserva-container">' +
+                        '<img src="/img/loading.gif" alt="Cargando..." style="display: inline-block; width: 40px; height: 40px; margin: 0 auto;">' +
+                    '</div>' +
                 @endif
             '</div>').dialog({
                 title: (action === 'add') ? "Nueva hora" : "{{ ($isMedico ? "Editar hora: " : "Hora médica: ") }}\"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
@@ -925,33 +1149,55 @@
                         text: "Cancelar reserva",
                         'class': 'btn btn-danger',
                         click: function () {
-
+                            mensajes.confirmacion_sino("¿Realmente desea cancelar esta reserva?", function () {
+                                sendPost('{{ route('patient.cancelreserva') }}', {
+                                    _token: '{{ csrf_token() }}',
+                                    id: h.codigo
+                                }, function () {
+                                    mensajes.alerta("Reserva cancelada correctamente.", "Reserva de horas", function () {
+                                        $("#dlg-new-hora-single").dialog('close');
+                                        loadAgenda();
+                                    });
+                                });
+                            });
                         }
                     }
                     @endif
                 ]
             });
 
-            @if ($isMedico)
-                if (h.estado === 1) {
-                    sendPost('{{ route('user.get_info_patient') }}', {
-                        _token: '{{ csrf_token() }}',
-                        id: h.id_paciente
-                    }, function (res) {
-                        var imgProfile = (res.paciente.profile_pic_path !== null) ? res.paciente.profile_pic_path : (id_sexo === 1 ? 'default_male.png' : (id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
+            if (h.estado === 1) {
+                var id_envio = h.id_medico;
 
-                        $('#reserva-container').html(
-                            '<fieldset>' +
-                                '<legend>Reserva</legend>' +
-                                'Reservado por: <br>' +
-                                '<a href="/patients/' + res.paciente.id + '/record/">' +
-                                    '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.paciente.nombres + ' ' + res.paciente.apellidos +
-                                '</a>' +
-                            '</fieldset>'
-                        );
-                    }, null, false);
-                }
-            @endif
+                @if ($isMedico)
+                    id_envio = h.id_paciente;
+                @endif
+
+                sendPost('{{ route('user.get_info_user') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id: id_envio
+                }, function (res) {
+                    var imgProfile = (res.usuario.profile_pic_path !== null) ? res.usuario.profile_pic_path : (res.usuario.id_sexo === 1 ? 'default_male.png' : (res.usuario.id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
+
+                    var url1 = "professionals";
+                    var url2 = "profile";
+
+                    @if ($isMedico)
+                        url1 = "patients";
+                        url2 = "record";
+                    @endif
+
+                    $('#reserva-container').html(
+                        '<fieldset>' +
+                            '<legend>Reserva</legend>' +
+                            '{{ ($isMedico ? "Reservado por" : "Profesional que antederá") }}: <br>' +
+                            '<a href="/' + url1 + '/' + res.usuario.id + '/' + url2 + '">' +
+                                '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.usuario.nombres + ' ' + res.usuario.apellidos +
+                            '</a>' +
+                        '</fieldset>'
+                    );
+                }, null, false);
+            }
 
             @if ($isMedico)
                 var color = new jscolor($('#hora-single-color')[0], {
@@ -1146,7 +1392,7 @@
                     '</div>' +
                     '<div class="col-sm-6 form-group">' +
                         '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
-                        '<div class="form-control" style="border: none; box-shadow: none;">' +
+                        '<div class="form-control" style="border: none; box-shadow: none; white-space: nowrap;">' +
                             '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + horasIniciales[0] + '"> - ' +
                             '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + horasIniciales[1] + '">' +
                         '</div>' +

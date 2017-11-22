@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\HoraMedica;
 use App\Notifications\AddListRequest;
+use App\Notifications\HoraCancelada;
+use App\Notifications\HoraReservada;
 use App\Usuario;
 use App\Sexos;
 use App\SolicitudesVerificacion;
@@ -1022,20 +1024,123 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
-    public function getInfoPatient(Request $request) {
+    public function getInfoUser(Request $request) {
         $datos = [
             "error" => false,
             "mensaje" => "",
-            "paciente" => []
+            "usuario" => []
         ];
 
         $paciente = Usuario::find($request["id"]);
 
         if (!is_null($paciente)) {
-            $datos["paciente"] = $paciente;
+            $datos["usuario"] = $paciente;
         }
         else {
             $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function getDocFreeHours(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "horas" => []
+        ];
+
+        $usuario = Usuario::find($request["id_doc"]);
+
+        $horas = $usuario->horasAsDoctor()
+            ->where('fecha', '>=', date('Y-m-d'))
+            ->where('estado', '=', 0)
+            ->whereRaw("(fecha::varchar || ' ' || hora_inicio)::timestamp >= now()")
+            ->orderBy('fecha', 'asc')
+            ->orderByRaw('hora_inicio::time asc')
+            ->get();
+
+        if (count($horas) > 0) {
+            $datos["horas"] = $horas;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function reservarHora(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $update = DB::update("update hora_medica set id_paciente = ?, estado = 1 where id = ?", [ Auth::user()->id, $request["id"] ]);
+
+        if (!$update) {
+            $datos["error"] = true;
+        }
+        else {
+            $hora = HoraMedica::find($request["id"]);
+
+            Usuario::find($hora->id_medico)->notify(new HoraReservada($hora));
+        }
+
+        return response()->json($datos);
+    }
+
+    public function cancelarReserva(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $hora = HoraMedica::find($request["id"]);
+
+        Usuario::find($hora->id_medico)->notify(new HoraCancelada($hora));
+
+        $update = DB::update("update hora_medica set id_paciente = null, estado = 0 where id = ?", [ $request["id"] ]);
+
+        if (!$update) {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    //notifiable only
+    public function getInfoHora(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "usuario" => [],
+            "hora" => [],
+        ];
+
+        $n = Auth::user()->notifications()->where('id', $request["n"])->first();
+
+        if ($n && is_null($n->read_at)) {
+            $n->update(['read_at' => Carbon::now()]);
+        }
+
+        $hora = HoraMedica::find($request["id"]);
+
+        if ($hora) {
+            $datos["hora"] = [
+                "nombre" => $hora->nombre,
+                "fecha" => implode("-", array_reverse(explode("-", $hora["fecha"]))),
+                "hora_inicio" => $hora->hora_inicio,
+                "hora_termino" => $hora->hora_termino,
+            ];
+
+//            var_dump($n);
+
+            $usuario = Usuario::find($n->data["hora"]["id_paciente"]);
+
+            $datos["usuario"] = [
+                "id" => $usuario->id,
+                "nombres" => $usuario->nombres,
+                "apellidos" => $usuario->apellidos,
+                "imgProfile" => $usuario->getProfileImage(),
+            ];
         }
 
         return response()->json($datos);
