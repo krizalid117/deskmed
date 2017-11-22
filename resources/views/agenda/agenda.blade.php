@@ -1,3 +1,7 @@
+<?php
+    $isMedico = Auth::user()->id_tipo_usuario === 2 || Auth::user()->id_tipo_usuario === 1;
+?>
+
 @extends('layouts.app')
 
 @section('title', '| Agenda')
@@ -172,12 +176,14 @@
 
         <div class="agenda-filtros">
             <div class="form-group col-sm-4">
+                @if ($isMedico)
                 <label for="sel-mode" class="form-label">Ver horas:</label>
                 <select id="sel-mode" class="form-control">
                     <option value="all">Todas</option>
                     <option value="0">Libres</option>
                     <option value="1">Reservadas</option>
                 </select>
+                @endif
             </div>
             <div class="col-sm-4 hidden-xs"></div>
             <div class="form-group col-sm-4">
@@ -465,18 +471,22 @@
             @endif
         </div>
         <div class="agenda-acciones">
-            <div class="btn-group dropup">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Crear&nbsp;{{--</button>--}}
-                {{--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
-                    <span class="caret"></span>
-                    {{--<span class="sr-only">Toggle Dropdown</span>--}}
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a id="new-hora-single" href="#">Hora individual</a></li>
-                    <li><a id="new-hora-group" href="#">Creación masiva de horas para el mes</a></li>
-                    {{--<li role="separator" class="divider"></li>--}}
-                </ul>
-            </div>
+            @if ($isMedico)
+                <div class="btn-group dropup">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Crear&nbsp;{{--</button>--}}
+                    {{--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
+                        <span class="caret"></span>
+                        {{--<span class="sr-only">Toggle Dropdown</span>--}}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a id="new-hora-single" href="#">Hora individual</a></li>
+                        <li><a id="new-hora-group" href="#">Creación masiva de horas para el mes</a></li>
+                        {{--<li role="separator" class="divider"></li>--}}
+                    </ul>
+                </div>
+            @else
+                <button class="btn btn-success" id="btn-reservar">Buscar horas para reservar</button>
+            @endif
         </div>
 
     </div>
@@ -647,17 +657,20 @@
                 });
             }).resize();
 
+            @if ($isMedico)
             $('#new-hora-single').click(function (e) {
                 e.preventDefault();
 
                 editarAgregarHoraSimple('add');
             });
 
+
             $('#new-hora-group').click(function (e) {
                 e.preventDefault();
 
                 creacionHorasMasivo();
             });
+            @endif
 
             tblAgenda.on('click', 'div[id^="hora-"]', function () {
                 var data = $(this).data('datos');
@@ -675,27 +688,69 @@
                 });
             });
 
+            @if ($isMedico)
             $('#sel-mode').change(function () {
                 loadAgenda();
             });
+            @endif
 
             updateEndTime($('.agenda-rango-hora.start'), $('.agenda-rango-hora.end'), function () {
                 ocultarFilasHorario();
+            });
+
+            $('#btn-reservar').click(function () {
+                $('<div id="dlg-reservas">' +
+                    '<div class="tabs-reservas">' +
+                        '<ul style="display: flex;">' +
+                            '<li style="width: 50%;">' +
+                                '<a style="width: 100%;" href="#reservas-lista-prof">Lista</a>' +
+                            '</li>' +
+                            '<li style="width: 50%;">' +
+                                '<a style="width: 100%;" href="#reservas-general">General</a>' +
+                            '</li>' +
+                        '</ul>' +
+                        '<div id="reservas-lista-prof">' +
+                            '<span class="bold">Tu lista de profesionales:</span>' +
+                            @foreach(Auth::user()->doctors() as $docs)
+
+                            @endforeach
+                        '</div>' +
+                        '<div id="reservas-general">' +
+                            '2' +
+                        '</div>' +
+                    '</div>' +
+                '</div>').dialog({
+                    title: "Buscar reservas",
+                    width: 450,
+                    classes: { 'ui-dialog': 'dialog-responsive' },
+                    resizable: false,
+                    modal: true,
+                    autoOpen: true,
+                    close: function () {
+                        $(this).dialog('destroy').remove();
+                    },
+                    closeOnEscape: false,
+                    buttons: [
+                        {
+                            text: "Cerrar",
+                            'class': 'btn',
+                            click: function () {
+                                $(this).dialog('close');
+                            }
+                        }
+                    ]
+                });
+
+                $('.tabs-reservas').tabs({
+                    active: 0
+                });
             });
         });
 
         function loadAgenda() {
             var tbody = $('.tbl-agenda').children('tbody');
 
-            @if ($mode === "daily")
-
-            @elseif ($mode === "weekly")
-
             loadWeeklyAgenda();
-
-            @elseif ($mode === "monthly")
-
-            @endif
         }
 
         function ocultarFilasHorario() {
@@ -742,7 +797,7 @@
                 _token: '{{ csrf_token() }}',
                 inicio: $('#startDate').data('date'),
                 termino: $('#endDate').data('date'),
-                mode: $('#sel-mode').val()
+                mode: <?php if ($isMedico) { ?>$('#sel-mode').val()<?php } else { echo "'all'"; } ?>
             }, function (res) {
                 $('.weekly-agenda-day').empty();
 
@@ -785,7 +840,7 @@
                 hora_inicio: "",
                 hora_termino: "",
                 estado: 0,
-                color: "f1f1f1"
+                color: "#f1f1f1"
             };
 
             var textoReserva = '';
@@ -796,30 +851,36 @@
 
             $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
                 '<div class="col-sm-6 form-group">' +
-                '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
-                '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '">' +
+                    '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
+                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '" {{ ($isMedico ? "" : "disabled") }}>' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
-                '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
-                '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" readonly>' +
+                    '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
+                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" {{ ($isMedico ? "" : "disabled") }} readonly>' +
                 '</div>' +
+                '<div class="col-sm-{{ ($isMedico ? "6" : "12") }} form-group">' +
+                    '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
+                    '<div class="form-control" style="border: none; box-shadow: none;">' +
+                        @if ($isMedico)
+                            '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
+                            '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
+                        @else
+                            h.hora_inicio + ' a ' +  h.hora_termino +
+                        @endif
+                    '</div>' +
+                '</div>' +
+                @if ($isMedico)
                 '<div class="col-sm-6 form-group">' +
-                '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
-                '<div class="form-control" style="border: none; box-shadow: none;">' +
-                '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
-                '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
-                '</div>' +
-                '</div>' +
-                '<div class="col-sm-6 form-group">' +
-                '<label for="hora-single-color" class="form-label">Color</label>' +
-                '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" readonly>' +
+                    '<label for="hora-single-color" class="form-label">Color</label>' +
+                    '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" {{ ($isMedico ? "" : "disabled") }} readonly>' +
                 '</div>' +
                 (h.estado === 1 ? '' +
                 '<div class="col-sm-12" id="reserva-container">' +
                     '<img src="/img/loading.gif" alt="Cargando..." style="display: inline-block; width: 40px; height: 40px; margin: 0 auto;">' +
                 '</div>' : '') +
+                @endif
             '</div>').dialog({
-                title: (action === 'add') ? "Nueva hora" : "Editar hora: \"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
+                title: (action === 'add') ? "Nueva hora" : "{{ ($isMedico ? "Editar hora: " : "Hora médica: ") }}\"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
                 width: 440,
                 classes: {'ui-dialog': 'dialog-responsive'},
                 resizable: false,
@@ -831,13 +892,14 @@
                 closeOnEscape: false,
                 buttons: [
                     {
-                        text: "Cancelar",
+                        text: "Cerrar",
                         'class': 'btn',
                         click: function () {
                             $(this).dialog('close');
                         }
-                    },
-                    {
+                    }
+                    @if ($isMedico)
+                    , {
                         text: "Guardar",
                         'class': 'btn btn-primary',
                         click: function () {
@@ -858,44 +920,59 @@
                             });
                         }
                     }
+                    @else
+                    , {
+                        text: "Cancelar reserva",
+                        'class': 'btn btn-danger',
+                        click: function () {
+
+                        }
+                    }
+                    @endif
                 ]
             });
 
-            if (h.estado === 1) {
-                sendPost('{{ route('user.get_info_patient') }}', {
-                    _token: '{{ csrf_token() }}',
-                    id: h.id_paciente
-                }, function (res) {
-                    var imgProfile = (res.paciente.profile_pic_path !== null) ? res.paciente.profile_pic_path : (id_sexo === 1 ? 'default_male.png' : (id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
+            @if ($isMedico)
+                if (h.estado === 1) {
+                    sendPost('{{ route('user.get_info_patient') }}', {
+                        _token: '{{ csrf_token() }}',
+                        id: h.id_paciente
+                    }, function (res) {
+                        var imgProfile = (res.paciente.profile_pic_path !== null) ? res.paciente.profile_pic_path : (id_sexo === 1 ? 'default_male.png' : (id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
 
-                    $('#reserva-container').html(
-                        '<fieldset>' +
-                            '<legend>Reserva</legend>' +
-                            'Reservado por: <br>' +
-                            '<a href="/patients/' + res.paciente.id + '/record/">' +
-                                '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.paciente.nombres + ' ' + res.paciente.apellidos +
-                            '</a>' +
-                        '</fieldset>'
-                    );
-                }, null, false);
-            }
+                        $('#reserva-container').html(
+                            '<fieldset>' +
+                                '<legend>Reserva</legend>' +
+                                'Reservado por: <br>' +
+                                '<a href="/patients/' + res.paciente.id + '/record/">' +
+                                    '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.paciente.nombres + ' ' + res.paciente.apellidos +
+                                '</a>' +
+                            '</fieldset>'
+                        );
+                    }, null, false);
+                }
+            @endif
 
-            var color = new jscolor($('#hora-single-color')[0], {
-                hash: true
-            });
+            @if ($isMedico)
+                var color = new jscolor($('#hora-single-color')[0], {
+                    hash: true
+                });
 
-            $('#hora-single-fecha').datepicker();
+                $('#hora-single-fecha').datepicker();
 
-            $('.hora-single-time').timepicker({
-                'timeFormat': 'H:i',
-                'step': 15,
-                'minTime': '00:00',
-                'maxTime': '23:45',
-                'forceRoundTime': true,
-                useSelect: true
-            }).on('changeTime', function () {
-                updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
-            });
+                $('.hora-single-time').timepicker({
+                    'timeFormat': 'H:i',
+                    'step': 15,
+                    'minTime': '00:00',
+                    'maxTime': '23:45',
+                    'forceRoundTime': true,
+                    useSelect: true
+                }).on('changeTime', function () {
+                    updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
+                });
+            @else
+//                $('#hora-single-color').css('background-color', h.color);
+            @endif
         }
 
         function creacionHorasMasivo() {

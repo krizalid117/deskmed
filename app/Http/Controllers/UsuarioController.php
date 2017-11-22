@@ -811,17 +811,17 @@ class UsuarioController extends Controller
 
         $mode = !is_null($mode) ? $mode : "weekly";
 
-        $view = "";
+        $view = "agenda";
 
-        if ($usuario->id_tipo_usuario === 2) {
-            $view = "doctor";
-        }
-        else if ($usuario->id_tipo_usuario === 3) {
-            $view = "patient";
-        }
-        else {
-            throw new HttpException(404);
-        }
+//        if ($usuario->id_tipo_usuario === 2) {
+//            $view = "doctor";
+//        }
+//        else if ($usuario->id_tipo_usuario === 3) {
+//            $view = "patient";
+//        }
+//        else {
+//            throw new HttpException(404);
+//        }
 
         return view("agenda.{$view}", [
             "usuario" => $usuario,
