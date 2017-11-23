@@ -17,11 +17,11 @@
         methods: {
             sendMessage() {
                 if ($.trim(this.messageText).length > 0) {
-                    var msg = $.trim(this.messageText);
+                    let msg = $.trim(this.messageText);
 
-//                    this.$emit('sendChatMessage', {
-//                        message: msg
-//                    });
+                    this.$emit('sendchatmessage', {
+                        message: msg
+                    });
 
                     this.messageText = '';
                 }

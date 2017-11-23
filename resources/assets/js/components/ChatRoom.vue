@@ -9,7 +9,7 @@
             <div class="panel-body">
                 <div class="col-xs-3 hidden-xs chat-list"></div>
                 <div class="col-sm-9 col-xs-12 chat-messagebox">
-                    <chat-log :messages="messages"></chat-log>
+                    <chat-log v-bind:messages="messages"></chat-log>
                 </div>
             </div>
 
@@ -25,8 +25,14 @@
 
 <script>
     export default {
-        props: ['messages']
+        props: ['messages'],
+        methods: {
+            sendchatmessage: function () {
+                console.log("2222");
+            }
+        }
     }
+
 </script>
 
 <style lang="css">

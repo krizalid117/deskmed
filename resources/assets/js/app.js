@@ -13,6 +13,8 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+// import ChatRoom from './components/ChatRoom.vue';
+
 Vue.component('chat-room', require('./components/ChatRoom.vue'));
 Vue.component('message-composer', require('./components/MessageComposer.vue'));
 Vue.component('chat-log', require('./components/ChatLog.vue'));
@@ -39,8 +41,8 @@ const app = new Vue({
         ]
     },
     methods: {
-        // sendChatMessage() {
-        //
-        // }
+        sendMessage: function () {
+            console.log("asdsadsa!!!!!");
+        }
     }
 });
