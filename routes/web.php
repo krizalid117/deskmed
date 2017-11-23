@@ -109,4 +109,6 @@ Route::group(['middleware' => 'auth'], function () {
 
     //notifiable only
     Route::post('/user/getinfohora', 'UsuarioController@getInfoHora')->name('user.getinfohora');
+
+    Route::get('/chat', 'UsuarioController@loadChatView')->name('user.mainchat');
 });

@@ -13,8 +13,34 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example', require('./components/Example.vue'));
+Vue.component('chat-room', require('./components/ChatRoom.vue'));
+Vue.component('message-composer', require('./components/MessageComposer.vue'));
+Vue.component('chat-log', require('./components/ChatLog.vue'));
+Vue.component('chat-message', require('./components/ChatMessage.vue'));
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    data: {
+        messages: [
+            {
+                message: 'Hola...',
+                user: 'Doctor',
+                isSender: true,
+                image: '/profilePics/default_male.png',
+                time: '12:30PM'
+            },
+            {
+                message: 'Buenas!!!1',
+                user: 'Paciente',
+                isSender: false,
+                image: '/profilePics/default_female.png',
+                time: '12:31PM'
+            }
+        ]
+    },
+    methods: {
+        // sendChatMessage() {
+        //
+        // }
+    }
 });

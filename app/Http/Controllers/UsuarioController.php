@@ -1146,6 +1146,12 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
+    public function loadChatView() {
+        return view('chat', [
+            "usuario" => Auth::user(),
+        ]);
+    }
+
     /* funciones estáticas */
 
     public static function downRut($rut) {
