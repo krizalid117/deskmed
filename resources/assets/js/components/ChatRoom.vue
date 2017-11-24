@@ -1,6 +1,6 @@
 <template lang="html">
     <div class="chat-room">
-        <div class="panel panel-deskmed2 chat-window">
+        <div class="panel panel-deskmed3 chat-window">
             <div class="panel-heading text-right">
                 <div class="col-xs-3 hidden-xs"></div>
                 <div class="col-sm-9 col-xs-12 chat-title">asd</div>
@@ -16,7 +16,7 @@
             <div class="panel-footer text-right">
                 <div class="col-xs-3 hidden-xs"></div>
                 <div class="col-sm-9 col-xs-12 message-composer">
-                    <message-composer></message-composer>
+                    <message-composer v-on:sendchatmessage="sendNewMessage"></message-composer>
                 </div>
             </div>
         </div>
@@ -27,8 +27,20 @@
     export default {
         props: ['messages'],
         methods: {
-            sendchatmessage: function () {
-                console.log("2222");
+            sendNewMessage: function (obj) {
+                const THIS = this;
+
+                sendChatMessage(obj, function (res) {
+                    THIS.messages.push({
+                        message: res.message,
+                        user: res.user,
+                        isSender: true,
+                        image: res.image,
+                        time: res.time
+                    });
+                });
+
+
             }
         }
     }

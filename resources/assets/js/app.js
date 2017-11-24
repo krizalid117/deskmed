@@ -41,8 +41,6 @@ const app = new Vue({
         ]
     },
     methods: {
-        sendMessage: function () {
-            console.log("asdsadsa!!!!!");
-        }
+
     }
 });

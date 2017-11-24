@@ -86,8 +86,6 @@
 {{--<script src="{{ URL::to('js/datepair/src/jquery.datepair.js') }}"></script>--}}
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.js"></script>
-<script src="{{ asset('js/app.js') }}"></script>
-
 
 <script> {{-- Scripts para el menu --}}
 

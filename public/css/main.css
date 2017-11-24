@@ -102,6 +102,15 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     min-height: 42px;
 }
 
+.panel-deskmed3 > .panel-heading {
+    color: var(--secondary-text-color);
+    background-color: var(--header-background-color);
+    border-color: #ddd;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .65);
+    padding: 10px;
+}
+
 .ui-widget-overlay {
     background: #000;
     opacity: .3;

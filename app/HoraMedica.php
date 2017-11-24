@@ -15,4 +15,8 @@ class HoraMedica extends Model
     public function paciente() {
         return $this->belongsTo('App\Usuario', 'id_paciente');
     }
+
+    public function chatRoom() {
+        return $this->belongsTo('App\ChatRoom');
+    }
 }

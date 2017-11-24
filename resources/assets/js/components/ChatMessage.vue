@@ -37,13 +37,15 @@
         border-radius: 3px;
 
         margin: 0 10px;
-        padding: 5px 10px;
+        padding: 5px 15px;
         position: relative;
         background-color: #f1f1f1;
+        text-align: right;
     }
 
     .chat-message.chat-message-sender .chat-message-container {
         background-color: rgba(240, 144, 6, .5);
+        text-align: left;
     }
 
     .chat-message.chat-message-sender .chat-message-container:before {

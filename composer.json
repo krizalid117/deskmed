@@ -10,7 +10,8 @@
         "doctrine/dbal": "^2.5",
         "felixkiss/uniquewith-validator": "^3.1",
         "guzzlehttp/guzzle": "~6.0",
-        "laravel/framework": "5.3.*"
+        "laravel/framework": "5.3.*",
+        "ramsey/uuid": "^3.7"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
