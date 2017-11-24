@@ -16,10 +16,12 @@
         },
         methods: {
             sendMessage() {
+
                 if ($.trim(this.messageText).length > 0) {
                     let msg = $.trim(this.messageText);
 
                     this.$emit('sendchatmessage', {
+                        el: this.$el,
                         message: msg
                     });
 

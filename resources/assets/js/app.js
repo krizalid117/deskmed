@@ -16,31 +16,68 @@ require('./bootstrap');
 // import ChatRoom from './components/ChatRoom.vue';
 
 Vue.component('chat-room', require('./components/ChatRoom.vue'));
+Vue.component('chat-list', require('./components/ChatList.vue'));
+Vue.component('chat-session', require('./components/ChatSession.vue'));
 Vue.component('message-composer', require('./components/MessageComposer.vue'));
 Vue.component('chat-log', require('./components/ChatLog.vue'));
 Vue.component('chat-message', require('./components/ChatMessage.vue'));
 
-const app = new Vue({
+const chat = new Vue({
     el: '#app',
     data: {
-        messages: [
+        activesession: '',
+        messages: [],
+        chatlists: [
             {
-                message: 'Hola...',
-                user: 'Doctor',
-                isSender: true,
-                image: '/profilePics/default_male.png',
-                time: '12:30PM'
+                uuid: '1234',
+                receiver: {
+                    image: '/profilePics/default_nonbinary.png',
+                    nombres: 'lala jr',
+                    apellidos: 'qwerty gonzalez sad sad sadsa',
+                    isDoctor: false
+                },
+                hora: {
+                    nombre: 'Hora kinesiólogo',
+                    fecha: '24-11-2017',
+                    hora_inicio: '11:30',
+                    hora_termino: '12:00',
+                    color: '#000454'
+                }
             },
             {
-                message: 'Buenas!!!1',
-                user: 'Paciente',
-                isSender: false,
-                image: '/profilePics/default_female.png',
-                time: '12:31PM'
+                uuid: 'abcd',
+                receiver: {
+                    image: '/profilePics/default_male.png',
+                    nombres: 'Steffan',
+                    apellidos: 'Kramer',
+                    isDoctor: false
+                },
+                hora: {
+                    nombre: 'Hora psiquiatra',
+                    fecha: '23-11-2017',
+                    hora_inicio: '17:00',
+                    hora_termino: '17:45',
+                    color: 'green'
+                }
             }
         ]
     },
     methods: {
+        selectSession: function (obj) {
 
+            const THIS = this;
+
+            vueSelectSession(obj, function () {
+                THIS.activesession = obj.uuid;
+
+                $(obj.el).find('.session-selected-row').show();
+            });
+        },
+        sendChatMessage: function (obj) {
+
+            vueSendChatMessage(obj, function () {
+
+            });
+        }
     }
 });

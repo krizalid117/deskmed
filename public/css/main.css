@@ -1137,6 +1137,10 @@ td.d-dtable-center {
     border-color: #EDB97C !important;
 }
 
+.not-allowed {
+    cursor: not-allowed !important;
+}
+
 /*** XS ***/
 
 @media (max-width: 767px) {

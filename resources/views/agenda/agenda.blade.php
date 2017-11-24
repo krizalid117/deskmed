@@ -1,6 +1,8 @@
 <?php
     $isMedico = Auth::user()->id_tipo_usuario === 2 || Auth::user()->id_tipo_usuario === 1;
 
+    $today = date("d-m-Y");
+
 //    dd(Auth::user()->doctors()->get());
 ?>
 
@@ -1049,6 +1051,8 @@
                         }
                     });
                 }
+
+                $('.hora-content').tooltip();
             });
         }
 
@@ -1063,27 +1067,31 @@
                 color: "#f1f1f1"
             };
 
-            var textoReserva = '';
-
             if (action === 'edit') {
                 h = hora;
             }
 
+            var hoy = new Date(invertirFecha('{{ $today }}') + ' 00:00:00');
+
+            var esHoy = +new Date(invertirFecha(h.fecha) + ' 00:00:00') === +hoy;
+
+            var esAntigua = +new Date(invertirFecha(h.fecha) + ' 00:00:00') < +hoy;
+
             $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
                 '<div class="col-sm-6 form-group">' +
                     '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
-                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '" {{ ($isMedico ? "" : "disabled") }}>' +
+                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + '>' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
                     '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
-                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" {{ ($isMedico ? "" : "disabled") }} readonly>' +
+                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
                 '</div>' +
                 '<div class="col-sm-{{ ($isMedico ? "6" : "12") }} form-group">' +
                     '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
                     '<div class="form-control" style="border: none; box-shadow: none; white-space: nowrap;">' +
                         @if ($isMedico)
-                            '<input type="text" id="hora-single-hora-start" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '"> - ' +
-                            '<input type="text" id="hora-single-hora-end" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '">' +
+                            '<input type="text" id="hora-single-hora-start" style="width: 70px;" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '" ' + (esHoy || esAntigua ? "disabled" : "") + '> - ' +
+                            '<input type="text" id="hora-single-hora-end" style="width: 70px;" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '" ' + (esHoy || esAntigua ? "disabled" : "") + '>' +
                         @else
                             h.hora_inicio + ' a ' +  h.hora_termino +
                         @endif
@@ -1092,7 +1100,7 @@
                 @if ($isMedico)
                     '<div class="col-sm-6 form-group">' +
                         '<label for="hora-single-color" class="form-label">Color</label>' +
-                        '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" {{ ($isMedico ? "" : "disabled") }} readonly>' +
+                        '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
                     '</div>' +
                     (h.estado === 1 ? '' +
                     '<div class="col-sm-12" id="reserva-container">' +
@@ -1106,7 +1114,7 @@
             '</div>').dialog({
                 title: (action === 'add') ? "Nueva hora" : "{{ ($isMedico ? "Editar hora: " : "Hora médica: ") }}\"" + h.nombre + "\" (" + h.hora_inicio + "-" + h.hora_termino + ")",
                 width: 440,
-                classes: {'ui-dialog': 'dialog-responsive'},
+                classes: { 'ui-dialog': 'dialog-responsive' },
                 resizable: false,
                 modal: true,
                 autoOpen: true,
@@ -1125,7 +1133,7 @@
                     @if ($isMedico)
                     , {
                         text: "Guardar",
-                        'class': 'btn btn-primary',
+                        'class': 'btn btn-primary ' + (esHoy || esAntigua ? "hidden" : ""),
                         click: function () {
                             sendPost('{{ route('user.saveagenda_single') }}', {
                                 _token: '{{ csrf_token() }}',
@@ -1141,6 +1149,32 @@
                                     $("#dlg-new-hora-single").dialog('close');
                                     loadAgenda();
                                 });
+                            });
+                        }
+                    }
+                    , {
+                        text: "Crear sala de chat",
+                        'class': 'btn btn-warning ' + (!esHoy || (h.id_paciente === null || typeof h.id_paciente === 'undefined') ? "not-allowed " : " ") + (action === 'add' ? "hidden" : ""),
+                        title: (!esHoy ? "Sólo se puede crear una sala de chat para horas en la misma fecha a la actual ({{ $today }})" : (h.id_paciente === null || typeof h.id_paciente === 'undefined') ? "Para crear salas de chat se necesitan pacientes que hayan reservado esta hora" : "Haga click aquí para iniciar una sala de chat con el paciente"),
+                        disabled: !esHoy || (h.id_paciente === null || typeof h.id_paciente === 'undefined'),
+                        click: function () {
+                            sendPost('{{ route('doctor.checksessiontime') }}', {
+                                _token: '{{ csrf_token() }}',
+                                id: h.codigo
+                            }, function (res) {
+                                if (res.ok) {
+                                    sendPost('{{ route('doctor.createchatroom') }}', {
+                                        _token: '{{ csrf_token() }}',
+                                        id_hora: h.codigo
+                                    }, function (resChatRoom) {
+                                        mensajes.confirmacion_sino("Sala creada correctamente. <br><br>¿Desea ir a la sala?", function () {
+                                            window.location = '/chat/' + resChatRoom.uuid;
+                                        });
+                                    });
+                                }
+                                else {
+                                    mensajes.alerta(res.mensaje);
+                                }
                             });
                         }
                     }
@@ -1200,11 +1234,18 @@
             }
 
             @if ($isMedico)
-                var color = new jscolor($('#hora-single-color')[0], {
-                    hash: true
-                });
+                if (!esHoy && !esAntigua) {
+                    var color = new jscolor($('#hora-single-color')[0], {
+                        hash: true
+                    });
+                }
+                else {
+                    $('#hora-single-color').css('background-color', h.color);
+                }
 
-                $('#hora-single-fecha').datepicker();
+                $('#hora-single-fecha').datepicker({
+                    minDate: '{{ $today }}'
+                });
 
                 $('.hora-single-time').timepicker({
                     'timeFormat': 'H:i',
@@ -1212,12 +1253,10 @@
                     'minTime': '00:00',
                     'maxTime': '23:45',
                     'forceRoundTime': true,
-                    useSelect: true
+                    useSelect: (!esHoy && !esAntigua)
                 }).on('changeTime', function () {
                     updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
                 });
-            @else
-//                $('#hora-single-color').css('background-color', h.color);
             @endif
         }
 

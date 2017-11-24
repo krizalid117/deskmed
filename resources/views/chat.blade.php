@@ -9,26 +9,31 @@
 @section('content')
 
     <div id="app" style="height: 100%;">
-        <chat-room :messages="messages"></chat-room>
+        <chat-room :chatlists="chatlists" v-on:selectsession="selectSession" v-on:sendchatmessage="sendChatMessage"></chat-room>
     </div>
 
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('js/app.js') }}"></script>
+
     <script type="text/javascript">
         $(function () {
+            @if (!is_null($uuid))
 
+            @endif
         });
 
-        function sendChatMessage(msg, callback) {
-            console.log(msg.message);
-
-            setTimeout(function () {
+        function vueSelectSession(obj, callback) {
+            mensajes.alerta('selectSession recieved!', "Alerta", function () {
                 if (callback) {
                     callback();
                 }
-            }, 5000);
+            });
+        }
+
+        function vueSendChatMessage(obj, callback) {
+            mensajes.alerta('SendChatMessage recieved: ' + obj.message);
         }
     </script>
+
 @endsection

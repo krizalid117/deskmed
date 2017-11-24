@@ -58,6 +58,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/user/getverificationresponse', 'UsuarioController@getVerificationResponse')->name('usuario.getverificationresponse');
 
         Route::get('/professional/agenda/{mode?}', 'UsuarioController@agenda')->name('doctor.agenda');
+
+        Route::post('/professional/checksessiontime', 'UsuarioController@checkSessionTime')->name('doctor.checksessiontime');
+
+        Route::post('/professional/createchatroom', 'UsuarioController@createChatRoom')->name('doctor.createchatroom');
     });
 
     //Rutas sólo para pacientes...
@@ -110,5 +114,5 @@ Route::group(['middleware' => 'auth'], function () {
     //notifiable only
     Route::post('/user/getinfohora', 'UsuarioController@getInfoHora')->name('user.getinfohora');
 
-    Route::get('/chat', 'UsuarioController@loadChatView')->name('user.mainchat');
+    Route::get('/chat/{uuid?}', 'UsuarioController@loadChatView')->name('user.mainchat');
 });

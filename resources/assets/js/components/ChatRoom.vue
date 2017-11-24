@@ -7,7 +7,9 @@
             </div>
 
             <div class="panel-body">
-                <div class="col-xs-3 hidden-xs chat-list"></div>
+                <div class="col-xs-3 hidden-xs chat-list" style="padding: 0 5px;">
+                    <chat-list v-bind:chatlists="chatlists" v-on:changeselectedsession="selectSession"></chat-list>
+                </div>
                 <div class="col-sm-9 col-xs-12 chat-messagebox">
                     <chat-log v-bind:messages="messages"></chat-log>
                 </div>
@@ -25,22 +27,30 @@
 
 <script>
     export default {
-        props: ['messages'],
+        props: ['chatlists', 'messages'],
+        data() {
+            return {
+
+            }
+        },
         methods: {
             sendNewMessage: function (obj) {
-                const THIS = this;
+                this.$emit('sendchatmessage', obj);
 
-                sendChatMessage(obj, function (res) {
-                    THIS.messages.push({
-                        message: res.message,
-                        user: res.user,
-                        isSender: true,
-                        image: res.image,
-                        time: res.time
-                    });
-                });
-
-
+//                const THIS = this;
+//
+//                sendChatMessage(obj, function (res) {
+//                    THIS.messages.push({
+//                        message: res.message,
+//                        user: res.user,
+//                        isSender: true,
+//                        image: res.image,
+//                        time: res.time
+//                    });
+//                });
+            },
+            selectSession: function (obj) {
+                this.$emit('selectsession', obj);
             }
         }
     }

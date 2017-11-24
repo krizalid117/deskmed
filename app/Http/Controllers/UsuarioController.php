@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ChatRoom;
 use App\HoraMedica;
 use App\Notifications\AddListRequest;
 use App\Notifications\HoraCancelada;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use \Carbon\Carbon;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 
 class UsuarioController extends Controller
 {
@@ -1146,10 +1149,71 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
-    public function loadChatView() {
+    public function loadChatView(Request $request, $uuid = NULL) {
         return view('chat', [
             "usuario" => Auth::user(),
+            "uuid" => $uuid,
         ]);
+    }
+
+    public function checkSessionTime(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "ok" => false, //indica si se puede inciar la hora o no (sólo se pueden iniciarsalas de chat para horas que ya están en rango horario o faltan a lo más 5 minutos para ello)
+        ];
+
+        $now = date('Y-m-d H:i');
+        $hora = HoraMedica::find($request["id"]);
+        $hora_inicio = date('Y-m-d H:i', strtotime($hora->fecha . ' ' . $hora->hora_inicio) - (60 * 5)); //5 minutos antes se puede iniciar
+        $hora_termino = date('Y-m-d H:i', strtotime($hora->fecha . ' ' . $hora->hora_termino));
+
+        if (($now >= $hora_inicio) && ($now <= $hora_termino)) {
+            if (!is_null($hora->id_paciente)) {
+                $datos["ok"] = true;
+            }
+            else {
+                $datos["mensaje"] = "Ningún paciente ha reservado esta hora.";
+            }
+        }
+        else {
+            $datos["mensaje"] = "Sólo puede iniciar una sala de chat para esta hora entre las " . (date('H:i', strtotime($hora->hora_inicio) - (60 * 5))) . " y las " . date('H:i', strtotime($hora->hora_termino)) . ".";
+        }
+
+        return response()->json($datos);
+    }
+
+    public function createChatRoom(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+            "uuid_chatroom" => ""
+        ];
+
+        $hora = HoraMedica::find($request["id_hora"]);
+
+        $cr = new ChatRoom();
+
+        try {
+            $uuid = Uuid::uuid4();
+
+            $cr->uuid = $uuid;
+            $cr->hora_id = $hora->id;
+            $cr->activa = true;
+
+            if (!$cr->save()) {
+                $datos["error"] = true;
+            }
+            else {
+                $datos["uuid_chatroom"] = $uuid;
+            }
+        }
+        catch (UnsatisfiedDependencyException $e) {
+            $datos["error"] = true;
+//            $datos["mensaje"] = "Error al crear hora: " . $e->getMessage();
+        }
+
+        return response()->json($datos);
     }
 
     /* funciones estáticas */

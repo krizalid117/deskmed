@@ -44,6 +44,8 @@
     </div>
 </div>
 
+<script src="{{ asset('js/app.js') }}"></script>
+
 <script src="{{ URL::to('js/jquery-3.1.1.js') }}"></script>
 <script src="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.js') }}"></script>
 <script src="{{ URL::to('js/select2-4.0.3/dist/js/select2.min.js') }}"></script>
@@ -82,10 +84,7 @@
 <script src="{{ URL::to('js/floatThead/jquery.floatThead._.js') }}"></script>
 <script src="{{ URL::to('js/timepicker/jquery.timepicker.min.js') }}"></script>
 <script src="{{ URL::to('js/jscolor.js') }}"></script>
-{{--<script src="{{ URL::to('js/datepair/src/Datepair.js') }}"></script>--}}
-{{--<script src="{{ URL::to('js/datepair/src/jquery.datepair.js') }}"></script>--}}
 <script src="{{ URL::to('js/functions.js') }}?_<?php echo time(); ?>"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.js"></script>
 
 <script> {{-- Scripts para el menu --}}
 
