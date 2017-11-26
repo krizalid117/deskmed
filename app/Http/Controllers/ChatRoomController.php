@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ChatMessage;
 use App\ChatRoom;
+use App\Usuario;
 use App\Events\ChatRoomNewMessage;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Http\Request;
@@ -32,8 +33,12 @@ class ChatRoomController extends Controller
             ];
         }
 
+        $hora = $chatRoom->horaMedica()->first();
+        $receiver = ((int) $hora->id_paciente === (int) Auth::user()->id) ? Usuario::find($hora->id_medico) : Usuario::find($hora->id_paciente);
+
         return response()->json([
             "id_hora" => $chatRoom->horaMedica()->first()->id,
+            "receiver" => $receiver->nombres . " " . $receiver->apellidos,
             "messages" => $mensajes,
         ]);
     }

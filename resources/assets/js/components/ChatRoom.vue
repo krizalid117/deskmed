@@ -3,7 +3,7 @@
         <div class="panel panel-deskmed3 chat-window">
             <div class="panel-heading text-right">
                 <div class="col-xs-3 hidden-xs"></div>
-                <div class="col-sm-9 col-xs-12 chat-title">asd</div>
+                <div class="col-sm-9 col-xs-12 chat-title">{{ receiver }}</div>
             </div>
 
             <div class="panel-body">
@@ -27,7 +27,7 @@
 
 <script>
     export default {
-        props: [ 'messages', 'chatlists', 'activesession' ],
+        props: [ 'messages', 'chatlists', 'activesession', 'receiver' ],
         methods: {
             sendNewMessage: function (obj) {
                 this.$emit('sendchatmessage', obj);

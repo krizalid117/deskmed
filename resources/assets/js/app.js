@@ -25,6 +25,7 @@ Vue.component('chat-message', require('./components/ChatMessage.vue'));
 const chat = new Vue({
     el: '#app',
     data: {
+        receiver: " ",
         activesession: '',
         messages: [],
         chatlists: []
@@ -35,8 +36,9 @@ const chat = new Vue({
             const THIS = this;
 
             this.$http.get('/getchatroommessages/' + obj.uuid).then(function (res) {
-                this.activesession = obj.uuid;
-                this.messages = res.data.messages;
+                THIS.activesession = obj.uuid;
+                THIS.messages = res.data.messages;
+                THIS.receiver = res.data.receiver;
 
                 Echo.private('chatroom.' + res.data.id_hora)
                     .listen('ChatRoomNewMessage', function(e) {
@@ -47,12 +49,12 @@ const chat = new Vue({
         sendChatMessage: function (obj) {
             const THIS = this;
 
-            this.$http.post('/sendmessage', {
+            THIS.$http.post('/sendmessage', {
                 message: obj.message,
-                uuid_chatroom: this.activesession
+                uuid_chatroom: THIS.activesession
             }).then(function (res) {
                 if (!res.error) {
-                    this.selectSession({ uuid: THIS.activesession });
+                    THIS.selectSession({ uuid: THIS.activesession });
                 }
                 else {
                     mensajes.alerta("Hubo un erro al enviar el mensaje.");
