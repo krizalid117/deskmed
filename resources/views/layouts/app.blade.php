@@ -1,6 +1,6 @@
 <?php
 
-    \Debugbar::disable();
+//    \Debugbar::disable();
 
 ?>
 
@@ -10,6 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Deskmed @yield('title')</title>
     <link rel="stylesheet" href="{{ URL::to('js/bootstrap-3.3.7/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.css') }}">
@@ -44,13 +45,20 @@
     </div>
 </div>
 
-<script src="{{ asset('js/app.js') }}"></script>
+<script>
+    window.Laravel = { csrfToken: '{{ csrf_token() }}' };
+</script>
+
+@if(Route::current()->getName() === "user.mainchat")
+    <script src="{{ asset('js/app.js') }}"></script>
+@endif
 
 <script src="{{ URL::to('js/jquery-3.1.1.js') }}"></script>
 <script src="{{ URL::to('js/jquery-ui-1.12.1.custom/jquery-ui.js') }}"></script>
 <script src="{{ URL::to('js/select2-4.0.3/dist/js/select2.min.js') }}"></script>
 <script src="{{ URL::to('js/select2-4.0.3/dist/js/i18n/es.js') }}"></script>
 <script>
+
     // Change JQueryUI plugin names to fix name collision with Bootstrap.
     $.widget.bridge('uitooltip', $.ui.tooltip);
     $.widget.bridge('uibutton', $.ui.button);
@@ -171,17 +179,19 @@
             }
 
             //Redirecciones
-            if (!$(this).hasClass('menu-chat')) {
-                if ($(this).hasClass('menu-home')) {
-                    window.location = '{{ route('home') }}';
-                }
-                else if ($(this).hasClass('menu-doctores')) {
-                    window.location = '{{ route('paciente.doctores') }}';
-                }
-                else if ($(this).hasClass('menu-agenda')) {
-                    window.location = '{{ $usuario->id_tipo_usuario === 2 ? route('doctor.agenda') : ($usuario->id_tipo_usuario === 3 ? route('patient.agenda') : route("home")) }}';
-                }
+            if ($(this).hasClass('menu-home')) {
+                window.location = '{{ route('home') }}';
             }
+            else if ($(this).hasClass('menu-doctores')) {
+                window.location = '{{ route('paciente.doctores') }}';
+            }
+            else if ($(this).hasClass('menu-agenda')) {
+                window.location = '{{ $usuario->id_tipo_usuario === 2 ? route('doctor.agenda') : ($usuario->id_tipo_usuario === 3 ? route('patient.agenda') : route("home")) }}';
+            }
+            else if ($(this).hasClass('menu-chat')) {
+                window.location = '{{ route('user.mainchat') }}';
+            }
+
         });
 
         /* Click en opciones de perfil */

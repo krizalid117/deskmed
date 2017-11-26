@@ -1,5 +1,5 @@
 <template lang="html">
-    <div class="chat-session" @click="selectSession" :data-uuid="session.uuid">
+    <div :class="{ 'chat-session': true, 'selected-session': (activesession === session.uuid) }" @click="selectSession" :data-uuid="session.uuid">
         <div class="session-img">
             <img class="img-circle" :src="session.receiver.image">
         </div>
@@ -8,28 +8,20 @@
             <div class="sesion-fecha">{{ session.hora.fecha + ' (' + session.hora.hora_inicio + ' - ' + session.hora.hora_termino + ')' }}</div>
             <div class="hora-receiver">{{ session.receiver.isDoctor ? 'Profesional' : 'Paciente' }}{{ ': ' +  session.receiver.nombres  + ' ' + session.receiver.apellidos }}</div>
         </div>
-        <span class="glyphicon glyphicon-chevron-right session-selected-row"></span>
+        <span :class="{ glyphicon: true, 'glyphicon-chevron-right': true, 'session-selected-row': true, hidden: (activesession !== session.uuid) }"></span>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['session'],
-        data() {
-            return {
-
-            }
-        },
+        props: [ 'session', 'activesession' ],
         methods: {
             selectSession: function () {
-                $('.session-selected-row').hide();
-
                 const el = this.$el;
 
                 this.$emit('selectsession', {
-                    el: el,
                     uuid: $(el).data('uuid')
-                })
+                });
             }
         }
     }
@@ -60,15 +52,19 @@
     }
 
     .chat-session:not(:last-child) {
-        border-bottom: 1px solid #f1f1f1;
+        /*border-bottom: 1px solid #f1f1f1;*/
     }
 
     .chat-session:hover {
         background-color: #f1f1f1;
     }
 
+    .selected-session {
+        background-color: #f1f1f1;
+    }
+
     .session-selected-row {
-        display: none;
+        /*display: none;*/
 
         position: absolute;
         right: 5px;

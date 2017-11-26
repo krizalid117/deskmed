@@ -9,7 +9,7 @@
 @section('content')
 
     <div id="app" style="height: 100%;">
-        <chat-room :chatlists="chatlists" v-on:selectsession="selectSession" v-on:sendchatmessage="sendChatMessage"></chat-room>
+        <chat-room :activesession="activesession" :messages="messages" :chatlists="chatlists" v-on:selectsession="selectSession" v-on:sendchatmessage="sendChatMessage"></chat-room>
     </div>
 
 @endsection

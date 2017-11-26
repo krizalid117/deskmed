@@ -8,10 +8,10 @@
 
             <div class="panel-body">
                 <div class="col-xs-3 hidden-xs chat-list" style="padding: 0 5px;">
-                    <chat-list v-bind:chatlists="chatlists" v-on:changeselectedsession="selectSession"></chat-list>
+                    <chat-list :activesession="activesession" :chatlists="chatlists" v-on:changeselectedsession="selectSession"></chat-list>
                 </div>
                 <div class="col-sm-9 col-xs-12 chat-messagebox">
-                    <chat-log v-bind:messages="messages"></chat-log>
+                    <chat-log :messages="messages"></chat-log>
                 </div>
             </div>
 
@@ -27,12 +27,7 @@
 
 <script>
     export default {
-        props: ['chatlists', 'messages'],
-        data() {
-            return {
-
-            }
-        },
+        props: [ 'messages', 'chatlists', 'activesession' ],
         methods: {
             sendNewMessage: function (obj) {
                 this.$emit('sendchatmessage', obj);
@@ -102,6 +97,9 @@
 
     .chat-messagebox {
         height: 100%;
+
+        overflow: hidden;
+        overflow-y: auto;
     }
 
     .message-composer {

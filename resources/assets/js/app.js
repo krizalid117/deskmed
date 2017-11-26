@@ -27,57 +27,54 @@ const chat = new Vue({
     data: {
         activesession: '',
         messages: [],
-        chatlists: [
-            {
-                uuid: '1234',
-                receiver: {
-                    image: '/profilePics/default_nonbinary.png',
-                    nombres: 'lala jr',
-                    apellidos: 'qwerty gonzalez sad sad sadsa',
-                    isDoctor: false
-                },
-                hora: {
-                    nombre: 'Hora kinesiólogo',
-                    fecha: '24-11-2017',
-                    hora_inicio: '11:30',
-                    hora_termino: '12:00',
-                    color: '#000454'
-                }
-            },
-            {
-                uuid: 'abcd',
-                receiver: {
-                    image: '/profilePics/default_male.png',
-                    nombres: 'Steffan',
-                    apellidos: 'Kramer',
-                    isDoctor: false
-                },
-                hora: {
-                    nombre: 'Hora psiquiatra',
-                    fecha: '23-11-2017',
-                    hora_inicio: '17:00',
-                    hora_termino: '17:45',
-                    color: 'green'
-                }
-            }
-        ]
+        chatlists: []
     },
     methods: {
         selectSession: function (obj) {
 
             const THIS = this;
 
-            vueSelectSession(obj, function () {
-                THIS.activesession = obj.uuid;
+            this.$http.get('/getchatroommessages/' + obj.uuid).then(function (res) {
+                this.activesession = obj.uuid;
+                this.messages = res.data.messages;
 
-                $(obj.el).find('.session-selected-row').show();
+                Echo.private('chatroom.' + res.data.id_hora)
+                    .listen('ChatRoomNewMessage', function(e) {
+                        THIS.selectSession({ uuid: THIS.activesession });
+                    });
             });
         },
         sendChatMessage: function (obj) {
+            const THIS = this;
 
-            vueSendChatMessage(obj, function () {
-
+            this.$http.post('/sendmessage', {
+                message: obj.message,
+                uuid_chatroom: this.activesession
+            }).then(function (res) {
+                if (!res.error) {
+                    this.selectSession({ uuid: THIS.activesession });
+                }
+                else {
+                    mensajes.alerta("Hubo un erro al enviar el mensaje.");
+                }
             });
+        },
+        scrollToEnd: function() {
+            var container = this.$el.querySelector(".chat-messagebox");
+            container.scrollTop = container.clientHeight;
         }
+    },
+    created: function () {
+
+    },
+    mounted: function() {
+        this.$http.get('/getchatrooms').then(function (res) {
+            this.chatlists = res.data.chatrooms;
+
+            this.selectSession({ uuid: res.data.chatrooms[0].uuid });
+        });
+    },
+    updated: function () {
+        this.scrollToEnd();
     }
 });

@@ -128,4 +128,10 @@ class Usuario extends Model implements Authenticatable
             ];
         }
     }
+
+//    public function chatRooms() {
+//        $horas = ($this->id_tipo_usuario === 2 ? $this->horasAsDoctor() : $this->horasAsPaciente());
+//
+//        $this->hasMany('App\ChatRoom', $fkey);
+//    }
 }

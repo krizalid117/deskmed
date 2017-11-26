@@ -1080,18 +1080,18 @@
             $('<div id="dlg-new-hora-single" style="padding-top: 15px;">' +
                 '<div class="col-sm-6 form-group">' +
                     '<label for="hora-single-nombre" class="form-label">Nombre</label>' +
-                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + '>' +
+                    '<input type="text" id="hora-single-nombre" class="form-control" value="' + h.nombre + '" ' + ((esHoy || esAntigua) && action === "edit" ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + '>' +
                 '</div>' +
                 '<div class="col-sm-6 form-group">' +
                     '<label for="hora-single-fecha" class="form-label">Fecha</label>' +
-                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
+                    '<input type="text" id="hora-single-fecha" class="form-control" value="' + h.fecha + '" placeholder="dd-mm-yyyy" ' + ((esHoy || esAntigua) && action === "edit" ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
                 '</div>' +
                 '<div class="col-sm-{{ ($isMedico ? "6" : "12") }} form-group">' +
                     '<label for="hora-single-hora-start" class="form-label">Hora</label>' +
                     '<div class="form-control" style="border: none; box-shadow: none; white-space: nowrap;">' +
                         @if ($isMedico)
-                            '<input type="text" id="hora-single-hora-start" style="width: 70px;" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '" ' + (esHoy || esAntigua ? "disabled" : "") + '> - ' +
-                            '<input type="text" id="hora-single-hora-end" style="width: 70px;" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '" ' + (esHoy || esAntigua ? "disabled" : "") + '>' +
+                            '<input type="text" id="hora-single-hora-start" style="width: 70px;" class="hora-single-time time start" placeholder="HH" value="' + h.hora_inicio + '" ' + ((esHoy || esAntigua) && action === "edit" ? "disabled" : "") + '> - ' +
+                            '<input type="text" id="hora-single-hora-end" style="width: 70px;" class="hora-single-time time end" placeholder="MM" value="' + h.hora_termino + '" ' + ((esHoy || esAntigua) && action === "edit" ? "disabled" : "") + '>' +
                         @else
                             h.hora_inicio + ' a ' +  h.hora_termino +
                         @endif
@@ -1100,7 +1100,7 @@
                 @if ($isMedico)
                     '<div class="col-sm-6 form-group">' +
                         '<label for="hora-single-color" class="form-label">Color</label>' +
-                        '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" ' + (esHoy || esAntigua ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
+                        '<input id="hora-single-color" class="form-control jscolor" value="' + h.color + '" placeholder="#F1F1F1" ' + ((esHoy || esAntigua) && action === "edit" ? "disabled" : "{{ ($isMedico ? "" : "disabled") }}") + ' readonly>' +
                     '</div>' +
                     (h.estado === 1 ? '' +
                     '<div class="col-sm-12" id="reserva-container">' +
@@ -1133,7 +1133,7 @@
                     @if ($isMedico)
                     , {
                         text: "Guardar",
-                        'class': 'btn btn-primary ' + (esHoy || esAntigua ? "hidden" : ""),
+                        'class': 'btn btn-primary ' + ((esHoy || esAntigua) && action === "edit" ? "hidden" : ""),
                         click: function () {
                             sendPost('{{ route('user.saveagenda_single') }}', {
                                 _token: '{{ csrf_token() }}',
@@ -1234,7 +1234,7 @@
             }
 
             @if ($isMedico)
-                if (!esHoy && !esAntigua) {
+                if ((!esHoy && !esAntigua && action === "edit") || action === "add") {
                     var color = new jscolor($('#hora-single-color')[0], {
                         hash: true
                     });
@@ -1253,7 +1253,7 @@
                     'minTime': '00:00',
                     'maxTime': '23:45',
                     'forceRoundTime': true,
-                    useSelect: (!esHoy && !esAntigua)
+                    useSelect: ((!esHoy && !esAntigua && action === "edit") || action === "add")
                 }).on('changeTime', function () {
                     updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
                 });

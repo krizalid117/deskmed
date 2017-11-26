@@ -1,5 +1,5 @@
 <template lang="html">
-    <div v-bind:class="{ 'chat-message-sender': message.isSender, 'chat-message': true }">
+    <div :class="{ 'chat-message-sender': !message.isSender, 'chat-message': true }">
         <div class="chat-message-time hidden-xs">{{ message.time }}</div>
         <div class="chat-message-container">{{ message.message }}</div>
         <div class="chat-message-image">

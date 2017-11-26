@@ -40,7 +40,7 @@
 
             <li class="side-menu-item menu-chat {{ ($currentView === "user.mainchat" ? "side-menu-selected" : "") }}" title="Mensajes">
                 <div class="menu-chat-messages-container">
-                    <span class="menu-chat-messages">1</span>
+                    <span class="menu-chat-messages"></span>
                     <img class="img-menu" src="{{ URL::to('img/chat.png') }}" alt="mensajes" data-title="Mensajes">
                 </div>
                 <div class="content-menu">Mensajes</div>

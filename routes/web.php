@@ -115,4 +115,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/user/getinfohora', 'UsuarioController@getInfoHora')->name('user.getinfohora');
 
     Route::get('/chat/{uuid?}', 'UsuarioController@loadChatView')->name('user.mainchat');
+
+    Route::get('/getchatroommessages/{uuid}', 'ChatRoomController@getMessages')->name('chat.getmessages');
+
+    Route::get('/getchatrooms', 'ChatRoomController@getChatRooms')->name('user.getchatmessages');
+
+    Route::post('/sendmessage', 'ChatRoomController@sendMessage')->name('user.sendmessage');
 });
