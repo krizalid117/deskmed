@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Laracasts\Utilities\JavaScript\JavaScriptFacade as JavaScript;
 use App\ChatRoom;
 use App\HoraMedica;
 use App\Notifications\AddListRequest;
 use App\Notifications\HoraCancelada;
 use App\Notifications\HoraReservada;
+use App\Notifications\SessionCreated;
 use App\Usuario;
 use App\Sexos;
 use App\SolicitudesVerificacion;
@@ -1038,6 +1040,7 @@ class UsuarioController extends Controller
 
         if (!is_null($paciente)) {
             $datos["usuario"] = $paciente;
+            $datos["image"] = $paciente->getProfileImage();
         }
         else {
             $datos["error"] = true;
@@ -1150,9 +1153,15 @@ class UsuarioController extends Controller
     }
 
     public function loadChatView(Request $request, $uuid = NULL) {
+
+        $uuid = (preg_match('/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/', $uuid) && !is_null(ChatRoom::find($uuid)) ? $uuid : NULL);
+
+        JavaScript::put([
+            'uuid' => $uuid,
+        ]);
+
         return view('chat', [
             "usuario" => Auth::user(),
-            "uuid" => $uuid,
         ]);
     }
 
@@ -1206,6 +1215,8 @@ class UsuarioController extends Controller
             }
             else {
                 $datos["uuid_chatroom"] = $uuid;
+
+                Usuario::find($hora->id_paciente)->notify(new SessionCreated($cr));
             }
         }
         catch (UnsatisfiedDependencyException $e) {

@@ -1168,7 +1168,7 @@
                                         id_hora: h.codigo
                                     }, function (resChatRoom) {
                                         mensajes.confirmacion_sino("Sala creada correctamente. <br><br>¿Desea ir a la sala?", function () {
-                                            window.location = '/chat/' + resChatRoom.uuid;
+                                            window.location = '/chat/' + resChatRoom.uuid_chatroom;
                                         });
                                     });
                                 }
@@ -1211,7 +1211,7 @@
                     _token: '{{ csrf_token() }}',
                     id: id_envio
                 }, function (res) {
-                    var imgProfile = (res.usuario.profile_pic_path !== null) ? res.usuario.profile_pic_path : (res.usuario.id_sexo === 1 ? 'default_male.png' : (res.usuario.id_sexo === 2 ? 'default_male.png' : 'default_nonbinary.png'));
+                    var imgProfile = res.image;
 
                     var url1 = "professionals";
                     var url2 = "profile";
@@ -1226,7 +1226,7 @@
                             '<legend>Reserva</legend>' +
                             '{{ ($isMedico ? "Reservado por" : "Profesional que antederá") }}: <br>' +
                             '<a href="/' + url1 + '/' + res.usuario.id + '/' + url2 + '">' +
-                                '<img style="width: 40px; height: 40px;" class="img-circle" src="/profilePics/' + imgProfile + '"> ' + res.usuario.nombres + ' ' + res.usuario.apellidos +
+                                '<img style="width: 40px; height: 40px;" class="img-circle" src="' + imgProfile + '"> ' + res.usuario.nombres + ' ' + res.usuario.apellidos +
                             '</a>' +
                         '</fieldset>'
                     );

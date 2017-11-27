@@ -27,10 +27,10 @@
                     <div class="content-menu">Mis profesionales de la salud</div>
                 </li>
             @endif
-            <li class="side-menu-item menu-tratamientos {{ ($currentView === "tratamientos" ? "side-menu-selected" : "") }}" title="{{ $labelTratamientos }}">
-                <img class="img-menu" src="{{ URL::to('img/tablets.png') }}" alt="tratamientos" data-title="{{ $labelTratamientos }}">
-                <div class="content-menu">{{ $labelTratamientos }}</div>
-            </li>
+            {{--<li class="side-menu-item menu-tratamientos {{ ($currentView === "tratamientos" ? "side-menu-selected" : "") }}" title="{{ $labelTratamientos }}">--}}
+                {{--<img class="img-menu" src="{{ URL::to('img/tablets.png') }}" alt="tratamientos" data-title="{{ $labelTratamientos }}">--}}
+                {{--<div class="content-menu">{{ $labelTratamientos }}</div>--}}
+            {{--</li>--}}
             <li class="side-menu-item menu-agenda {{ (isset(explode(".", $currentView)[1]) && explode(".", $currentView)[1] === "agenda" ? "side-menu-selected" : "") }}" title="Agenda">
                 <img class="img-menu" src="{{ URL::to('img/notepad.png') }}" alt="agenda" data-title="Agenda">
                 <div class="content-menu">Agenda</div>

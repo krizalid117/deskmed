@@ -180,6 +180,7 @@ return [
         Felixkiss\UniqueWithValidator\ServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
         Laravel\Tinker\TinkerServiceProvider::class,
+        Laracasts\Utilities\JavaScript\JavaScriptServiceProvider::class,
 
     ],
 

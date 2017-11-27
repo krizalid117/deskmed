@@ -17,23 +17,7 @@
 @section('scripts')
 
     <script type="text/javascript">
-        $(function () {
-            @if (!is_null($uuid))
 
-            @endif
-        });
-
-        function vueSelectSession(obj, callback) {
-            mensajes.alerta('selectSession recieved!', "Alerta", function () {
-                if (callback) {
-                    callback();
-                }
-            });
-        }
-
-        function vueSendChatMessage(obj, callback) {
-            mensajes.alerta('SendChatMessage recieved: ' + obj.message);
-        }
     </script>
 
 @endsection

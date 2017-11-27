@@ -62,6 +62,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/professional/checksessiontime', 'UsuarioController@checkSessionTime')->name('doctor.checksessiontime');
 
         Route::post('/professional/createchatroom', 'UsuarioController@createChatRoom')->name('doctor.createchatroom');
+
+        Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');
     });
 
     //Rutas sólo para pacientes...
@@ -86,8 +88,6 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::post('/patient/cancelreserva', 'UsuarioController@cancelarReserva')->name('patient.cancelreserva');
     });
-
-    Route::get('/patients/{id}/record/{notification_uuid?}', 'UsuarioController@patientProfile')->name('patients.profile');
 
     Route::get('/professionals/{id}/profile/{notification_uuid?}', 'UsuarioController@doctorProfile')->name('doctors.profile');
 

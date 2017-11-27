@@ -70,10 +70,20 @@ const chat = new Vue({
 
     },
     mounted: function() {
+        const THIS = this;
+
         this.$http.get('/getchatrooms').then(function (res) {
             this.chatlists = res.data.chatrooms;
 
-            this.selectSession({ uuid: res.data.chatrooms[0].uuid });
+            //uuid se pasa a través de JavaScriptServiceProvider al renderizar la vista
+            if (uuid !== null) {
+                console.log("Cargando chatroom solicitado: ", uuid);
+                this.selectSession({ uuid: uuid });
+            }
+            else if (res.data.chatrooms.length > 0) {
+                console.log("Cargando primer chatroom (sí existe): ", res.data.chatrooms[0].uuid);
+                this.selectSession({ uuid: res.data.chatrooms[0].uuid });
+            }
         });
     },
     updated: function () {
