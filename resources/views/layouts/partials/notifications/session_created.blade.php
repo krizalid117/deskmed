@@ -1,4 +1,4 @@
-<a class="notification-item {{ (is_null($notif->read_at) ? "notification-item-unread" : "notification-item-read") }}" href="#" data-uuid="{{ $notif->id }}" onclick="window.location = '{{ route('user.mainchat', $notif->data["chat_room"]["uuid"]) }}';">
+<a class="notification-item {{ (is_null($notif->read_at) ? "notification-item-unread" : "notification-item-read") }}" href="#" data-uuid="{{ $notif->id }}" onclick="window.location = '{{ route('user.mainchat', [$notif->data["chat_room"]["uuid"], $notif->id]) }}';">
     <li class="profile-setting not">
         <?php $medico = \App\Usuario::find(\App\HoraMedica::find($notif->data["chat_room"]["hora_id"])->id_medico); ?>
         <div class="not-img">

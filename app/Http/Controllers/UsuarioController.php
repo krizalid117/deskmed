@@ -1061,7 +1061,7 @@ class UsuarioController extends Controller
         $horas = $usuario->horasAsDoctor()
             ->where('fecha', '>=', date('Y-m-d'))
             ->where('estado', '=', 0)
-            ->whereRaw("(fecha::varchar || ' ' || hora_inicio)::timestamp >= now()")
+            ->whereRaw("(fecha::varchar || ' ' || hora_termino)::timestamp <= now()")
             ->orderBy('fecha', 'asc')
             ->orderByRaw('hora_inicio::time asc')
             ->get();
@@ -1152,9 +1152,15 @@ class UsuarioController extends Controller
         return response()->json($datos);
     }
 
-    public function loadChatView(Request $request, $uuid = NULL) {
+    public function loadChatView($uuid = NULL, $not_uuid = NULL) {
 
         $uuid = (preg_match('/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/', $uuid) && !is_null(ChatRoom::find($uuid)) ? $uuid : NULL);
+
+        $n = Auth::user()->unreadNotifications()->where('id', $not_uuid)->first();
+
+        if ($n) {
+            $n->update(['read_at' => Carbon::now()]);
+        }
 
         JavaScript::put([
             'uuid' => $uuid,

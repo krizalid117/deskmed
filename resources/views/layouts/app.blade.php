@@ -261,7 +261,7 @@
             setXsClasses();
         });
 
-        setInterval(reloadNotifications, 30000);
+        setInterval(reloadNotifications, 5000);
     });
 
     function setXsClasses() {

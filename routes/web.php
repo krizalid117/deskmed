@@ -114,7 +114,7 @@ Route::group(['middleware' => 'auth'], function () {
     //notifiable only
     Route::post('/user/getinfohora', 'UsuarioController@getInfoHora')->name('user.getinfohora');
 
-    Route::get('/chat/{uuid?}', 'UsuarioController@loadChatView')->name('user.mainchat');
+    Route::get('/chat/{uuid?}/{not_uuid?}', 'UsuarioController@loadChatView')->name('user.mainchat');
 
     Route::get('/getchatroommessages/{uuid}', 'ChatRoomController@getMessages')->name('chat.getmessages');
 
