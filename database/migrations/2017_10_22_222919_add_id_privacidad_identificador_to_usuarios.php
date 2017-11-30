@@ -28,7 +28,6 @@ class AddIdPrivacidadIdentificadorToUsuarios extends Migration
     public function down()
     {
         Schema::table('usuarios', function (Blueprint $table) {
-            $table->dropForeign('id_privacidad_identificador');
 
             $table->dropColumn('id_privacidad_identificador');
         });

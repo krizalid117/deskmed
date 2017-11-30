@@ -1061,7 +1061,7 @@ class UsuarioController extends Controller
         $horas = $usuario->horasAsDoctor()
             ->where('fecha', '>=', date('Y-m-d'))
             ->where('estado', '=', 0)
-            ->whereRaw("(fecha::varchar || ' ' || hora_termino)::timestamp <= now()")
+            ->whereRaw("(fecha::varchar || ' ' || hora_termino)::timestamp >= now()")
             ->orderBy('fecha', 'asc')
             ->orderByRaw('hora_inicio::time asc')
             ->get();

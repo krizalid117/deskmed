@@ -28,7 +28,6 @@ class AddSexoToUsuarios extends Migration
     public function down()
     {
         Schema::table('usuarios', function (Blueprint $table) {
-            $table->dropForeign('id_sexo');
 
             $table->dropColumn('id_sexo');
         });

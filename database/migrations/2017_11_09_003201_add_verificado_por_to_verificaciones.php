@@ -29,8 +29,8 @@ class AddVerificadoPorToVerificaciones extends Migration
     public function down()
     {
         Schema::table('verificaciones', function (Blueprint $table) {
+            $table->dropColumn('id_solicitud');
             $table->dropColumn('id_usuario_verificante');
-            $table->dropColumn('solicitud_verificacion');
         });
     }
 }
