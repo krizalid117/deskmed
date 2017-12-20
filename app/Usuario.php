@@ -74,6 +74,14 @@ class Usuario extends Model implements Authenticatable
         return $this->hasMany('App\HoraMedica', 'id_paciente');
     }
 
+    public function subscripciones() {
+        return $this->hasMany('App\Subscripciones', 'id_usuario');
+    }
+
+    public function subscripcionActiva() {
+        //
+    }
+
     public function getProfileImage() {
         $profilePic = "/profilePics/default_nonbinary.png";
 
