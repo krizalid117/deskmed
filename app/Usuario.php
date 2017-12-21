@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Http\Controllers\GlobalController;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -79,7 +80,13 @@ class Usuario extends Model implements Authenticatable
     }
 
     public function subscripcionActiva() {
-        //
+        $subs =  $this->subscripciones()->whereRaw('now() between inicio_subscripcion and termino_subscripcion')->get();
+
+        if (count($subs) > 0) {
+            return $subs[0];
+        }
+
+        return false;
     }
 
     public function getProfileImage() {
