@@ -212,6 +212,9 @@
                 else if ($(this).hasClass('profile-setting-validations')) {
                     window.location = '{{ route('admin.validations') }}';
                 }
+                else if ($(this).hasClass('profile-setting-subs')) {
+                    window.location = '{{ route('admin.subs') }}';
+                }
             @endif
         });
 

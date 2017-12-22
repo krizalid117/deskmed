@@ -41,8 +41,12 @@
                     <ul>
                         @if ($usuario->id_tipo_usuario === 1)
                         <li class="profile-setting per profile-setting-validations">
-                            <img src="{{ URL::to('img/validations.png') }}" style="filter: invert(100%);" alt="Solicitudes de valiación">
+                            <img src="{{ URL::to('img/validations.png') }}" style="filter: invert(100%);">
                             <span>Solicitudes de validación</span>
+                        </li>
+                        <li class="profile-setting per profile-setting-subs">
+                            <img src="{{ URL::to('img/dollar.png') }}">
+                            <span>Subscripciones</span>
                         </li>
                         @endif
                         @if ($usuario->id_tipo_usuario === 2)

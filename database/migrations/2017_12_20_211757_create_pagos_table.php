@@ -23,10 +23,13 @@ class CreatePagosTable extends Migration
             $table->foreign('id_usuario')->references('id')->on('usuarios')->onUpdate('cascade')->onDelete('cascade');
         });
 
-        Schema::table('subscripciones', function (Blueprint $table) {
-            $table->integer('id_pago')->nullable();
+        Schema::create('subscripcion_pagos', function (Blueprint $table) {
+            $table->integer('id_pago');
+            $table->integer('id_subscripcion');
+            $table->timestamps();
 
-            $table->foreign('id_pago')->references('id')->on('pagos')->onUpdate('cascade')->onDelete('set null');
+            $table->foreign('id_pago')->references('id')->on('pagos')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_subscripcion')->references('id')->on('subscripciones')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -37,10 +40,7 @@ class CreatePagosTable extends Migration
      */
     public function down()
     {
-        Schema::table('subscripciones', function (Blueprint $table) {
-            $table->dropColumn('id_pago');
-        });
-
+        Schema::dropIfExists('subscripcion_pagos');
         Schema::dropIfExists('pagos');
     }
 }

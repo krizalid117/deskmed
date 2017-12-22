@@ -200,12 +200,34 @@ class GlobalController
 
         $validations = json_encode(DB::select($consulta));
 
-//        dd($validations);
-
         return view('admin.validations', [
             "usuario" => Auth::user(),
             "validations" => $validations,
         ]);
+    }
+
+    public function subs() {
+        $consulta = "
+            select s.id
+            , s.id_usuario
+            , s.id_plan
+            , id_pago
+            , s.inicio_subscripcion
+            , s.termino_subscripcion
+            , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+            , concat_ws(' ', u.nombres, u.apellidos) as usuario_nombre_completo
+            , p.nombre as nombre_plan
+            , p.precio_mensual::int as precio_mensual_plan
+            , pa.estado as estado_pago
+            , pa.total::int as total_pago
+            from subscripciones s 
+            join usuarios u
+              on u.id = s.id_usuario
+            join plan p
+              on p.id = s.id_plan
+            join pagos pa
+              on pa.id = s.id_pago
+        ";
     }
 
     public function getDoctorInfo(Request $request) {
