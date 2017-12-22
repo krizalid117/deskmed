@@ -208,26 +208,46 @@ class GlobalController
 
     public function subs() {
         $consulta = "
-            select s.id
+            select s.id as id_sub
             , s.id_usuario
             , s.id_plan
-            , id_pago
-            , s.inicio_subscripcion
-            , s.termino_subscripcion
+            , to_char(s.inicio_subscripcion, 'dd-mm-yyyy HH24:mi:ss') as inicio_subscripcion 
+            , to_char(s.termino_subscripcion, 'dd-mm-yyyy HH24:mi:ss') as termino_subscripcion 
+            , cast(extract(epoch from s.inicio_subscripcion::timestamp without time zone) as integer) as tstamp_inicio_sub
+            , cast(extract(epoch from s.termino_subscripcion::timestamp without time zone) as integer) as tstamp_termino_sub
             , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+            , cast(extract(epoch from s.updated_at::timestamp without time zone) as integer) as tstamp
             , concat_ws(' ', u.nombres, u.apellidos) as usuario_nombre_completo
-            , p.nombre as nombre_plan
-            , p.precio_mensual::int as precio_mensual_plan
-            , pa.estado as estado_pago
-            , pa.total::int as total_pago
+            , pl.nombre as nombre_plan
+            , pl.precio_mensual::int as precio_mensual_plan
+            , sum(pa.total)::int as total_pagos
+            , case
+                when count(pa) > 0 then
+                    json_agg((
+                        select to_json(a) from (
+                            select pa.total::int
+                            , pa.estado
+                            , to_char(pa.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+                        ) a                        
+                    ) order by pa.updated_at desc)
+                else '[]'
+            end as pagos
             from subscripciones s 
             join usuarios u
               on u.id = s.id_usuario
-            join plan p
-              on p.id = s.id_plan
-            join pagos pa
-              on pa.id = s.id_pago
+            join planes pl
+              on pl.id = s.id_plan
+            join pagos pa 
+              on pa.id_subscripcion = s.id
+            group by s.id, u.id, pl.id
         ";
+
+        $subs = json_encode(DB::select($consulta));
+
+        return view('admin.subs', [
+            "usuario" => Auth::user(),
+            "subs" => $subs,
+        ]);
     }
 
     public function getDoctorInfo(Request $request) {

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '| Cuenta')
+@section('title', '| Validaciones')
 
 @section('stylesheets')
     <style>
@@ -28,9 +28,7 @@
 
 @section('content')
 
-    <div id="verification-container" class="hidden">
-
-    </div>
+    <div id="verification-container" class="hidden"></div>
 
     <div class="basic-form-container">
 
