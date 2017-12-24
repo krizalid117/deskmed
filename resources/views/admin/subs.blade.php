@@ -3,7 +3,11 @@
 @section('title', '| Subscripciones')
 
 @section('stylesheets')
-
+    <style>
+        .select2-search {
+            display: none;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -148,6 +152,61 @@
 
             $('#btn-add-sub').click(function () {
 
+                sendPost('{{ route('admin.getusers') }}', {
+                    _token: '{{ csrf_token() }}'
+                }, function (res) {
+                    $('<div class="add-sub-dialog">' +
+                        '<fieldset class="fs-sub-user-selection">' +
+                        '<legend class="bold">Seleccionar usuario</legend>' +
+                            '<select class="sel-user-sub"></select>' +
+                        '</fieldset>' +
+                    '</div>').dialog({
+                        title: "Agregar subscripción",
+                        classes: { 'ui-dialog': 'dialog-responsive' },
+                        width: 1000,
+                        resizable: false,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        position: {my: "center top", at: "center top+70", of: window},
+                        close: function () {
+                            $('.add-sub-dialog').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Cerrar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.add-sub-dialog').dialog("close");
+                                }
+                            },
+                            {
+                                text: 'Aceptar',
+                                'class': 'btn btn-primary',
+                                click: function () {
+
+                                }
+                            }
+                        ]
+                    });
+
+                    for (var i = 0; i < res.usuarios.length; i++) {
+                        var usuario = res.usuarios[i];
+
+                        $('.sel-user-sub').append('<option value="' + usuario.usuario_id + '">' + usuario.usuario_nombre_completo + '</option>');
+                    }
+
+                    $('.sel-user-sub')//.select2()
+                        .change(function () {
+                            var $this = $(this);
+                            var usuario = $.grep(res.usuarios, function (elem) {
+                                return elem.usuario_id = $this.val();
+                            })[0];
+
+                            alert(usuario.usuario_nombre_completo);
+                        });
+                });
             });
         });
     </script>

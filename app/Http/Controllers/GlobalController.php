@@ -206,7 +206,17 @@ class GlobalController
         ]);
     }
 
-    public function subs() {
+    public function subs(Request $request, $tipo = 0) {
+
+        $filtroTipo = "1=1";
+
+        if (intval($tipo) === 1) { //Subscripciones activas
+            $filtroTipo = "now() between s.inicio_subscripcion and s.termino_subscripcion";
+        }
+        else if (intval($tipo) === 2) { //Subscripciones no activas
+            $filtroTipo = "now() not between s.inicio_subscripcion and s.termino_subscripcion";
+        }
+
         $consulta = "
             select s.id as id_sub
             , s.id_usuario
@@ -239,6 +249,7 @@ class GlobalController
               on pl.id = s.id_plan
             join pagos pa 
               on pa.id_subscripcion = s.id
+            where {$filtroTipo}
             group by s.id, u.id, pl.id
         ";
 
@@ -248,6 +259,42 @@ class GlobalController
             "usuario" => Auth::user(),
             "subs" => $subs,
         ]);
+    }
+
+    public function getSubbableUSers() {
+        $datos = [
+            "error" => false,
+            "usuarios" => [],
+        ];
+
+        $consulta = "
+            select u.id as usuario_id
+            , concat_ws(' ', u.nombres, u.apellidos) as usuario_nombre_completo
+            , coalesce(v.antecedente_titulo , u.antecedente_titulo_segun_usuario, 'Sin especificar') as antecedente_titulo_segun_usuario
+            , coalesce(v.especialidad , u.especialidad_segun_usuario, 'Sin especificar') as especialidad_segun_usuario
+            , coalesce(v.fecha_registro , u.fecha_registro_segun_usuario, 'Sin especificar') as fecha_registro_segun_usuario
+            , coalesce(v.institucion_habilitante , u.institucion_habilitante_segun_usuario, 'Sin especificar') as institucion_habilitante_segun_usuario
+            , coalesce(v.nregistro , u.nregistro_segun_usuario, 'Sin especificar') as nregistro_segun_usuario
+            , coalesce(v.titulo_habilitante_legal , u.titulo_segun_usuario, 'Sin especificar') as titulo_segun_usuario
+            , (v.habilitado is true) as verificado
+            from usuarios u
+            left join verificaciones v
+              on v.id_usuario = u.id and v.habilitado is true
+            left join subscripciones s 
+              on s.id_usuario = u.id and now() between s.inicio_subscripcion and s.termino_subscripcion
+            where u.id_tipo_usuario = 2
+            and s.id is null
+            order by usuario_nombre_completo asc
+        ";
+
+        if ($r = DB::select($consulta)) {
+            $datos["usuarios"] = $r;
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
     }
 
     public function getDoctorInfo(Request $request) {

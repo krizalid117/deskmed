@@ -125,9 +125,9 @@ input[type="text"]:-moz-placeholder, textarea:-moz-placeholder { /* Firefox 18- 
     /*z-index: 2 !important;*/
 }
 
-.select2-dropdown {
-    z-index: 99 !important;
-}
+/*.select2-dropdown {*/
+    /*z-index: 99 !important;*/
+/*}*/
 
 .pretty i:before {
     z-index: 1 !important;
