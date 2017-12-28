@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Pagos;
+use App\Plan;
+use App\Subscripciones;
 use \Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -13,7 +16,7 @@ use App\Usuario;
 use App\Verificaciones;
 use App\SolicitudesVerificacion;
 
-class GlobalController
+class GlobalController extends Controller
 {
 
     public static function log($msj) {
@@ -221,8 +224,8 @@ class GlobalController
             select s.id as id_sub
             , s.id_usuario
             , s.id_plan
-            , to_char(s.inicio_subscripcion, 'dd-mm-yyyy HH24:mi:ss') as inicio_subscripcion 
-            , to_char(s.termino_subscripcion, 'dd-mm-yyyy HH24:mi:ss') as termino_subscripcion 
+            , to_char(s.inicio_subscripcion, 'dd-mm-yyyy') as inicio_subscripcion 
+            , to_char(s.termino_subscripcion, 'dd-mm-yyyy') as termino_subscripcion 
             , cast(extract(epoch from s.inicio_subscripcion::timestamp without time zone) as integer) as tstamp_inicio_sub
             , cast(extract(epoch from s.termino_subscripcion::timestamp without time zone) as integer) as tstamp_termino_sub
             , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
@@ -258,6 +261,7 @@ class GlobalController
         return view('admin.subs', [
             "usuario" => Auth::user(),
             "subs" => $subs,
+            "tipo" => $tipo,
         ]);
     }
 
@@ -287,11 +291,80 @@ class GlobalController
             order by usuario_nombre_completo asc
         ";
 
-        if ($r = DB::select($consulta)) {
-            $datos["usuarios"] = $r;
+        if ($ru = DB::select($consulta)) {
+            $datos["usuarios"] = $ru;
+
+            //planes
+
+            $consulta = "
+                select p.id
+                , p.nombre
+                , p.precio_mensual
+                from planes p 
+                where p.activo is true
+            ";
+
+            if ($rp = DB::select($consulta)) {
+                $datos["planes"] = $rp;
+            }
+            else {
+                $datos["error"] = true;
+            }
         }
         else {
             $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function saveSub(Request $request) {
+        $datos = [
+            "error" => false,
+        ];
+
+        $this->validate($request, [
+            "id_usuario" => "required|exists:usuarios,id",
+            "id_plan" => "required|exists:planes,id",
+            "fecha_desde" => 'required|max:10|date_format:"d-m-Y"',
+            "nmeses" => "required|numeric|min:1|max:24"
+        ], [], [
+            "id_usuario" => "Usuario",
+            "id_plan" => "Plan",
+            "fecha_desde" => "Inicio subscripción",
+            "nmeses" => "Duración"
+        ]);
+
+        DB::beginTransaction();
+
+        //Agregar subscripción
+        $sub = new Subscripciones();
+        $sub->id_usuario = $request["id_usuario"];
+        $sub->id_plan = $request["id_plan"];
+        $sub->inicio_subscripcion = implode('-', array_reverse(explode('-', $request["fecha_desde"]))) . " 00:00:00";
+        $sub->termino_subscripcion = date('Y-m-d', strtotime(date('d-m-Y', strtotime($request["fecha_desde"])) . " +{$request["nmeses"]} month")) . " 00:00:00";
+
+        if (!$sub->save()) {
+            $datos["error"] = true;
+
+            DB::rollBack();
+        }
+        else {
+            //Agregar pago
+            $pago = new Pagos();
+            $pago->id_usuario = $request["id_usuario"];
+            $pago->id_subscripcion = $sub->id;
+            $pago->estado = 0;
+            $pago->total = (new Plan())::find($request["id_plan"])->precio_mensual * intval($request["nmeses"]);
+
+            if (!$pago->save()) {
+                $datos["error"] = true;
+
+                DB::rollBack();
+            }
+            else {
+                DB::commit();
+            }
         }
 
         return response()->json($datos);
@@ -474,4 +547,52 @@ class GlobalController
 
         return response()->json($datos);
     }
+
+    public function extendSub(Request $request) {
+        $datos = [
+            "error" => false,
+        ];
+
+        $this->validate($request, [
+            "id_sub" => "required|exists:subscripciones,id",
+            "nmeses" => "required|numeric|min:1|max:24",
+        ], [], [
+            "id_sub" => "Subscripción",
+            "nmeses" => "Meses a extender",
+        ]);
+
+        DB::beginTransaction();
+
+        $sub = Subscripciones::find($request["id_sub"]);
+        $endBefore = $sub->termino_subscripcion;
+
+        $sub->termino_subscripcion = date('Y-m-d', strtotime(date('d-m-Y', strtotime(explode(' ', $endBefore)[0])) . " +{$request["nmeses"]} month")) . " 00:00:00";
+
+        if (!$sub->save()) {
+            $datos["error"] = true;
+
+            DB::rollBack();
+        }
+        else {
+            //Agregar pago
+            $pago = new Pagos();
+            $pago->id_usuario = $sub->id_usuario;
+            $pago->id_subscripcion = $sub->id;
+            $pago->estado = 0;
+            $pago->total = (new Plan())::find($sub->id_plan)->precio_mensual * intval($request["nmeses"]);
+
+            if (!$pago->save()) {
+                $datos["error"] = true;
+
+                DB::rollBack();
+            }
+            else {
+                DB::commit();
+            }
+        }
+
+        return response()->json($datos);
+    }
+
+
 }

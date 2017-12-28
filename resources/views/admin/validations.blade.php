@@ -369,7 +369,7 @@
                             }
 
                             $('#tbody-verificaciones').html(reloadVerifications());
-                        })
+                        });
                     });
 
                     function reloadVerifications() {
