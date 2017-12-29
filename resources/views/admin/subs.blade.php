@@ -35,7 +35,7 @@
 
     <div class="basic-form-container">
 
-        <div class="admin-tabs">
+        <div class="admin-tabs" style="display: none;">
             <ul>
                 <li><a href="#admin-subs">Subscripciones</a></li>
                 <li><a href="#admin-plans">Planes</a></li>
@@ -54,27 +54,65 @@
                 <br>
                 <br>
 
-                <table class="d-dtable">
+                <table class="d-dtable" style="width: 100%;">
                     <thead>
-                    <tr>
-                        <th>tstamp</th>
-                        <th>tstamp inicio sub</th>
-                        <th>tstamp termino sub</th>
-                        <th style="width: 30px;">ID sub</th>
-                        <th style="width: 50px;">ID usuario</th>
-                        <th>Usuario</th>
-                        <th style="width: 100px;">Plan</th>
-                        <th style="width: 80px;">Precio mensual</th>
-                        <th style="width: 100px;">Inicio</th>
-                        <th style="width: 100px;">Término</th>
-                        <th style="width: 70px;">Acciones</th>
-                    </tr>
+                        <tr>
+                            <th>tstamp</th>
+                            <th>tstamp inicio sub</th>
+                            <th>tstamp termino sub</th>
+                            <th style="width: 30px;">ID sub</th>
+                            <th style="width: 50px;">ID usuario</th>
+                            <th>Usuario</th>
+                            <th style="width: 100px;">Plan</th>
+                            <th style="width: 80px;">Precio mensual</th>
+                            <th style="width: 100px;">Inicio</th>
+                            <th style="width: 100px;">Término</th>
+                            <th style="width: 70px;">Acciones</th>
+                        </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
             <div id="admin-plans">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <button id="btn-add-plan" class="btn btn-success glyphicon glyphicon-plus" style="margin-left: auto;" title="Nuevo plan"></button>
+                </div>
 
+                <br>
+                <br>
+
+                <table class="table table-striped table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th style="text-align: left;">Nombre</th>
+                            <th style="text-align: right; width: 200px;">Precio mensual</th>
+                            <th style="text-align: center; width: 100px;">Activo</th>
+                            <th style="text-align: center; width: 100px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($planes) > 0) {
+                            foreach ($planes as $plan) { ?>
+                                <tr data-plan="{{ json_encode($plan) }}">
+                                    <td>{{ $plan->id }}</td>
+                                    <td>{{ $plan->nombre }}</td>
+                                    <td style="text-align: right;">${{ number_format($plan->precio_mensual, 0, ',', '.') }}</td>
+                                    <td style="text-align: center;">{{ ($plan->activo ? '&#10003;' : 'X') }}</td>
+                                    <td style="text-align: center;">
+                                        <span class="ui-icon ui-icon-pencil edit-plan" style="cursor: pointer;" title="Editar plan"></span>
+                                        <span class="ui-icon ui-icon-trash delete-plan" style="cursor: pointer;" title="Eliminar plan"></span>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
+                        } else { ?>
+                            <tr>
+                                <td colspan="5">No hay planes.</td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -85,6 +123,8 @@
 @section('scripts')
     <script>
         var subs = eval({!! $subs !!});
+
+        mensajes.loading_open();
 
         $(function () {
             $('.admin-tabs').tabs();
@@ -175,9 +215,8 @@
                         "render": function () {
                             return '<div class="val-actions">' +
                                 '<span class="glyphicon glyphicon-retweet sub-extender" title="Extender o renovar subscripción"></span>' +
-//                                '<span class="glyphicon glyphicon-"></span>' +
-//                                '<span class="glyphicon glyphicon-"></span>' +
-//                                '<span class="glyphicon glyphicon-"></span>' +
+                                '<span class="glyphicon glyphicon-usd sub-pagos" title="Ver pagos asociados a la subscripción"></span>' +
+                                '<span class="glyphicon glyphicon-trash sub-delete" title="Eliminar subscripción"></span>' +
                             '</div>';
                         }
                     }
@@ -185,6 +224,10 @@
                 rowCallback: function (row, data) {
                     $(row).data('datos', data);
                 }
+            });
+
+            $('#filter-subs-search').keyup(function () {
+                dtable.search(this.value).draw();
             });
 
             $('#btn-add-sub').click(function () {
@@ -543,11 +586,238 @@
                         }
                     ]
                 });
+            }).on('click', '.sub-pagos', function () {
+                var data = $(this).closest('tr').data('datos');
+
+                sendPost('{{ route('admin.subpagos') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id_sub: data.id_sub
+                }, function (res) {
+                    var subsHtml = '';
+                    var subsTotal = 0;
+
+                    if (res.pagos.length > 0) {
+                        for (var i = 0; i < res.pagos.length; i++) {
+                            var pago = res.pagos[i];
+
+                            subsHtml += '<tr>' +
+                                '<td style="text-align: center;">' + pago.id + '</td>' +
+                                '<td style="text-align: center;">' + pago.fecha_creacion + '</td>' +
+                                '<td style="text-align: right;">$' + pago.total.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '.-</td>' +
+                                '<td style="text-align: center;">' + pago.estado + '</td>' +
+                            '</tr>';
+
+                            subsTotal += parseInt(pago.total);
+                        }
+                    }
+                    else {
+                        subsHtml = '<tr><td colspan="4">No hay pagos asociados.</td></tr>';
+                    }
+
+                    $('<div class="dlg-sub-pagos">' +
+                        '<table class="table table-striped table-hover table-condensed">' +
+                            '<thead>' +
+                                '<th style="text-align: center;">ID</th>' +
+                                '<th style="text-align: center;">Fecha</th>' +
+                                '<th style="text-align: right;">Monto</th>' +
+                                '<th style="text-align: center;">Estado</th>' +
+                            '</thead>' +
+                            '<tbody>' + subsHtml + '</tbody>' +
+                        '</table>' +
+                        '<span class="bold">Total: </span>$' + subsTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") +
+                    '</div>').dialog({
+                        title: "Pagos para la subscripción",
+                        classes: { 'ui-dialog': 'dialog-responsive' },
+                        width: 600,
+                        resizable: false,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        close: function () {
+                            $('.dlg-sub-pagos').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Cerrar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.dlg-sub-pagos').dialog("close");
+                                }
+                            }
+                        ]
+                    });
+                });
+            }).on('click', '.sub-delete', function () {
+                var data = $(this).closest('tr').data('datos');
+
+                sendPost('{{ route('admin.checksub') }}', {
+                    _token: '{{ csrf_token() }}',
+                    id_sub: data.id_sub
+                }, function (res) {
+                    if (res.isActive) {
+                        mensajes.confirmacion_sino('Eliminar subscripciones activas dejará sus pagos asociados al período activo como <b>eliminados</b>. <br><br>¿Desea continuar?', function () {
+                            continuar();
+                        });
+                    }
+                    else {
+                        continuar();
+                    }
+
+                    function continuar() {
+                        sendPost('{{ route('admin.deletesub') }}', {
+                            _token: '{{ csrf_token() }}',
+                            id_sub: data.id_sub,
+                            is_active: res.isActive
+                        }, function () {
+                            mensajes.alerta('Subscripción eliminada correctamente.', 'Subscripción eliminada', function () {
+                               location.reload();
+                            });
+                        });
+                    }
+                });
             });
 
             $('#filter-subs-state').change(function () {
                 window.location = '/admin/subs/' + $(this).val();
             });
+
+            //Planes
+            $('#btn-add-plan').click(function () {
+                adminPlan('add');
+            });
+
+            $('#admin-plans')
+                .on('click', '.edit-plan', function () {
+                    var plan = $(this).closest('tr').data('plan');
+
+                    adminPlan('edit', {
+                        id: plan.id,
+                        nombre: plan.nombre,
+                        precio: plan.precio_mensual,
+                        activo: plan.activo
+                    });
+                })
+                .on('click', '.delete-plan', function () {
+                    var plan = $(this).closest('tr').data('plan');
+
+                    sendPost('{{ route('admin.checkplansubs') }}', {
+                        _token: '{{ csrf_token() }}',
+                        id_plan: plan.id
+                    }, function (res) {
+                        if (res.nsubs > 0) {
+                            mensajes.alerta("El plan tiene subscripciones asociadas. No puede ser eliminado.", "Planes");
+                        }
+                        else {
+                            mensajes.confirmacion_sino("¿Está seguro de eliminar el plan <span class=\"bold\">\"" + plan.nombre + "\"</span>?", function () {
+                                sendPost('{{ route('admin.deleteplan') }}', {
+                                    _token: '{{ csrf_token() }}',
+                                    id_plan: plan.id
+                                }, function () {
+                                    mensajes.alerta("Plan eliminado correctamente.", "Planes", function () {
+                                        location.reload();
+                                    });
+                                });
+                            });
+                        }
+                    });
+                });
+
+            mensajes.loading_close();
+            $('.admin-tabs').fadeIn(300);
         });
+
+        function adminPlan(action, planEdit) {
+            var plan = {
+                id: 0,
+                nombre: '',
+                precio: '',
+                activo: true
+            };
+
+            if (action === 'edit') {
+                plan = planEdit;
+            }
+
+            $('<div class="dlg-admin-plan">' +
+                '<div class="form-group">' +
+                    '<label for="" class="admin-plan-nombre">Nombre:</label>' +
+                    '<input type="text" class="form-control" id="admin-plan-nombre" value="' + plan.nombre + '">' +
+                '</div>' +
+                '<div class="form-group">' +
+                    '<label for="" class="admin-plan-precio">Precio mensual:</label>' +
+                    '<input type="number" min="0" step="1000" class="form-control" id="admin-plan-precio" value="' + plan.precio + '">' +
+                '</div>' +
+                '<div class="checkbox">' +
+                    '<label class="bold"><input type="checkbox" id="admin-plan-activo" ' + (plan.activo ? "checked" : "") + '> Activo</label>' +
+                '</div>' +
+            '</div>').dialog({
+                title: (action === 'add' ? 'Agregar' : 'Editar') + " plan" + (action === 'edit' ? (' ' + plan.nombre) : ''),
+                classes: { 'ui-dialog': 'dialog-responsive' },
+                width: 500,
+                resizable: false,
+                draggable: true,
+                autoOpen: true,
+                modal: true,
+                escapeOnClose: true,
+                close: function () {
+                    $('.dlg-admin-plan').dialog('destroy').remove();
+                },
+                buttons: [
+                    {
+                        text: "Cerrar",
+                        'class': 'btn',
+                        click: function () {
+                            $('.dlg-admin-plan').dialog("close");
+                        }
+                    },
+                    {
+                        text: 'Guardar',
+                        'class': 'btn btn-primary',
+                        click: function () {
+                            if (action === 'edit' && parseInt(plan.precio) !== parseInt($('#admin-plan-precio').val())) {
+                                mensajes.confirmacion_sino("Al cambiar el precio mensual de un plan, los precios de las subscripciones adquiridas con éste <b>NO</b> se verán afectadas, sólo las subscripciones nuevas. <br><br> ¿Desea continuar?", function () {
+                                    continuar();
+                                });
+                            }
+                            else {
+                                continuar();
+                            }
+
+                            function continuar() {
+                                var error = '';
+
+                                if ($.trim($('#admin-plan-nombre').val()).length === 0) {
+                                    error = 'Debe ingresar un nombre al plan.';
+                                }
+                                else if (($('#admin-plan-precio').val().length > 0 && isNaN($('#admin-plan-precio').val())) || parseInt($('#admin-plan-precio').val()) < 0 || $('#admin-plan-precio').val().length === 0) {
+                                    error = 'El precio mensual debe ser numérico mayor o igual a cero.';
+                                }
+
+                                if (error === "") {
+
+                                    plan.precio = $('#admin-plan-precio').val();
+                                    plan.activo = $('#admin-plan-activo').is(':checked');
+                                    plan.nombre = $.trim($('#admin-plan-nombre').val());
+
+                                    sendPost('{{ route('admin.saveplan') }}', {
+                                        _token: '{{ csrf_token() }}',
+                                        action: action,
+                                        plan: plan
+                                    }, function () {
+                                        mensajes.alerta('Plan ' + (action === 'edit' ? 'editado' : 'agregado') + ' correctamente.', 'Planes', function () {
+                                            location.reload();
+                                        });
+                                    });
+                                }
+                                else {
+                                    mensajes.alerta(error, "Error");
+                                }
+                            }
+                        }
+                    }
+                ]
+            });
+        }
     </script>
 @endsection

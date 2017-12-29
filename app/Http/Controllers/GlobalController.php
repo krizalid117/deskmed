@@ -258,10 +258,25 @@ class GlobalController extends Controller
 
         $subs = json_encode(DB::select($consulta));
 
+        $planes = [];
+
+        $consulta = "
+                select p.id
+                , p.nombre
+                , p.precio_mensual
+                , p.activo
+                from planes p
+            ";
+
+        if ($rp = DB::select($consulta)) {
+            $planes = $rp;
+        }
+
         return view('admin.subs', [
             "usuario" => Auth::user(),
             "subs" => $subs,
             "tipo" => $tipo,
+            "planes" => $planes,
         ]);
     }
 
@@ -269,6 +284,7 @@ class GlobalController extends Controller
         $datos = [
             "error" => false,
             "usuarios" => [],
+            "planes" => [],
         ];
 
         $consulta = "
@@ -594,5 +610,159 @@ class GlobalController extends Controller
         return response()->json($datos);
     }
 
+    public function subPagos(Request $request) {
+        $datos = [
+            "error" => false,
+            "pagos" => [],
+        ];
 
+        $consulta = "
+            select p.id
+            , case
+                when p.estado = 0 then 'Normal'
+                when p.estado = 1 then 'Anulado'
+                else 'Eliminado'
+            end as estado
+            , to_char(p.created_at, 'dd-mm-yyyy HH24:mi:ss') as fecha_creacion
+            , p.total
+            from pagos p
+            where p.id_subscripcion = ?
+            order by p.created_at asc
+        ";
+
+        if ($r = DB::select($consulta, [$request["id_sub"]])) {
+            $datos["pagos"] = $r;
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function savePlan(Request $request) {
+        $datos = [
+            "error" => false,
+            "mensaje" => "",
+        ];
+
+        $action = $request["action"];
+        $p = $request["plan"];
+
+        if ($action === "add") {
+            $plan = new Plan();
+
+            $plan->nombre = $p["nombre"];
+            $plan->precio_mensual = $p["precio"];
+            $plan->activo = $p["activo"] === true || $p["activo"] === "true";
+
+            if (!$plan->save()) {
+                $datos["error"] = true;
+            }
+        }
+        else if ($action === 'edit') {
+            $plan = Plan::find($p["id"]);
+
+            $plan->nombre = $p["nombre"];
+            $plan->precio_mensual = $p["precio"];
+            $plan->activo = $p["activo"] === true || $p["activo"] === "true";
+
+            if (!$plan->save()) {
+                $datos["error"] = true;
+            }
+        }
+        else {
+            $datos["error"] = true;
+            $datos["mensaje"] = "Acción incorrecta.";
+        }
+
+        return response()->json($datos);
+    }
+
+    public function checkPlanSubs(Request $request) {
+        $datos = [
+            "error" => false,
+            "nsubs" => 1,
+        ];
+
+        $consulta = "
+            select count(s.*)
+            from subscripciones s
+            where id_plan = ?
+        ";
+
+        if ($r = DB::select($consulta, [$request["id_plan"]])) {
+            $datos["nsubs"] = intval($r[0]->count);
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function deletePlan(Request $request) {
+        $datos = [
+            "error" => false,
+        ];
+
+        if (!Plan::destroy($request["id_plan"])) {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function checkSub(Request $request) {
+        $datos = [
+            "error" => false,
+            "isActive" => true,
+        ];
+
+        $consulta = "
+            select count(s.*)
+            from subscripciones s
+            where id = ?
+            and now() between s.inicio_subscripcion and s.termino_subscripcion
+        ";
+
+        if ($r = DB::select($consulta, [$request["id_sub"]])) {
+            $datos["isActive"] = intval($r[0]->count) > 0;
+        }
+        else {
+            $datos["error"] = true;
+        }
+
+        return response()->json($datos);
+    }
+
+    public function deleteSub(Request $request) {
+        $datos = [
+            "error" => false,
+        ];
+
+        DB::beginTransaction();
+
+        $update = DB::table('pagos')
+            ->where('id_subscripcion', '=', $request["id_sub"])
+            ->update([
+                "estado" => 2,
+            ]);
+
+        if ($update) {
+            if (!Subscripciones::destroy($request["id_sub"])) {
+                $datos["error"] = true;
+                DB::rollback();
+            }
+            else {
+                DB::commit();
+            }
+        }
+        else {
+            $datos["error"] = true;
+            DB::rollback();
+        }
+
+        return response()->json($datos);
+    }
 }

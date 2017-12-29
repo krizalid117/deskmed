@@ -52,6 +52,18 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/admin/savesub', 'GlobalController@saveSub')->name('admin.savesub');
 
         Route::post('/admin/extendsub', 'GlobalController@extendSub')->name('admin.extendsub');
+
+        Route::post('/admin/subpagos', 'GlobalController@subPagos')->name('admin.subpagos');
+
+        Route::post('/admin/saveplan', 'GlobalController@savePlan')->name('admin.saveplan');
+
+        Route::post('/admin/checkplansubs', 'GlobalController@checkPlanSubs')->name('admin.checkplansubs');
+
+        Route::post('/admin/deleteplan', 'GlobalController@deletePlan')->name('admin.deleteplan');
+
+        Route::post('/admin/checksub', 'GlobalController@checkSub')->name('admin.checksub');
+
+        Route::post('/admin/deletesub', 'GlobalController@deleteSub')->name('admin.deletesub');
     });
 
     //Rutas sólo para doctores...
