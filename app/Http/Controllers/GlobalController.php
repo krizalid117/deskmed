@@ -261,12 +261,12 @@ class GlobalController extends Controller
         $planes = [];
 
         $consulta = "
-                select p.id
-                , p.nombre
-                , p.precio_mensual
-                , p.activo
-                from planes p
-            ";
+            select p.id
+            , p.nombre
+            , p.precio_mensual
+            , p.activo
+            from planes p
+        ";
 
         if ($rp = DB::select($consulta)) {
             $planes = $rp;

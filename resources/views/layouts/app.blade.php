@@ -1,6 +1,68 @@
 <?php
 
+    use \Illuminate\Support\Facades\DB;
+
 //    \Debugbar::disable();
+
+    $sub = null;
+
+    $consulta = "
+            select s.id as id_sub
+            , s.id_usuario
+            , s.id_plan
+            , to_char(s.inicio_subscripcion, 'dd-mm-yyyy') as inicio_subscripcion
+            , to_char(s.termino_subscripcion, 'dd-mm-yyyy') as termino_subscripcion
+            , cast(extract(epoch from s.inicio_subscripcion::timestamp without time zone) as integer) as tstamp_inicio_sub
+            , cast(extract(epoch from s.termino_subscripcion::timestamp without time zone) as integer) as tstamp_termino_sub
+            , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+            , cast(extract(epoch from s.updated_at::timestamp without time zone) as integer) as tstamp
+            , concat_ws(' ', u.nombres, u.apellidos) as usuario_nombre_completo
+            , pl.nombre as nombre_plan
+            , pl.precio_mensual::int as precio_mensual_plan
+            , sum(pa.total)::int as total_pagos
+            , case
+                when count(pa) > 0 then
+                    json_agg((
+                        select to_json(a) from (
+                            select pa.total::int
+                            , pa.estado
+                            , to_char(pa.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+                        ) a
+                    ) order by pa.updated_at desc)
+                else '[]'
+            end as pagos
+            from subscripciones s
+            join usuarios u
+              on u.id = s.id_usuario
+            join planes pl
+              on pl.id = s.id_plan
+            join pagos pa
+              on pa.id_subscripcion = s.id
+            where now() between s.inicio_subscripcion and s.termino_subscripcion
+            and s.id_usuario = ?
+            group by s.id, u.id, pl.id
+        ";
+
+    if ($r = DB::select($consulta, [$usuario->id])) {
+        if (count($r)> 0) {
+            $sub = $r[0];
+        }
+    }
+
+    $planes = [];
+
+    $consulta = "
+        select p.id
+        , p.nombre
+        , p.precio_mensual
+        from planes p
+        where p.activo is true
+        order by precio_mensual desc
+    ";
+
+    if ($rp = DB::select($consulta)) {
+        $planes = $rp;
+    }
 
 ?>
 
@@ -207,6 +269,77 @@
             }
             else if ($(this).hasClass('profile-setting-ficha')) {
                 window.location = '{{ route('usuario.ficha') }}';
+            }
+            else if ($(this).hasClass('profile-setting-sub')) {
+
+                profileCerrar();
+
+                @if(!is_null($sub))
+                    {{-- Subscrito --}}
+
+
+                @else
+                    {{-- No subscrito --}}
+
+                    $('<div class="dlg-subscribe">' +
+                        '<table class="table table-striped table-hover table-condensed">' +
+                            '<thead>' +
+                                '<tr>' +
+                                    '<th style="text-align: left;">Nombre</th>' +
+                                    '<th style="text-align: right; width: 200px;">Precio mensual</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>' +
+                                <?php if (count($planes) > 0) {
+                                    foreach ($planes as $plan) { ?>
+                                        '<tr>' +
+                                            '<td>{{ $plan->nombre }}</td>' +
+                                            '<td style="text-align: right;">${{ number_format($plan->precio_mensual, 0, ',', '.') }}</td>' +
+                                        '</tr>' +
+                                    <?php
+                                    }
+                                } else { ?>
+                                    '<tr>' +
+                                        '<td colspan="2">No hay planes.</td>' +
+                                    '</tr>' +
+                                <?php } ?>
+                            '</tbody>' +
+                        '</table>' +
+                        '<hr>' +
+                        'Para subscribirte a Deskmed y empezar a configurar tu horario y a tener consultas médicas online, debes hacer una transferencia bancaria a: <br><br>' +
+                        '<span class="bold">Cuenta corriente: </span> 61874566<br>' +
+                        '<span class="bold">Banco: </span> BCI<br>' +
+                        '<span class="bold">RUT: </span> 18.244.205-4<br>' +
+                        '<span class="bold">Nombre: </span> Patricio Fernando Zúñiga González<br>' +
+                        '<span class="bold">Correo electrónico: </span> patricio.zunigag@gmail.com' +
+                        '<br><br>' +
+                        'Y envía un e-mail a <span class="bold">patricio.zunigag@gmail.com</span> adjuntando el voucher o comprobante e indicando el correo electrónico con el que estás registrado, así como el plan al cual deseas subscribirte. ¡En las próximas 48 horas hábiles se validará tu pago y ya podrás disfrutar al 100% de Deskmed!' +
+                        '<br><br>' +
+                        '<sub>Los precios listados incluyen IVA.</sub>' +
+                    '</div>').dialog({
+                        title: "¡Subscríbete a Deskmed!",
+                        classes: { 'ui-dialog': 'dialog-responsive' },
+                        width: 500,
+                        resizable: false,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        close: function () {
+                            $('.dlg-subscribe').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Cerrar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.dlg-subscribe').dialog("close");
+                                }
+                            }
+                        ]
+                    });
+
+                @endif
             }
             @if ($usuario->id_tipo_usuario === 1)
                 else if ($(this).hasClass('profile-setting-validations')) {

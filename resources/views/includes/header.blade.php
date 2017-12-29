@@ -4,6 +4,7 @@
 
     $currentView = Route::current()->getName();
     $profilePic = UsuarioController::getProfilePic($usuario->profile_pic_path, $usuario->id_sexo);
+
 ?>
 
 <div class="header-container">
@@ -50,23 +51,29 @@
                         </li>
                         @endif
                         @if ($usuario->id_tipo_usuario === 2)
+                        <li class="profile-setting per profile-setting-sub" title="{{ (is_null($sub) ? "¡Subscríbase para configurar horas y tener consultas médicas en línea!" : "Plan: {$sub->nombre_plan}") }}">
+                            <img src="{{ (is_null($sub) ? URL::to('img/x.png') : URL::to('img/check.png')) }}">
+                            <span>
+                                {{ (is_null($sub) ? "No subscrito" : "Subscrito") }}
+                            </span>
+                        </li>
                         <li class="profile-setting per profile-setting-career">
-                            <img src="{{ URL::to('img/doc.png') }}" alt="Perfil profesional">
+                            <img src="{{ URL::to('img/doc.png') }}">
                             <span>Perfil profesional</span>
                         </li>
                         @endif
                         @if ($usuario->id_tipo_usuario === 3)
                         <li class="profile-setting per profile-setting-ficha">
-                            <img src="{{ URL::to('img/ficha.png') }}" alt="Ficha de salud">
+                            <img src="{{ URL::to('img/ficha.png') }}">
                             <span>Ficha de salud</span>
                         </li>
                         @endif
                         <li class="profile-setting per profile-setting-config">
-                            <img src="{{ URL::to('img/settings.png') }}" alt="Cuenta">
+                            <img src="{{ URL::to('img/settings.png') }}">
                             <span>Cuenta</span>
                         </li>
                         <li class="profile-setting per profile-setting-logout">
-                            <img src="{{ URL::to('img/logout.png') }}" alt="Salir">
+                            <img src="{{ URL::to('img/logout.png') }}">
                             <span>Cerrar sesión</span>
                         </li>
                     </ul>
