@@ -1,7 +1,54 @@
 <?php
+    use \Illuminate\Support\Facades\DB;
+
     $isMedico = Auth::user()->id_tipo_usuario === 2 || Auth::user()->id_tipo_usuario === 1;
 
     $today = date("d-m-Y");
+
+    $sub = null;
+
+    $consulta = "
+        select s.id as id_sub
+        , s.id_usuario
+        , s.id_plan
+        , to_char(s.inicio_subscripcion, 'dd-mm-yyyy') as inicio_subscripcion
+        , to_char(s.termino_subscripcion, 'dd-mm-yyyy') as termino_subscripcion
+        , cast(extract(epoch from s.inicio_subscripcion::timestamp without time zone) as integer) as tstamp_inicio_sub
+        , cast(extract(epoch from s.termino_subscripcion::timestamp without time zone) as integer) as tstamp_termino_sub
+        , to_char(s.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+        , cast(extract(epoch from s.updated_at::timestamp without time zone) as integer) as tstamp
+        , concat_ws(' ', u.nombres, u.apellidos) as usuario_nombre_completo
+        , pl.nombre as nombre_plan
+        , pl.precio_mensual::int as precio_mensual_plan
+        , sum(pa.total)::int as total_pagos
+        , case
+            when count(pa) > 0 then
+                json_agg((
+                    select to_json(a) from (
+                        select pa.total::int
+                        , pa.estado
+                        , to_char(pa.updated_at, 'dd-mm-yyyy HH24:mi:ss') as updated_at
+                    ) a
+                ) order by pa.updated_at desc)
+            else '[]'
+        end as pagos
+        from subscripciones s
+        join usuarios u
+          on u.id = s.id_usuario
+        join planes pl
+          on pl.id = s.id_plan
+        join pagos pa
+          on pa.id_subscripcion = s.id
+        where now() between s.inicio_subscripcion and s.termino_subscripcion
+        and s.id_usuario = ?
+        group by s.id, u.id, pl.id
+    ";
+
+    if ($r = DB::select($consulta, [$usuario->id])) {
+        if (count($r)> 0) {
+            $sub = $r[0];
+        }
+    }
 
 //    dd(Auth::user()->doctors()->get());
 ?>
@@ -581,7 +628,7 @@
         <div class="agenda-acciones">
             @if ($isMedico)
                 <div class="btn-group dropup">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Crear&nbsp;{{--</button>--}}
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {!! (is_null($sub) ? "disabled title=\"No puede crear horas sin subscribise\"" : "") !!}>Crear&nbsp;{{--</button>--}}
                     {{--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
                         <span class="caret"></span>
                         {{--<span class="sr-only">Toggle Dropdown</span>--}}
@@ -1133,7 +1180,7 @@
                     @if ($isMedico)
                     , {
                         text: "Guardar",
-                        'class': 'btn btn-primary ' + ((esHoy || esAntigua) && action === "edit" ? "hidden" : ""),
+                        'class': 'btn btn-primary btn-guardar-edicion-hora ' + ((esHoy || esAntigua) && action === "edit" ? "hidden" : ""),
                         click: function () {
                             sendPost('{{ route('user.saveagenda_single') }}', {
                                 _token: '{{ csrf_token() }}',
@@ -1257,6 +1304,9 @@
                 }).on('changeTime', function () {
                     updateEndTime($('.hora-single-time.start'), $('.hora-single-time.end'));
                 });
+
+                $('.btn-guardar-edicion-hora').prop('disabled', {{ (is_null($sub) ? 'true' : 'false') }})
+                    .attr('title', '{{ (is_null($sub) ? 'No puede editar hooras si no está subscrito' : '') }}');
             @endif
         }
 

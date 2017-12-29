@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
                 "apellidos" => "Bustamante Fernandez",
                 "email" => "pacientedemo@gmail.com",
                 "password" => Hash::make("pato123"),
+                "profile_pic_path" => null,
                 "fecha_nacimiento" => "1974-03-26",
                 "id_tipo_usuario" => 3,
                 "id_tipo_identificador" => 1,

@@ -26,8 +26,8 @@ class GlobalAlterVarcharLength extends Migration
      */
     public function down()
     {
-        Schema::table('verificaciones', function (Blueprint $table) {
-            $table->string('antecedente_titulo', 255)->change();
-        });
+        //Schema::table('verificaciones', function (Blueprint $table) {
+          //  $table->string('antecedente_titulo', 255)->change();
+        //});
     }
 }

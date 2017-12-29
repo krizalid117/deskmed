@@ -277,7 +277,32 @@
                 @if(!is_null($sub))
                     {{-- Subscrito --}}
 
-
+                    $('<div class="dlg-subscription">' +
+                        '<span class="bold">Plan: </span>{{ $sub->nombre_plan }}<br>' +
+                        '<span class="bold">Precio mensual: </span>${{ number_format($sub->precio_mensual_plan, 0, ',', '.') }}<br>' +
+                        '<span class="bold">Vence el: </span>{{ $sub->termino_subscripcion }}' +
+                    '</div>').dialog({
+                        title: "Datos de subscripción",
+                        classes: { 'ui-dialog': 'dialog-responsive' },
+                        width: 300,
+                        resizable: false,
+                        draggable: true,
+                        autoOpen: true,
+                        modal: true,
+                        escapeOnClose: true,
+                        close: function () {
+                            $('.dlg-subscription').dialog('destroy').remove();
+                        },
+                        buttons: [
+                            {
+                                text: "Aceptar",
+                                'class': 'btn',
+                                click: function () {
+                                    $('.dlg-subscription').dialog("close");
+                                }
+                            }
+                        ]
+                    });
                 @else
                     {{-- No subscrito --}}
 
